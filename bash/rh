@@ -1,0 +1,4 @@
+#!/bin/bash
+PROGRAM=$1.hs
+shift
+runhaskell -i/home/dsicilia/dev/haskell ~/dev/haskell/$PROGRAM $*

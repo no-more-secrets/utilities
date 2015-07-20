@@ -1,0 +1,9 @@
+#!/bin/bash
+# This program will take an extended regex (must be escaped already if necessary)
+# and will filter all input lines on it returning a list of all matches, however
+# only the contents of the first group in the regex will be shown.  The regex
+# is verified to have at least on group.
+set -o pipefail
+REGEX="$1"
+[[ "$REGEX" =~ .*\(.*\).* ]] || { echo "regex must contain at least one group" 1>&2 && exit 1; }
+egrep -o "$REGEX" | sed -r "s/$REGEX/\1/g"

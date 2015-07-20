@@ -1,0 +1,23 @@
+#!/bin/bash
+# This program will do a "colorized-cat" (i.e., run pygmentize) but
+# in cases where the file name has no extension (and hence pygmentize
+# can't figure out which lexer to use) then it will explicitly tell it
+# to use bash.  Note there are some exceptions to this rule, such as if
+# the file is called "Makefile".
+PYGMENTIZE=/usr/bin/pygmentize
+
+use_bash() {
+    # path components will mess up our checks
+    BASENAME=$(basename "$1")
+    # does it have an extension or is it called Makefile?
+    [[ ! "$BASENAME" =~ .*\..* && "$BASENAME" != "Makefile" ]] && return 0
+    return 1
+}
+
+for i in $*; do
+    if use_bash "$i"; then
+        $PYGMENTIZE -l bash $i
+    else
+        $PYGMENTIZE $i
+    fi
+done
