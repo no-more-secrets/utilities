@@ -1,0 +1,67 @@
+#!/bin/bash
+# This script is used to replace the 'rm' command.  Instead of removing
+# it will will simply move to a special location within your /tmp folder.
+
+\unalias -a
+
+error() {
+    echo "error: $*" >&2
+    exit 1
+}
+
+#######################################################################
+# Process command line args
+all_params="$(echo "$@")"
+
+find_param() {
+    # Is '$1' at the beginning of the string (followed by a word
+    # boundary) or is it preceded by a space (and followed by
+    # a word boundary)?  We need the \s instead of \< because
+    # somehow the "word boundary" mechanism gets messed up by
+    # the "-" sign.
+    regex="^$1\>|\s$1\>"
+    [[ "$all_params" =~ $regex ]]
+}
+
+recursive=; force=;
+
+# Search for any of: -r -f -rf -fr
+{ find_param "-r[f]?" || find_param "-[f]?r"; } && recursive=1
+{ find_param "-f[r]?" || find_param "-[r]?f"; } && force=-f
+
+#######################################################################
+# Setup target folder.  E.g. /tmp/recycle/2016/01/23/16/37
+destination=/tmp/recycle/$(date "+%Y/%m/%d/%H/%M")
+mkdir -p $destination
+
+#######################################################################
+# Iterative through files/folders
+for name in "$@"; do
+    # Filter out all arguments; we've already extracted the info
+    # we need above
+    [[ ${name:0:1} == "-" ]] && continue
+    # If -f is specified then we don't care if the file exists or not
+    test ! -e "$name" -a -z "$force" && error "$name does not exist"
+    # Always an error here even if -f is specified
+    test -d "$name" -a -z "$recursive" && error "$name is a folder"
+
+    # Full path to name
+    full_path="$(readlink -f "$name")"
+    # Replace slashes with underscores
+    flattened=${full_path//\//_}
+    # Replace spaces with # sign
+    flattened=${flattened// /#}
+    move_to=$destination/$flattened
+
+    # If a similiar file exists in the recycle bin the do not
+    # overwrite it
+    test -e "$move_to" -a -z "$force" && {
+        error "$move_to already exists"
+    }
+
+    echo "recycling $name"
+    cmd="/bin/mv $force"
+    $cmd "$name" "$move_to" || {
+        error "failed to run: $cmd \"$name\" \"$move_to\""
+    }
+done
