@@ -1,0 +1,105 @@
+#!/bin/bash
+# Title: iMake / Author: D. Sicilia / Date: Jan 2016 This
+# is an interactive make shell.  It allows you to type in
+# `make` commands and they will be evaluated as would be
+# in a REPL.  The basic idea is that user input is sent
+# into a pipe file and then picked up by `make` which is
+# reading from the pipe file as if it were a make file.
+set -o pipefail
+# How long to wait for make to display output before
+# printing another input prompt (seconds).  The longer
+# it is the safer, but the more lag there will be after
+# hitting enter.
+WAITTIME=.2
+# We will take user input and write it to this pipe, then
+# GNU make will read from this pipe (in place of reading
+# from a makefile).
+pipe="/tmp/makepipe.$$"
+mkfifo $pipe || { echo "Failed to make pipe."; exit 1; }
+# This is not strictly necessary, but it's just a way of
+# keeping the pipe alive until we are ready to close it.
+# Otherwise, when our while loop (which redirects into
+# the pipe) ends then the pipe will be closed before we
+# have a chance to kill the make process that is reading
+# from it and then make will emit an error message (and we
+# don't want to just suppress make error messages because
+# we want the user to see them in general).
+{ while true; do sleep 1; done &>>$pipe & }; keepalive=$!
+# This will run the make program in a loop.  The purpose
+# of the loop is to restart it in the event of an error.
+# The make program will stay running and continue to
+# process new lines (even without restarting) so long as
+# there are no errors.  The make program reads from the
+# pipe as if it were a make file.
+makewrapper() { while true; do make -f $pipe; done; }
+# Run this looping-make in the background and it will
+# simply listen and react to the pipe.
+{ makewrapper & }; makefile=$!
+# This will kill all child processes of $makefile (if
+# they haven't already died) and then kill makefile
+# and keepalive.  Finally it will delete the pipe file.
+# This will be called on Ctrl-C and exit, so in some cases
+# could be called multiple times if the user hits Ctrl-C,
+# because the cleanup function also calls exit itself.
+# If we didn't manually kill these then they would
+# generally stay alive after this program terminated.
+# Note that this only kills the immediate children.
+cleanup() {
+    interrupted=$1
+    to_kill=
+    if ps -p $makefile &>/dev/null; then
+        children="$(pgrep -P $makefile)"
+        # The order here matters: first kill the parent
+        # (which is running in a loop) so that it
+        # doesn't spawn anymore child processes and
+        # then kill any remaining children.
+        to_kill+="$makefile $children"
+    fi
+    to_kill+=" $keepalive"
+    # In practice, the order in which things seem
+    # to happen here is as follows: first we kill
+    # the makewrapper itself and it dies, leaving the
+    # child processes running.  Then it kills the make
+    # invocation, then finally we kill the keepalive.
+    # We need to check each process to see if it still
+    # exists because sometimes killing one process in
+    # the list can cause another to die automatically.
+    for p in $to_kill; do
+        if ps -p $p &>/dev/null; then
+            kill $p
+        fi
+    done
+    rm -f $pipe
+    # If we're exiting because of a signal then add
+    # a new line and exit with an error, otherwise
+    # exit normally.
+    [ ! -z "$interrupted" ] && { echo; exit 1; }
+    exit 0
+}
+# We need to run this cleanup on exit to kill any running
+# processes and to remove the pipe. We send the output
+# to stderr because otherwise any logging or output made
+# by this function would go into the pipe (if the trap
+# happens while we're in the loop sending stdout to the
+# pipe) and will cause GNU make to emit an error message.
+trap "cleanup interrupted >&2" SIGINT SIGTERM
+trap "cleanup             >&2" EXIT
+# Just read input from the user and feed it into the pipe.
+# Each time the user enters a line it will be picked up
+# by GNU make and processed.  If a GNU make command is
+# issued that prints to the screen then that will happen
+# immediately.
+while true; do
+    # Display our command prompt (does not go into pipe)
+    echo -en "\033[33mmake\033[00m> " >&2
+    read line
+    [[ "$line" == "quit" ]] && break
+    [[ "$line" == "q"    ]] && break
+    # If the line is not empty then send it to the
+    # pipe and then wait briefly for GNU make to
+    # respond with output, otherwise our next prompt
+    # will appear before make's output and/or newlines
+    # may end up in the wrong place.
+    [ ! -z "$line" ] && { echo "$line"; sleep $WAITTIME; }
+done >>$pipe
+# The cleanup function will be called here before exiting.
