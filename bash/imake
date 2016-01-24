@@ -1,8 +1,8 @@
 #!/bin/bash
-# Title: iMake / Author: D. Sicilia / Date: Jan 2016 This
-# is an interactive make shell.  It allows you to type in
-# `make` commands and they will be evaluated as would be
-# in a REPL.  The basic idea is that user input is sent
+# Title: iMake / Author: D. Sicilia / Date: Jan 2016
+# This is an interactive make shell.  It allows you to type
+# in `make` commands and they will be evaluated as would
+# be in a REPL.  The basic idea is that user input is sent
 # into a pipe file and then picked up by `make` which is
 # reading from the pipe file as if it were a make file.
 set -o pipefail
@@ -14,7 +14,7 @@ WAITTIME=.2
 # We will take user input and write it to this pipe, then
 # GNU make will read from this pipe (in place of reading
 # from a makefile).
-pipe="/tmp/makepipe.$$"
+pipe="./.makepipe.$$"
 mkfifo $pipe || { echo "Failed to make pipe."; exit 1; }
 # This is not strictly necessary, but it's just a way of
 # keeping the pipe alive until we are ready to close it.
@@ -53,7 +53,7 @@ cleanup() {
         # (which is running in a loop) so that it
         # doesn't spawn anymore child processes and
         # then kill any remaining children.
-        to_kill+="$makefile $children"
+        to_kill+=" $makefile $children"
     fi
     to_kill+=" $keepalive"
     # In practice, the order in which things seem
@@ -92,9 +92,29 @@ trap "cleanup             >&2" EXIT
 while true; do
     # Display our command prompt (does not go into pipe)
     echo -en "\033[33mmake\033[00m> " >&2
-    read line
-    [[ "$line" == "quit" ]] && break
-    [[ "$line" == "q"    ]] && break
+    read line >&2
+    # This will set the $1, $2, etc. variables to the
+    # words in $line.
+    set -- $line
+    [[ "$1" == "quit" || "$1" == "q" ]] && break
+    # The source command takes a make file name as first
+    # arg.  If no file name is given then it will default
+    # to "Makefile".  If the file exists then it will be
+    # sourced into the current session, unless it contains
+    # any errors in which case make will terminate.
+    if [[ "$1" == "source" || "$1" == "." ]]; then
+        filename=$2
+        [ -z "$filename" ] && filename=Makefile
+        if test -f "$filename"; then
+            echo "Sourcing $filename" >&2
+            # Send the make file into the pipe (load it).
+            cat "$filename"
+            sleep $WAITTIME
+        elif test ! -z "$filename"; then
+            echo "$filename not found" >&2
+        fi
+        continue
+    fi
     # If the line is not empty then send it to the
     # pipe and then wait briefly for GNU make to
     # respond with output, otherwise our next prompt
