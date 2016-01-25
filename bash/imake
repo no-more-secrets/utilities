@@ -13,6 +13,8 @@ history -r "$HOME/.imake_history"
 # it is the safer, but the more lag there will be after
 # hitting enter.
 WAITTIME=.2
+# Command prompt.  Does not support colors.
+prompt="make> "
 # Some colors
 c_norm="\033[00m"
 c_orange="\033[33m"
@@ -50,6 +52,7 @@ makewrapper() { while true; do make -f $pipe; done; }
 # generally stay alive after this program terminated.
 # Note that this only kills the immediate children.
 cleanup() {
+    echo -en "$c_norm" # Reset any output colors
     interrupted=$1
     to_kill=
     if ps -p $makefile &>/dev/null; then
@@ -100,16 +103,15 @@ while true; do
     # Display our command prompt (does not go into pipe)
     # and read a line of input.
     #read -p $'\033[33mmake\033[00m: ' -e line >&2
-    echo -en "$c_norm"   >&2 # No color for input line
-    read -e -p 'make> ' line >&2
-    echo -en "$c_orange" >&2 # Color all output response
+    echo -en "$c_norm"      >&2 # No color for input line
+    read -ep "$prompt" line >&2
+    echo -en "$c_orange"    >&2 # Color all output response
     [[ "$line" ]] || continue
     # Add this line to the command history
     history -s "$line"
     # This will set the $1, $2, etc. variables to the
-    # words in $line.
-    set -- $line
-    fst=$1; shift
+    # words in $line, extract the first word, and shift.
+    set -- $line; fst=$1; shift
     [[ $fst == :quit || $fst == :q ]] && break
     # The source command takes a make file name as first
     # arg.  If no file name is given then it will default
@@ -120,7 +122,7 @@ while true; do
         line=; filename=$1
         [ -z "$filename" ] && filename=Makefile
         # If file exists then send it to make
-        [ -f $filename ] && cat "$filename" || {
+        [ -f $filename ] && line="$(cat $filename)" || {
             echo "$filename not found" >&2
         }
     fi
@@ -132,6 +134,6 @@ while true; do
     # respond with output, otherwise our next prompt
     # will appear before make's output and/or newlines
     # may end up in the wrong place.
-    [ ! -z "$line" ] && echo "$line" && sleep $WAITTIME
+    [ ! -z "$line" ] && echo -e "$line" && sleep $WAITTIME
 done >>$pipe
 # The cleanup function will be called here before exiting.
