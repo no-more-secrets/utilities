@@ -40,8 +40,12 @@ for name in "$@"; do
     # Filter out all arguments; we've already extracted the info
     # we need above
     [[ ${name:0:1} == "-" ]] && continue
-    # If -f is specified then we don't care if the file exists or not
-    test ! -e "$name" -a -z "$force" && error "$name does not exist"
+    if test ! -e "$name"; then
+        # File does not exist.  If -f is specified then we don't
+        # care if the file exists or not
+        test -z "$force" && error "$name does not exist"
+        continue
+    fi
     # Always an error here even if -f is specified
     test -d "$name" -a -z "$recursive" && error "$name is a folder"
 
