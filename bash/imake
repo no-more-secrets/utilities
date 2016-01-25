@@ -6,6 +6,8 @@
 # into a pipe file and then picked up by `make` which is
 # reading from the pipe file as if it were a make file.
 set -o pipefail
+# Read in the existing history file from last session
+history -r "$HOME/.imake_history"
 # How long to wait for make to display output before
 # printing another input prompt (seconds).  The longer
 # it is the safer, but the more lag there will be after
@@ -74,6 +76,8 @@ cleanup() {
     # a new line and exit with an error, otherwise
     # exit normally.
     [ ! -z "$interrupted" ] && { echo; exit 1; }
+    # Write the command history for next session
+    history -w "$HOME/.imake_history"
     exit 0
 }
 # We need to run this cleanup on exit to kill any running
@@ -92,7 +96,10 @@ trap "cleanup             >&2" EXIT
 while true; do
     # Display our command prompt (does not go into pipe)
     echo -en "\033[33mmake\033[00m> " >&2
-    read line >&2
+    read -e line >&2
+    [ -z "$line" ] && continue
+    # Add this line to the command history
+    history -s "$line"
     # This will set the $1, $2, etc. variables to the
     # words in $line.
     set -- $line
@@ -115,11 +122,26 @@ while true; do
         fi
         continue
     fi
+    if [[ "$1" == "print" ]]; then
+        echo '$(info $('$2'))'
+        sleep $WAITTIME
+        continue
+    fi
+    if [[ "$1" == "origin" ]]; then
+        echo '$(info $(origin '$2'))'
+        sleep $WAITTIME
+        continue
+    fi
+    if [[ "$1" == "value" ]]; then
+        echo '$(info $(value '$2'))'
+        sleep $WAITTIME
+        continue
+    fi
     # If the line is not empty then send it to the
     # pipe and then wait briefly for GNU make to
     # respond with output, otherwise our next prompt
     # will appear before make's output and/or newlines
     # may end up in the wrong place.
-    [ ! -z "$line" ] && { echo "$line"; sleep $WAITTIME; }
+    echo "$line" && sleep $WAITTIME
 done >>$pipe
 # The cleanup function will be called here before exiting.
