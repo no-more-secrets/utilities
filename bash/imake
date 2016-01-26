@@ -125,7 +125,7 @@ cat /dev/null > $vars_file
 # script, and we need to encode a make command containing
 # an embedded bash command to be executed.  The inner bash
 # command has some of its strings surrounded by single
-# quotes to avoid evalutaing $'s.  However this can cause
+# quotes to avoid evaluating $'s.  However this can cause
 # problems when the values of make variables have single
 # quotes in them.
 echo $'
@@ -147,7 +147,7 @@ echo $'
       )                                                  \
     )
 
-  # Get list of "echo A=val >> '$vars_file';" statements
+  # Get list of "echo A=val >> $vars_file;" statements
   __keyvals =                                            \
     $(foreach _j,$(__filevars),                          \
       echo $(_q)$(_j)=$(call _q_sub,$(value $(_j)))$(_q) \
@@ -173,7 +173,10 @@ reload='
 # it into the pipe.  Each time the user enters a line it
 # will be picked up by GNU make and processed.  If a GNU
 # make command is issued that prints to the screen then
-# that will happen immediately.
+# that will happen immediately.  Also, in each loop
+# iteration, we check to see if make has restarted due to
+# an error, in which case we reload all variables that we
+# have cached in the $vars_file.
 while true; do
     # Display our command prompt (does not go into pipe)
     # and read a line of input.
@@ -220,7 +223,6 @@ while true; do
         # they would otherwise be lost.  Note that we only
         # reload if make has restarted (and we know this by
         # checking for the __noreload marker variable).
-        #echo "$reload"
         echo "$reload"
         sleep $WAITTIME
         # save all of our variables to file
