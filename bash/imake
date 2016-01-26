@@ -175,13 +175,13 @@ while true; do
     # This will set the $1, $2, etc. variables to the
     # words in $line, extract the first word, and shift.
     set -- $line; fst=$1; shift
-    [[ $fst == :quit || $fst == :q ]] && break
+    [[ $fst == quit || $fst == q ]] && break
     # The source command takes a make file name as first
     # arg.  If no file name is given then it will default
     # to "Makefile".  If the file exists then it will be
     # sourced into the current session, unless it contains
     # any errors in which case make will terminate.
-    if [[ $fst == :source || $fst == . ]]; then
+    if [[ $fst == source || $fst == . ]]; then
         line=; filename=$1
         [ -z "$filename" ] && filename=Makefile
         # If file exists then send it to make
@@ -189,9 +189,10 @@ while true; do
             echo "$filename not found" >&2
         }
     fi
-    [ $fst == :info   ] && line='$(info '"$*"')'
-    [ $fst == :origin ] && line='$(info $(origin '$1'))'
-    [ $fst == :value  ] && line='$(info $(value '$1'))'
+    [ $fst == print  ] && line='$(info $('$1'))'
+    [ $fst == info   ] && line='$(info '"$*"')'
+    [ $fst == origin ] && line='$(info $(origin '$1'))'
+    [ $fst == value  ] && line='$(info $(value '$1'))'
     # If the line is not empty then send it to the
     # pipe and then wait briefly for GNU make to
     # respond with output, otherwise our next prompt
