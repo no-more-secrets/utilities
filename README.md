@@ -50,6 +50,15 @@ Collection of Miscellaneous Scripts
                 make> # session are still intact:
                 make> print h
                 5
+
+                make> # Now source a Makefile into the session.
+                make> # (no targets are run).
+                make> . src/Makefile
+
+                make> # At this point all variables loaded
+                make> # from the Makefile are available for
+                make> # inspection/changing in the REPL.
+
                 make> quit
 
     * recycle - Recycle Bin for Linux.  This is intended as a
