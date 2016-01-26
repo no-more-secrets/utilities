@@ -85,6 +85,7 @@ cleanup() {
         fi
     done
     rm -f $pipe
+    rm -f $vars_file
     # If we're exiting because of a signal then add
     # a new line and exit with an error, otherwise
     # exit normally.
@@ -101,19 +102,14 @@ cleanup() {
 # pipe) and will cause GNU make to emit an error message.
 trap "cleanup interrupted >&2" SIGINT SIGTERM SIGPIPE
 trap "cleanup             >&2" EXIT
-
-send_bash() {
-    bash_string="${1//\$/\$\$}"
-    echo '$('"shell $bash_string"')'
-}
-#send_bash 'echo -e "xx\n\n$HOME\n\nyy"'
-
-send_make() { echo "$1" >$pipe; }
-
+# This function (not currently used) will send a string
+# of bash code to make's shell command with $'s escaped.
+# e.g. send_bash 'echo -e "xx\n\n$HOME\n\nyy"'
+send_bash() { echo '$('"shell $${1//\$/\$\$}"')'; }
 # Reloading of Make.  The following bit of code comprises
-# the mechanism for reloading the values of our session
-# variables in the event that make restarts in the
-# background.  This can happen if the user types in an
+# the mechanism for storing and reloading the values of
+# our session variables in the event that make restarts in
+# the background.  This can happen if the user types in an
 # invalid statement.  If make does restart then we lose all
 # variables that we have defined in this session.  So what
 # we do is, after each command is entered by the user and
@@ -121,9 +117,8 @@ send_make() { echo "$1" >$pipe; }
 # the $(value ...) make function) of all variables whose
 # origin is "file" and store them in a file.  Then when
 # make reloads we can just tell make to "include" this
-# file to reload them all.
-#
-# First kill any existing vars from previous sessions.
+# file to reload them all.  First kill any existing vars
+# from previous sessions.
 cat /dev/null > $vars_file
 # There is some complexity in what we are about to do here
 # mainly resulting from quoting issues.  We are in a bash
@@ -133,29 +128,46 @@ cat /dev/null > $vars_file
 # quotes to avoid evalutaing $'s.  However this can cause
 # problems when the values of make variables have single
 # quotes in them.
-send_make "__quote__ = '"
-# This replaces ' with '"'"' i.e., it first breaks
-# the current string with a single quote, then emits a
-# single quote by surrounding it with double quotes, then
-# continues in the original string by emitting another
-# single quote.
-send_make '__quote_sub__   = $(subst $(__quote__),$(__quote__)"$(__quote__)"$(__quote__),$1)'
-# Get a list of all make variables whose origin is 'file'.
-send_make '__filevars__    = $(patsubst %=file,%,$(filter %=file,$(foreach _i,$(.VARIABLES),$(_i)=$(origin $(_i)))))'
-# Make a list of "echo A=val >> .imakevars;" statements
-send_make '__assignments__ = $(foreach _j,$(__filevars__),echo $(__quote__)$(_j)=$(call __quote_sub__,$(value $(_j)))$(__quote__) >> ./'$vars_file';)'
-send_make '__save_vars__   = $(shell cat > ./'$vars_file'; $(__assignments__))'
-# This is the marker that we check for to know if make
-# has reloaded itself.
-send_make '__noreload__  = true'
-sleep $WAITTIME
+echo $'
+  # _q_sub replaces \' with \'"\'"\' i.e., it first breaks
+  # the current string with a single quote, then emits a
+  # single quote by surrounding it with double quotes, then
+  # continues in the original string by emitting another
+  # single quote.
+  _q = \'
+  _q_sub = $(subst $(_q),$(_q)"$(_q)"$(_q),$1)
+
+  # Get a list of all variables whose origin is "file".
+  __filevars =                                           \
+    $(patsubst %=file,%,                                 \
+      $(filter %=file,                                   \
+        $(foreach _i,$(.VARIABLES),                      \
+          $(_i)=$(origin $(_i))                          \
+        )                                                \
+      )                                                  \
+    )
+
+  # Get list of "echo A=val >> '$vars_file';" statements
+  __keyvals =                                            \
+    $(foreach _j,$(__filevars),                          \
+      echo $(_q)$(_j)=$(call _q_sub,$(value $(_j)))$(_q) \
+      >> '$vars_file';                                   \
+    )
+
+  __save_vars = $(shell cat > '$vars_file'; $(__keyvals))
+
+  # This is the marker that we check for to know if make
+  # has reloaded itself.
+  __noreload = true
+' >$pipe
 # This is the make command which reloads the saved
-# variables.
+# variables.  We don't put this in the block of make code
+# above because at this point the variable reloader does
+# not handle defines properly for some reason.
 reload='
-  ifndef __noreload__
-      -include ./'$vars_file'
-      __noreload__ = true
-      $(info reloading...)
+  ifndef __noreload
+    -include '$vars_file'
+    __noreload = true
   endif'
 # Main input loop.  Just read input from the user and feed
 # it into the pipe.  Each time the user enters a line it
@@ -207,11 +219,12 @@ while true; do
         # reload our variable values from this session as
         # they would otherwise be lost.  Note that we only
         # reload if make has restarted (and we know this by
-        # checking for the __noreload__ marker variable).
+        # checking for the __noreload marker variable).
+        #echo "$reload"
         echo "$reload"
         sleep $WAITTIME
         # save all of our variables to file
-        echo '$(__save_vars__)'
+        echo '$(__save_vars)'
         # Here we don't have to wait because the save_vars
         # command will not echo anything to the screen.
     }
