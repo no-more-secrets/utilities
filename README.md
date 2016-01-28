@@ -12,16 +12,16 @@ Collection of Miscellaneous Scripts
 
                 Sample session:
 
-                make> # Set some variables.  What you type will
-                make> # be sent verbatim to make, except for
-                make> # a few select iMake commands.
+                # Set some variables.  What you type will
+                # be sent verbatim to make, except for
+                # a few select iMake commands.
 
                 make> g = 5
                 make> h = $(g)
                 make> $(info $(h))
                 5
 
-                make> # Here are some iMake special commands:
+                # Here are some iMake special commands:
                 make> info h       # like $(info h)
                 h
                 make> info $(h)    # like $(info $(h))
@@ -33,31 +33,31 @@ Collection of Miscellaneous Scripts
                 make> origin h     # $(info $(origin h))
                 file
 
-                make> # We can still type it the long way
+                # We can still type it the long way
                 make> $(info $(origin h))
                 file
 
-                make> # Try a more complex command
+                # Try a more complex command
                 make> info $(patsubst %,%.x,$(h))
                 5.x
 
-                make> # Try an invalid command
+                # Try an invalid command
                 make> invalid_command
                 ./.makepipe.6448:33: *** missing separator.  Stop.
 
-                make> # Make has reloaded due to the error,
-                make> # but our variable values from this
-                make> # session are still intact:
+                # Make has reloaded due to the error,
+                # but our variable values from this
+                # session are still intact:
                 make> print h
                 5
 
-                make> # Now source a Makefile into the session.
-                make> # (no targets are run).
+                # Now source a Makefile into the session.
+                # (no targets are run).
                 make> . src/Makefile
 
-                make> # At this point all variables loaded
-                make> # from the Makefile are available for
-                make> # inspection/changing in the REPL.
+                # At this point all variables loaded
+                # from the Makefile are available for
+                # inspection/changing in the REPL.
 
                 make> quit
 
