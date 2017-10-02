@@ -40,6 +40,12 @@ for name in "$@"; do
     # Filter out all arguments; we've already extracted the info
     # we need above
     [[ ${name:0:1} == "-" ]] && continue
+    if test -L "$name"; then
+        # If it's a symlink then just remove it, no need to recycle it.
+        # Also, probably no need to include the -f here.
+        /bin/rm "$name" || error "failed to remove link $name"
+        continue
+    fi
     if test ! -e "$name"; then
         # File does not exist.  If -f is specified then we don't
         # care if the file exists or not
