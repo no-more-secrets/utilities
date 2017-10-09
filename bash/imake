@@ -1,16 +1,22 @@
 #!/bin/bash
-# Title: iMake / Author: D. Sicilia / Date: Jan 2016
-# This is an interactive make shell.  It allows you to type
-# in `make` commands and they will be evaluated as would
-# be in a REPL.  The basic idea is that user input is sent
-# into a pipe file and then picked up by `make` which is
-# reading from the pipe file as if it were a make file.
+# ╔═════════════════════════════════════════════════════════════╗
+# ║                            iMake                            ║
+# ╚═════════════════════════════════════════════════════════════╝
+# Title: iMake / Author: D. Sicilia / Date: Jan 2016 This  is  an
+# interactive make shell. It allows you to  type  in  `make`  com-
+# mands  and  they  will  be evaluated as would be in a REPL. The
+# basic idea is that user input is sent into a pipe file and then
+# picked  up  by `make` which is reading from the pipe file as if
+# it were a make file.
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                              Help
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 help='
     # Here is a sample session to demonstrate imake
 
-    # Set some variables.  What you type will
-    # be sent verbatim to make, except for
-    # a few select iMake commands.
+    # Set some variables. What you type will be sent verbatim  to
+    # make, except for a few select iMake commands.
 
     make> g = 5
     make> h = $(g)
@@ -42,98 +48,100 @@ help='
     make> invalid_command
     ./.makepipe.6448:33: *** missing separator.  Stop.
 
-    # Make has reloaded due to the error,
-    # but our variable values from this
-    # session are still intact:
+    # Make has reloaded due to the error, but our variable values
+    # from this session are still intact:
     make> print h
     5
 
-    # Now source a Makefile into the session.
-    # (no targets are run).
+    # Now  source  a  Makefile  into the session. (no targets are
+    # run).
     make> . src/Makefile
 
-    # At this point all variables loaded
-    # from the Makefile are available for
-    # inspection/changing in the REPL.
+    # At this point all  variables  loaded  from the Makefile are
+    # available for inspection/changing in the REPL.
 
     make> quit
 '
 [ "$1" == "--help" ] && echo "$help" && exit 0
 
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                          Configuration
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 set -o pipefail
 # Read in the existing history file from last session
 history -r "$HOME/.imake_history"
-# This is a file to which all make variables (with origin
-# 'file') will be written before each new command prompt
-# is displayed.  This is so that if the user enters a
-# command that terminates make then in the next iteration
-# of the loop we just read that file back in so that we
-# don't lose our variables.
+# This is a file to which all make variables (with origin 'file')
+# will  be  written  before  each new command prompt is displayed.
+# This  is  so  that if the user enters a command that terminates
+# make  then  in the next iteration of the loop we just read that
+# file back in so that we don't lose our variables.
 vars_file=".imakevars"
-# How long to wait for make to display output before
-# printing another input prompt (seconds).  The longer
-# it is the safer, but the more lag there will be after
-# hitting enter.
+# How long to wait for make  to display output before printing an-
+# other input prompt (seconds). The longer it is the  safer,  but
+# the more lag there will be after hitting enter.
 WAITTIME=.1
-# Command prompt.  Does not support colors.
+# Command prompt. Does not support colors.
 prompt="make> "
 # Some colors
 c_norm="\033[00m"
 c_orange="\033[33m"
-# We will take user input and write it to this pipe, then
-# GNU make will read from this pipe (in place of reading
-# from a makefile).
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                     Run make in Background
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# We will take user input and write it to  this  pipe,  then  GNU
+# make will read from this pipe (in  place of reading from a make-
+# file).
 pipe="./.makepipe.$$"
 mkfifo $pipe || { echo "Failed to make pipe."; exit 1; }
-# This is not strictly necessary, but it's just a way of
-# keeping the pipe alive until we are ready to close it.
-# Otherwise, when our while loop (which redirects into
-# the pipe) ends then the pipe will be closed before we
-# have a chance to kill the make process that is reading
-# from it and then make will emit an error message (and we
-# don't want to just suppress make error messages because
-# we want the user to see them in general).
+# This is not strictly necessary, but it's just a way of  keeping
+# the  pipe alive until we are ready to close it. Otherwise, when
+# our while loop (which redirects into the pipe)  ends  then  the
+# pipe  will  be  closed before we have a chance to kill the make
+# process  that  is  reading  from  it and then make will emit an
+# error message (and we don't  want  to  just suppress make error
+# messages because we  want  the  user  to  see  them in general).
 { while true; do sleep 1; done &>>$pipe & }; keepalive=$!
-# This will run the make program in a loop.  The purpose
-# of the loop is to restart it in the event of an error.
-# The make program will stay running and continue to
-# process new lines (even without restarting) so long as
-# there are no errors.  The make program reads from the
-# pipe as if it were a make file.
+# This will run the make program in a loop. The  purpose  of  the
+# loop  is  to  restart it in the event of an error. The make pro-
+# gram will stay running and continue to process new lines  (even
+# without  restarting)  so  long as there are no errors. The make
+# program reads from the pipe as if it were a make file.
 makewrapper() { while true; do make -f $pipe; done; }
-# Run this looping-make in the background and it will
-# simply listen and react to the pipe.
+# Run this looping-make  in  the  background  and  it will simply
+# listen and react to the pipe.
 { makewrapper & }; makefile=$!
-# This will kill all child processes of $makefile (if
-# they haven't already died) and then kill makefile
-# and keepalive.  Finally it will delete the pipe file.
-# This will be called on Ctrl-C and exit, so in some cases
-# could be called multiple times if the user hits Ctrl-C,
-# because the cleanup function also calls exit itself.
-# If we didn't manually kill these then they would
-# generally stay alive after this program terminated.
-# Note that this only kills the immediate children.
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                             Cleanup
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# This will kill all child  processes  of $makefile (if they have
+# not already died) and then kill makefile and keepalive. Finally
+# it will delete the pipe file. This will be called on Ctrl-C and
+# exit,  so  in  some cases could be called multiple times if the
+# user  hits Ctrl-C, because the cleanup function also calls exit
+# itself. If we didn't manually kill  these then they would gener-
+# ally stay alive after this program terminated. Note  that  this
+# only kills the immediate children.
 cleanup() {
     echo -en "$c_norm" # Reset any output colors
     interrupted=$1
     to_kill=
     if ps -p $makefile &>/dev/null; then
         children="$(pgrep -P $makefile)"
-        # The order here matters: first kill the parent
-        # (which is running in a loop) so that it
-        # doesn't spawn anymore child processes and
-        # then kill any remaining children.
+        # The order here matters: first kill the parent (which is
+        # running  in  a  loop)  so that it doesn't spawn anymore
+        # child processes and then kill  any  remaining  children.
         to_kill+=" $makefile $children"
     fi
     to_kill+=" $keepalive"
-    # In practice, the order in which things seem
-    # to happen here is as follows: first we kill
-    # the makewrapper itself and it dies, leaving the
-    # child processes running.  Then it kills the make
-    # invocation, then finally we kill the keepalive.
-    # We need to check each process to see if it still
-    # exists because sometimes killing one process in
-    # the list can cause another to die automatically.
+    # In practice, the order in which  things seem to happen here
+    # is as follows: first we kill the makewrapper itself and  it
+    # dies, leaving the child processes running.  Then  it  kills
+    # the make invocation, then finally we kill the keepalive. We
+    # need to check each process  to  see  if  it still exists be-
+    # cause sometimes killing one process in the list  can  cause
+    # another to die automatically.
     for p in $to_kill; do
         if ps -p $p &>/dev/null; then
             kill $p
@@ -141,54 +149,53 @@ cleanup() {
     done
     rm -f $pipe
     rm -f $vars_file
-    # If we're exiting because of a signal then add
-    # a new line and exit with an error, otherwise
-    # exit normally.
+    # If we're exiting because of  a  signal  then add a new line
+    # and exit with an error, otherwise exit normally.
     [ ! -z "$interrupted" ] && { echo; exit 1; }
     # Write the command history for next session
     history -w "$HOME/.imake_history"
     exit 0
 }
 # We need to run this cleanup on exit to kill any running
-# processes and to remove the pipe. We send the output
-# to stderr because otherwise any logging or output made
-# by this function would go into the pipe (if the trap
-# happens while we're in the loop sending stdout to the
-# pipe) and will cause GNU make to emit an error message.
+# processes and to remove the pipe. We send the output to  stderr
+# because otherwise any logging or output made by  this  function
+# would go into the pipe (if the  trap happens while we're in the
+# loop  sending  stdout  to  the pipe) and will cause GNU make to
+# emit an error message.
 trap "cleanup interrupted >&2" SIGINT SIGTERM SIGPIPE
 trap "cleanup             >&2" EXIT
-# This function (not currently used) will send a string
-# of bash code to make's shell command with $'s escaped.
-# e.g. send_bash 'echo -e "xx\n\n$HOME\n\nyy"'
+# This  function  (not currently used) will send a string of bash
+# code to make's shell command with $'s escaped.  e.g.  send_bash
+# 'echo -e "xx\n\n$HOME\n\nyy"'
 send_bash() { echo '$('"shell $${1//\$/\$\$}"')'; }
-# Reloading of Make.  The following bit of code comprises
-# the mechanism for storing and reloading the values of
-# our session variables in the event that make restarts in
-# the background.  This can happen if the user types in an
-# invalid statement.  If make does restart then we lose all
-# variables that we have defined in this session.  So what
-# we do is, after each command is entered by the user and
-# sent to make, we take a snapshot of the values (as in
-# the $(value ...) make function) of all variables whose
-# origin is "file" and store them in a file.  Then when
-# make reloads we can just tell make to "include" this
-# file to reload them all.  First kill any existing vars
-# from previous sessions.
+
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                        Reloading of Make
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# The following bit of code  comprises  the mechanism for storing
+# and  reloading the values of our session variables in the event
+# that make restarts in the background. This can  happen  if  the
+# user  types  in an invalid statement. If make does restart then
+# we lose all variables that we have defined in this session.  So
+# what we do is, after each  command  is  entered by the user and
+# sent to make, we take a  snapshot  of  the values (as in the $(-
+# value ...) make function) of  all  variables  whose  origin  is
+# "file" and store them in a file. Then when make reloads we  can
+# just tell make to "include" this file to reload them all. First
+# kill any existing vars from previous sessions.
 cat /dev/null > $vars_file
-# There is some complexity in what we are about to do here
-# mainly resulting from quoting issues.  We are in a bash
-# script, and we need to encode a make command containing
-# an embedded bash command to be executed.  The inner bash
-# command has some of its strings surrounded by single
-# quotes to avoid evaluating $'s.  However this can cause
-# problems when the values of make variables have single
-# quotes in them.
+# There is some complexity in what we are about to do here mainly
+# resulting from quoting issues. We are  in a bash script, and we
+# need to encode a make command containing an embedded  bash  com-
+# mand  to  be  executed.  The inner bash command has some of its
+# strings surrounded by  single  quotes  to  avoid evaluating $'s.
+# However this can cause problems  when  the  values of make vari-
+# ables have single quotes in them.
 echo $'
-  # _q_sub replaces \' with \'"\'"\' i.e., it first breaks
-  # the current string with a single quote, then emits a
-  # single quote by surrounding it with double quotes, then
-  # continues in the original string by emitting another
-  # single quote.
+  # _q_sub  replaces  \'  with \'"\'"\' i.e., it first breaks the
+  # current string with a single quote, then emits a single quote
+  # by  surrounding  it with double quotes, then continues in the
+  # original string by emitting another single quote.
   _q = \'
   _q_sub = $(subst $(_q),$(_q)"$(_q)"$(_q),$1)
 
@@ -211,30 +218,33 @@ echo $'
 
   __save_vars = $(shell cat > '$vars_file'; $(__keyvals))
 
-  # This is the marker that we check for to know if make
-  # has reloaded itself.
+  # This is the marker that we check  for  to know if make has re-
+  # loaded itself.
   __noreload = true
 ' >$pipe
-# This is the make command which reloads the saved
-# variables.  We don't put this in the block of make code
-# above because at this point the variable reloader does
-# not handle defines properly for some reason.
+# This is the make command which  reloads the saved variables. We
+# don't put this in the block of  make code above because at this
+# point the variable reloader  does  not  handle defines properly
+# for some reason.
 reload='
   ifndef __noreload
     -include '$vars_file'
     __noreload = true
   endif'
-# Main input loop.  Just read input from the user and feed
-# it into the pipe.  Each time the user enters a line it
-# will be picked up by GNU make and processed.  If a GNU
-# make command is issued that prints to the screen then
-# that will happen immediately.  Also, in each loop
-# iteration, we check to see if make has restarted due to
-# an error, in which case we reload all variables that we
-# have cached in the $vars_file.
+
+# ╔═════════════════════════════════════════════════════════════╗
+# ║                       Main input loop                       ║
+# ╚═════════════════════════════════════════════════════════════╝
+# Just read input from the user  and  feed it into the pipe. Each
+# time the user enters a line it will be picked up  by  GNU  make
+# and  processed.  If a GNU make command is issued that prints to
+# the  screen  then  that  will happen immediately. Also, in each
+# loop iteration, we check to see if make has restarted due to an
+# error, in which  case  we  reload  all  variables  that we have
+# cached in the $vars_file.
 while true; do
-    # Display our command prompt (does not go into pipe)
-    # and read a line of input.
+    # Display our command prompt (does not go into pipe) and read
+    # a line of input.
     #read -p $'\033[33mmake\033[00m: ' -e line >&2
     echo -en "$c_norm"      >&2 # No color for input line
     read -ep "$prompt" line >&2
@@ -242,15 +252,15 @@ while true; do
     [[ "$line" ]] || continue
     # Add this line to the command history
     history -s "$line"
-    # This will set the $1, $2, etc. variables to the
-    # words in $line, extract the first word, and shift.
+    # This will set the $1,  $2,  etc.  variables to the words in
+    # $line, extract the first word, and shift.
     set -- $line; fst=$1; shift
     [[ $fst == quit || $fst == q ]] && break
-    # The source command takes a make file name as first
-    # arg.  If no file name is given then it will default
-    # to "Makefile".  If the file exists then it will be
-    # sourced into the current session, unless it contains
-    # any errors in which case make will terminate.
+    # The  source command takes a make file name as first arg. If
+    # no file name is given then it will  default  to  "Makefile".
+    # If the file exists then it will be sourced into the current
+    # session, unless it contains any  errors  in which case make
+    # will terminate.
     if [[ $fst == source || $fst == . ]]; then
         line=; filename=$1
         [ -z "$filename" ] && filename=Makefile
@@ -263,27 +273,26 @@ while true; do
     [ $fst == info   ] && line='$(info '"$*"')'
     [ $fst == origin ] && line='$(info $(origin '$1'))'
     [ $fst == value  ] && line='$(info $(value '$1'))'
-    # If the line is not empty then send it to the
-    # pipe and then wait briefly for GNU make to
-    # respond with output, otherwise our next prompt
-    # will appear before make's output and/or newlines
-    # may end up in the wrong place.
+    # If  the line is not empty then send it to the pipe and then
+    # wait briefly for GNU make to respond with output, otherwise
+    # our next prompt will appear  before  make's  output  and/or
+    # newlines may end up in the wrong place.
     [ ! -z "$line" ] && {
         echo -e "$line"
         sleep $WAITTIME
-        # If the command we just sent caused an error then
-        # make will have terminated and reloaded (if we've
-        # waited long enough...) and so now we need to
-        # reload our variable values from this session as
-        # they would otherwise be lost.  Note that we only
-        # reload if make has restarted (and we know this by
-        # checking for the __noreload marker variable).
+        # If the command we just sent caused an error  then  make
+        # will have terminated and reloaded (if we've waited long
+        # enough...)  and  so  now we need to reload our variable
+        # values  from  this  session  as they would otherwise be
+        # lost. Note that we  only  reload  if make has restarted
+        # (and we know this by checking for the __noreload marker
+        # variable).
         echo "$reload"
         sleep $WAITTIME
         # save all of our variables to file
         echo '$(__save_vars)'
-        # Here we don't have to wait because the save_vars
-        # command will not echo anything to the screen.
+        # Here  we  don't  have to wait because the save_vars com-
+        # mand will not echo anything to the screen.
     }
 done >>$pipe
 # The cleanup function will be called here before exiting.

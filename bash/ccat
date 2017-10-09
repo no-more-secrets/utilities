@@ -1,4 +1,7 @@
 #!/bin/bash
+# ╔═════════════════════════════════════════════════════════════╗
+# ║                       Colorized `cat`                       ║
+# ╚═════════════════════════════════════════════════════════════╝
 # This program will do a "colorized-cat" (i.e.,  run  pygmentize)
 # but  in  cases  where the file name has no extension (and hence
 # pygmentize can't figure out which  lexer  to  use) then it will

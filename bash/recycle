@@ -1,6 +1,10 @@
 #!/bin/bash
-# This script is used to replace the 'rm' command.  Instead of removing
-# it will will simply move to a special location within your /tmp folder.
+# ╔═════════════════════════════════════════════════════════════╗
+# ║                    Commandline Recycler                     ║
+# ╚═════════════════════════════════════════════════════════════╝
+# This script is used to replace the 'rm' command. Instead of  re-
+# moving it will will simply move to a  special  location  within
+# your /tmp folder.
 
 \unalias -a
 
@@ -9,16 +13,17 @@ error() {
     exit 1
 }
 
-#######################################################################
-# Process command line args
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                    Process command line args
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 all_params="$(echo "$@")"
 
 find_param() {
-    # Is '$1' at the beginning of the string (followed by a word
-    # boundary) or is it preceded by a space (and followed by
-    # a word boundary)?  We need the \s instead of \< because
-    # somehow the "word boundary" mechanism gets messed up by
-    # the "-" sign.
+    # Is '$1' at the beginning of the string (followed by a  word
+    # boundary) or is it preceded by  a  space (and followed by a
+    # word boundary)? We need the \s instead of \< because
+    # somehow the "word boundary" mechanism gets messed up by the
+    # "-" sign.
     regex="^$1\>|\s$1\>"
     [[ "$all_params" =~ $regex ]]
 }
@@ -29,25 +34,29 @@ recursive=; force=;
 { find_param "-r[f]?" || find_param "-[f]?r"; } && recursive=1
 { find_param "-f[r]?" || find_param "-[r]?f"; } && force=-f
 
-#######################################################################
-# Setup target folder.  E.g. /tmp/recycle/2016/01/23/16/37
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                       Setup target folder
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+# e.g. /tmp/recycle/2016/01/23/16/37
 destination=/tmp/recycle/$(date "+%Y/%m/%d/%H/%M")
 mkdir -p $destination
 
-#######################################################################
-# Iterative through files/folders
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+#                 Iterative through files/folders
+# ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 for name in "$@"; do
-    # Filter out all arguments; we've already extracted the info
+    # Filter  out all arguments; we've already extracted the info
     # we need above
     [[ ${name:0:1} == "-" ]] && continue
     if test -L "$name"; then
-        # If it's a symlink then just remove it, no need to recycle it.
-        # Also, probably no need to include the -f here.
+        # If it's a symlink then  just  remove  it, no need to re-
+        # cycle it. Also, probably no  need  to  include  the  -f
+        # here.
         /bin/rm "$name" || error "failed to remove link $name"
         continue
     fi
     if test ! -e "$name"; then
-        # File does not exist.  If -f is specified then we don't
+        # File does not exist. If -f is specified then  we  don't
         # care if the file exists or not
         test -z "$force" && error "$name does not exist"
         continue
@@ -63,7 +72,7 @@ for name in "$@"; do
     flattened=${flattened// /#}
     move_to=$destination/$flattened
 
-    # If a similiar file exists in the recycle bin the do not
+    # If a similiar file exists  in  the  recycle  bin the do not
     # overwrite it
     test -e "$move_to" -a -z "$force" && {
         error "$move_to already exists"
