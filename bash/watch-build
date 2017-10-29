@@ -8,4 +8,5 @@ bash_script='
     echo "-----------------------------------------------------------"
 '
 
-find src -name "*.?pp" | entr -c /bin/bash -c "$bash_script"
+where="${1-:src}"
+find "$where" -name "*.?pp" | entr -c /bin/bash -c "$bash_script"
