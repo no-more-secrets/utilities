@@ -264,8 +264,17 @@ while true; do
     if [[ $fst == source || $fst == . ]]; then
         line=; filename=$1
         [ -z "$filename" ] && filename=Makefile
-        # If file exists then send it to make
-        [ -f $filename ] && line="$(cat $filename)" || {
+        # If file exists then send it to make. Instead of reading
+        # the  contents  of  the  file and sending it to make, we
+        # will  just  use  make's  own include statement to do so.
+        # This is not only simpler, but works better because some
+        # make  files  rely  on  the  MAKEFILE_LIST  variable con-
+        # taining the path to the make  file  on  the  end  while
+        # loading (which make normally  does  when loading a make-
+        # file).  If  we just read in the contents and send it to
+        # make then this won't happen unless were to do  it  manu-
+        # ally.
+        [ -f $filename ] && line="include $filename" || {
             echo "$filename not found" >&2
         }
     fi
