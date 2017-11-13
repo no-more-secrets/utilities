@@ -2,11 +2,12 @@
 # This  script  will  find all hpp or cpp files under the current
 # folder and will then enter into  a polling loop waiting for any
 # of  them  to change. As soon as one changes then a make command
-# will be run.
-bash_script='
-    /usr/bin/make;
-    echo "-----------------------------------------------------------"
-'
+# will be run with a target if one has been specified.
+target="$1"
 
-where="${1-:src}"
-find "$where" -name "*.?pp" | entr -c /bin/bash -c "$bash_script"
+bash_script="
+    /usr/bin/make $target
+    echo '-----------------------------------------------------------'
+"
+
+find . -name "*.?pp" | entr -c /bin/bash -c "$bash_script"
