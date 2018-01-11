@@ -3,10 +3,9 @@
 # folder and will then enter into  a polling loop waiting for any
 # of  them  to change. As soon as one changes then a make command
 # will be run with a target if one has been specified.
-target="$1"
 
 bash_script="
-    /usr/bin/make $target
+    /usr/bin/make "$@"
     echo '-----------------------------------------------------------'
 "
 
