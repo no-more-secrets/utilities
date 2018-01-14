@@ -1,0 +1,22 @@
+#!/bin/bash
+set -e
+
+minutes=$1
+
+dev=$(upower -e | grep BAT)
+
+get() {
+    percentage=$(upower -i $dev | awk '/percentage/ { print $2 }')
+    echo "$(date)" "|" $percentage
+}
+
+get
+
+(( minutes > 0 )) && {
+    while true; do
+        sleep $(( minutes * 60 ))
+        get
+    done
+}
+
+true
