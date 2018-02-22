@@ -16,13 +16,23 @@ install_to="/Users/dsicilia/dev/tools"
 c_compiler=/opt/local/bin/x86_64-apple-darwin16-gcc-mp-7
 cxx_compiler=/opt/local/bin/x86_64-apple-darwin16-g++-mp-7
 
+# When this is 1 it will build a gcc that can only build 64 bit
+# binaries.  This is useful because it then won't require that
+# the system have 32-bit devel packages installed.  If it is 0,
+# then it will attempt to build a gcc that can produce either
+# 64- or 32-bit binaries, but you must have the 32 devel files
+# and packages installed on the system otherwise the configure
+# will fail (and probably the build will take longer when it is
+# 0).
+only_64bit=0
+
 # ╔═════════════════════════════════════════════════════════════╗
 # ║                  Shouldn't Have to Change                   ║
 # ╚═════════════════════════════════════════════════════════════╝
 program_suffix=${version//_/-}
 install_prefix="$install_to/gcc-$program_suffix"
 git_repo=git://gcc.gnu.org/git/gcc.git
-build_logs=$install_prefix/build_logs
+build_logs=$install_prefix/build-logs
 work_prefix=/tmp # may not exist yet
 work_folder=gcc  # may not exist yet
 work_path=$work_prefix/$work_folder
@@ -34,7 +44,26 @@ export CXX=$cxx_compiler
 
 c_norm="\033[00m"
 c_green="\033[32m"
+c_green="\033[32m"
 c_red="\033[31m"
+
+# The following flags probably do a bit more than just control
+# whether gcc can build 32 bit or not, but that's all we're using
+# it for here.
+(( only_64bit )) && multilib="--disable-multilib" \
+                 || multilib="--enable-multilib"
+
+# ╔═════════════════════════════════════════════════════════════╗
+# ║                            Check                            ║
+# ╚═════════════════════════════════════════════════════════════╝
+fail() {
+    echo "$@"
+    return 1
+}
+
+# Check some things for the user
+[[ -x "$c_compiler"   ]] || fail "$c_compiler does not exist."
+[[ -x "$cxx_compiler" ]] || fail "$cxx_compiler does not exist."
 
 # ╔═════════════════════════════════════════════════════════════╗
 # ║                          Utilities                          ║
@@ -42,10 +71,19 @@ c_red="\033[31m"
 run() {
     local desc=$1
     local func=$2
+
     local dots="$desc .........................................."
     local regex='(.{40}).*'
     [[ "$dots" =~ $regex ]]; dots="${BASH_REMATCH[1]}"
     echo -n "$dots "
+
+    local marker="$func.finished"
+    # If we have already completed this step then just skip.
+    if [[ -f "$build_logs/$marker" ]]; then
+        echo -e "${c_green}DONE${c_norm}"
+        return 0
+    fi
+
     mkdir -p $build_logs
     # current_log_file should not be  local  because  it is refer-
     # enced by the die() function.
@@ -55,6 +93,9 @@ run() {
     # screen if necessary.
     $func 3>&1 1>>$current_log_file 2>>$current_log_file
     echo -e "${c_green}SUCCESS${c_norm}"
+    # touch marker file so that we don't repeat this step if
+    # we fail and run again.
+    touch $build_logs/$func.finished
 }
 
 die() {
@@ -82,15 +123,32 @@ init() {
 # ╚═════════════════════════════════════════════════════════════╝
 clone() {
     cd $work_prefix
-    rm -rf $work_folder
 
-    git clone $git_repo $work_folder
-    cd $work_folder
-
+    # Hopefully gcc always follows this convention for mapping
+    # version number to tag name.
     local tag=gcc-$version-release
+
+    # Don't remove it if it already exists because it takes too
+    # long to clone again, so if it exists then just run a git
+    # clean on it.
+
+    if [[ ! -d $work_folder ]]; then
+        # Do a shallow clone only of the tag
+        git clone --depth=1 --branch=$tag $git_repo $work_folder
+        cd $work_folder
+    else
+        cd $work_folder
+        # f=force, x=remove ignored files, d=remove directories,
+        # f=force (#2) meaning move sub .git folders.
+        git clean -fxdf
+    fi
 
     git checkout $tag
 }
+
+# Needs to be a different name because we need to perform this
+# function twice.
+clone2() { clone "$@"; }
 
 # ╔═════════════════════════════════════════════════════════════╗
 # ║                   Download Prerequisites                    ║
@@ -162,6 +220,7 @@ build_gcc() {
 
     ../configure CC=$c_compiler                \
                  CXX=$cxx_compiler             \
+                 $multilib                     \
                  --with-gmp=$install_prefix    \
                  --with-mpfr=$install_prefix   \
                  --with-mpc=$install_prefix    \
@@ -188,8 +247,8 @@ test_gcc() {
         #include <iostream>
 
         int main() {
-            std::cout << \"Hello from gcc-$program_suffix!\"
-                      << std::endl;
+            std::cout << \"Hello from gcc version: \"
+                      << __VERSION__ << std::endl;
             return 0;
         }
     "
@@ -213,7 +272,7 @@ main() {
     run "building isl"              build_isl
     run "building mpfr"             build_mpfr
     run "building mpc"              build_mpc
-    run "cloning gcc"               clone
+    run "cloning gcc"               clone2
     run "building gcc"              build_gcc
     run "testing gcc"               test_gcc
 }
