@@ -1,5 +1,5 @@
-#!/usr/bin/env stack
--- stack --resolver lts-9.21 --install-ghc runghc
+#!/usr/bin/stack
+-- stack --resolver lts-9.21 runghc
 
 import Text.Printf (printf)
 
@@ -12,54 +12,86 @@ blueRate   = yellowRate*3.0
 -- Per Query ------------------------------------------------------------
 
 desiredItemsPerSecond :: Float
-desiredItemsPerSecond = 0.7 -- how many per second do we need
+desiredItemsPerSecond = 2.0 -- how many per second do we need
 
 itemName       = "Blue Circuit" -- what is being produced
-timePerCycle   = 10.0     -- seconds
-itemMultiplier = 1.0      -- how many you get in itemTime
+timePerCycle   = 10.0           -- seconds
+itemMultiplier =  1.0           -- how many you get in itemTime
 
 ingredients :: [(String, Float)]
 ingredients = [
-  ("Red Circuit",   2.0),
-  ("Green Circuit", 20.0),
-  ("Sulfuric Acid", 5.0)
+  ("red circuits",   2.0),
+  ("green circuits", 20.0)--,
+  --("sulfuric acids", 5.0)
   ]
 
-cyclesPerSecond = 1.0/timePerCycle
-
 -- Per Factory ----------------------------------------------------------
+
+cyclesPerSecond = 1.0/timePerCycle
 
 itemsPerFactoryPerCycle  = itemMultiplier
 itemsPerFactoryPerSecond = itemsPerFactoryPerCycle*cyclesPerSecond
 
 depPerFactoryPerCycle :: Float -> Float
-depPerFactoryPerCycle inputQuantityPerFactoryPerCycle = inputQuantityPerFactoryPerCycle
+depPerFactoryPerCycle inputQuantityPerFactoryPerCycle =
+    inputQuantityPerFactoryPerCycle
 
 depPerFactoryPerSecond :: Float -> Float
-depPerFactoryPerSecond inputQuantityPerFactoryPerCycle = depPerFactoryPerCycle inputQuantityPerFactoryPerCycle * cyclesPerSecond
+depPerFactoryPerSecond inputQuantityPerFactoryPerCycle =
+    depPerFactoryPerCycle inputQuantityPerFactoryPerCycle * cyclesPerSecond
 
 -- Total ----------------------------------------------------------------
 
 numFactories  = desiredItemsPerSecond/itemsPerFactoryPerSecond
 
-depPerSecond inputQuantityPerFactoryPerCycle = depPerFactoryPerSecond inputQuantityPerFactoryPerCycle * numFactories
+depPerSecond :: Float -> Float
+depPerSecond inputQuantityPerFactoryPerCycle =
+    depPerFactoryPerSecond inputQuantityPerFactoryPerCycle * numFactories
 
-beltsStr :: Float -> String
-beltsStr x = printf "[%2.3fy, %2.3fr, %2.3fb]" (x/yellowRate) (x/redRate) (x/blueRate) 
+roundUpToHalf :: Float -> Float
+roundUpToHalf x = case closeEnough of
+                   True  -> x
+                   False -> fromIntegral (ceiling (2.0*x)) / 2.0
+ where
+   nearestTwiceInteger = fromIntegral $ round (2.0*x)
+   distanceFromNearestInteger = abs (nearestTwiceInteger-2.0*x)
+   closeEnough = distanceFromNearestInteger < 0.01
 
-depStr :: (String, Float) -> String
-depStr (name, inputQuantityPerFactoryPerCycle) = r
+toBelts :: Float -> (Float, Float, Float)
+toBelts rate = (roundUpToHalf $ rate/yellowRate
+               ,roundUpToHalf $ rate/redRate
+               ,roundUpToHalf $ rate/blueRate
+               ) 
+
+uncurry3 f (x, y, z) = f x y z
+
+depStr :: (String, Float, (Float, Float, Float)) -> String
+depStr (name, rate, (by, br, bb)) = r
   where
-    f = printf "%-30s" (printf "Total Input of %ss:" name :: String) :: String
-    r = printf "%s %7s/s  %s" f rateStr (beltsStr rate) :: String
-    rate = depPerSecond inputQuantityPerFactoryPerCycle
-    rateStr = printf "%2.3f" rate :: String
+    f = printf "%-30s" (printf "%s" name :: String)
+    r = printf "%s %9s      %s" (f :: String) rateStr beltsStr
+    rateStr  = if rate < 0 then "" else printf "%2.1f/s" rate
+    beltsStr = printf "%2.1f     %2.1f     %2.1f" by br bb :: String
+
+sumTuple3 :: (Num a) => [(a,a,a)] -> (a,a,a)
+sumTuple3 xs = (sum x, sum y, sum z)
+  where (x,y,z) = unzip3 xs
+
+h = unzip3
 
 main :: IO ()
 main = do
-    printf "To produce %f %ss per second:\n" desiredItemsPerSecond itemName
+    printf "To produce %f %ss/second:\n" desiredItemsPerSecond itemName
     printf "\n"
-    printf "  - Number of Factories: %f\n" numFactories
+    pairs <- return ((ceiling (numFactories/2.0)) :: Int)
+    printf "  Number of Factories: %f (%d pairs)\n" numFactories pairs
     printf "\n"
-    putStr $ unlines $ map (printf "  - %s") $ map depStr $ ingredients
+    printf "  Total input of                  Quantity   Yellow     Red    Blue\n"
+    printf "  -----------------------------------------------------------------\n"
+    rates <- return (map depPerSecond . map snd $ ingredients)
+    belts <- return (map toBelts rates)
+    names <- return (map fst ingredients)
+    putStr $ unlines $ map (printf "  %s") $ map depStr $ zip3 names rates belts
+    printf "  -----------------------------------------------------------------\n"
+    putStr $ printf "  %s\n" $ depStr ("total", -1, (sumTuple3 belts))
     printf "\n"
