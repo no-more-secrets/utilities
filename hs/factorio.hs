@@ -12,7 +12,7 @@ blueRate   = yellowRate*3.0
 -- Per Query ------------------------------------------------------------
 
 desiredItemsPerSecond :: Float
-desiredItemsPerSecond = 2.0 -- how many per second do we need
+desiredItemsPerSecond = 25.0 -- how many per second do we need
 
 itemName       = "Blue Circuit" -- what is being produced
 timePerCycle   = 10.0           -- seconds
@@ -69,9 +69,12 @@ depStr :: (String, Float, (Float, Float, Float)) -> String
 depStr (name, rate, (by, br, bb)) = r
   where
     f = printf "%-30s" (printf "%s" name :: String)
-    r = printf "%s %9s      %s" (f :: String) rateStr beltsStr
+    r = printf "%s %9s %s" (f :: String) rateStr beltsStr
     rateStr  = if rate < 0 then "" else printf "%2.1f/s" rate
-    beltsStr = printf "%2.1f     %2.1f     %2.1f" by br bb :: String
+    yellowBeltStr = printf "%2.1f" by :: String
+    redBeltStr    = printf "%2.1f" br :: String
+    blueBeltStr   = printf "%2.1f" bb :: String
+    beltsStr = printf "%8s%8s%8s" yellowBeltStr redBeltStr blueBeltStr :: String
 
 sumTuple3 :: (Num a) => [(a,a,a)] -> (a,a,a)
 sumTuple3 xs = (sum x, sum y, sum z)
