@@ -23,7 +23,10 @@ git clone --depth=1 --branch=v$version https://github.com/vim/vim
 
 cd vim
 
-prefix="/home/dsicilia/dev/tools/vim-$version"
+tools="$HOME/dev/tools"
+mkdir -p "$tools"
+
+prefix="$tools/vim-$version"
 
 ./configure --enable-python3interp=yes --prefix=$prefix
 
