@@ -75,8 +75,14 @@ mkdir build
 cd build
 cmake -G "Unix Makefiles" $cmake_vars ../llvm
 
-threads=$(nproc --all)
+if which nproc 2>/dev/null; then
+    threads=$(nproc --all)
+else
+    threads=5
+fi
 
 make -j$threads
+
+make -j$threads check-clang # optional
 
 make install
