@@ -45,7 +45,6 @@ echo "  To folder: $install"
 echo
 echo -n "Press enter to continue..."
 read
-exit 0
 
 cd $work
 
