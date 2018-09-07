@@ -42,6 +42,14 @@ languages="c,c++"
 export CC=$c_compiler
 export CXX=$cxx_compiler
 
+# Some how the flags in the configure commands that tell gcc
+# where dependencies are located (in the install_prefix) still
+# doesn't seem to prevent build errors where the build cannot
+# locate e.g. libisl, even though it was built and exists in
+# the install_prefix.
+export LIBRARY_PATH="$install_prefix:$LIBRARY_PATH"
+export LD_LIBRARY_PATH="$install_prefix:$LD_LIBRARY_PATH"
+
 c_norm="\033[00m"
 c_green="\033[32m"
 c_green="\033[32m"
