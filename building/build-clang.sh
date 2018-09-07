@@ -30,7 +30,7 @@ else
     candidate=$(svn ls http://llvm.org/svn/llvm-project/llvm/tags/$release | gstt rc)
 fi
 
-repo_root=$release/$candidate
+repo_root=tags/$release/$candidate
 suffix=v${release/RELEASE_}.$candidate
 install=$HOME/dev/tools/llvm-$suffix
 
