@@ -39,5 +39,7 @@ $prefix/bin/vim --version
 rm -f ~/bin/vim
 rm -f ~/bin/vimdiff
 
+mkdir -p ~/bin
+
 ln -s $prefix/bin/vim ~/bin/vim
 ln -s $prefix/bin/vimdiff ~/bin/vimdiff
