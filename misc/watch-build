@@ -9,4 +9,4 @@ bash_script="
     echo '-----------------------------------------------------------'
 "
 
-find . -name "*.?pp" | entr -c /bin/bash -c "$bash_script"
+find . \( -name "*.?pp" -or -name "*.c" \) | entr -c /bin/bash -c "$bash_script"
