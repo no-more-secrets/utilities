@@ -13,8 +13,8 @@ threads=4
 # The gcc folder will be placed inside this one.
 install_to="$HOME/dev/tools"
 # Should be gcc (not clang as it might be on mac).
-c_compiler=/opt/local/bin/x86_64-apple-darwin16-gcc-mp-7
-cxx_compiler=/opt/local/bin/x86_64-apple-darwin16-g++-mp-7
+c_compiler=/usr/bin/gcc
+cxx_compiler=/usr/bin/g++
 
 # When this is 1 it will build a gcc that can only build 64 bit
 # binaries.  This is useful because it then won't require that
@@ -24,7 +24,7 @@ cxx_compiler=/opt/local/bin/x86_64-apple-darwin16-g++-mp-7
 # and packages installed on the system otherwise the configure
 # will fail (and probably the build will take longer when it is
 # 0).
-only_64bit=0
+only_64bit=1
 
 # ╔═════════════════════════════════════════════════════════════╗
 # ║                  Shouldn't Have to Change                   ║
@@ -47,8 +47,8 @@ export CXX=$cxx_compiler
 # doesn't seem to prevent build errors where the build cannot
 # locate e.g. libisl, even though it was built and exists in
 # the install_prefix.
-export LIBRARY_PATH="$install_prefix:$LIBRARY_PATH"
-export LD_LIBRARY_PATH="$install_prefix:$LD_LIBRARY_PATH"
+export LIBRARY_PATH="$install_prefix/lib"
+export LD_LIBRARY_PATH="$install_prefix/lib"
 
 c_norm="\033[00m"
 c_green="\033[32m"
