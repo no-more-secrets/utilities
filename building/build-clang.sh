@@ -18,20 +18,41 @@ gstt() {
   grep $1 | sort -V | tail -n1 | tr -d '/'
 }
 
-# Get latest llvm version
-release=$(svn ls http://llvm.org/svn/llvm-project/llvm/tags | gstt RELEASE_)
-[[ "$release" =~ RELEASE_[0-9]+ ]] || die "release $release has unexpected form."
+# Get global head revision of repo as a default.  This
+# should be fine whether trunk or tag is being built.
+rev=$(svn info --show-item=revision http://llvm.org/svn/llvm-project)
 
-candidates=$(svn ls http://llvm.org/svn/llvm-project/llvm/tags/$release)
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Command line parameters
 
-if [[ "$candidates" =~ final ]]; then
-    candidate=final
+[[ "$1" =~ --trunk.* ]] && trunk=1 || trunk=0
+[[ "$1" =~ --trunk=([0-9]+) ]] && rev=${BASH_REMATCH[1]}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+if (( trunk )); then
+    repo_root=trunk
+    release=trunk
+    [[ -z "$rev" ]] && rev=$(svn info --show-item=revision http://llvm.org/svn/llvm-project/llvm/trunk)
+    suffix=trunk-r$rev
+    candidate=
 else
-    candidate=$(svn ls http://llvm.org/svn/llvm-project/llvm/tags/$release | gstt rc)
+    # Get latest llvm version
+    release=$(svn ls http://llvm.org/svn/llvm-project/llvm/tags | gstt RELEASE_)
+    [[ "$release" =~ RELEASE_[0-9]+ ]] || die "release $release has unexpected form."
+
+    candidates=$(svn ls http://llvm.org/svn/llvm-project/llvm/tags/$release)
+
+    if [[ "$candidates" =~ final ]]; then
+        candidate=final
+    else
+        candidate=$(svn ls http://llvm.org/svn/llvm-project/llvm/tags/$release | gstt rc)
+    fi
+
+    repo_root=tags/$release/$candidate
+    suffix=v${release/RELEASE_}.$candidate
 fi
 
-repo_root=tags/$release/$candidate
-suffix=v${release/RELEASE_}.$candidate
 install=$HOME/dev/tools/llvm-$suffix
 
 [[ -d "$install" ]] && die "$install already exists."
@@ -48,19 +69,19 @@ read
 
 cd $work
 
-svn co http://llvm.org/svn/llvm-project/llvm/$repo_root llvm
+svn co -r$rev http://llvm.org/svn/llvm-project/llvm/$repo_root llvm
 
 cd llvm/tools
-svn co http://llvm.org/svn/llvm-project/cfe/$repo_root clang
+svn co -r$rev http://llvm.org/svn/llvm-project/cfe/$repo_root clang
 cd ../../
 
 cd llvm/tools/clang/tools
-svn co http://llvm.org/svn/llvm-project/clang-tools-extra/$repo_root extra
+svn co -r$rev http://llvm.org/svn/llvm-project/clang-tools-extra/$repo_root extra
 cd ../../../../
 
 # Check out Compiler-RT (optional):
 #cd llvm/projects
-#svn co http://llvm.org/svn/llvm-project/compiler-rt/$repo_root compiler-rt
+#svn co -r$rev http://llvm.org/svn/llvm-project/compiler-rt/$repo_root compiler-rt
 #cd ../..
 
 # This option would tell it where the libstdc++ is that it would use.
