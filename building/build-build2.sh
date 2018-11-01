@@ -1,16 +1,6 @@
 #!/bin/bash
 set -e
-set -x
 set -o pipefail
-
-# =======================================================================
-# Things to change
-# =======================================================================
-  version=0.8.0
-  checksum=8223d01a27ddf427e6833d826e631cf1e3b9f70185f7c66684e57339096afea5
-# =======================================================================
-
-install_to=$HOME/dev/tools/build2-$version
 
 die() {
   echo "$@" >&2
@@ -22,22 +12,45 @@ end() {
   exit 0
 }
 
-[[ -d $install_to ]] && end "build2 version $version already installed."
+# Assumes that there is a file call toolchain.sha256 and that the first line
+# looks like:
+#     # 0.8.0
+version=$(wget -qO- 'https://download.build2.org/toolchain.sha256' | awk 'NR==1 { print $2 }')
+echo "found latest version: $version"
 
-cd /tmp
+install_to=$HOME/dev/tools/build2-$version
 
-work=build-build2
+if [[ ! -d $install_to ]]; then
+  echo "build2 version $version not already installed. Installing..."
 
-[[ -d $work ]] && /bin/rm -rf "$work"
-mkdir -p $work
-cd $work
+  cd /tmp
 
-curl -sSfO https://download.build2.org/$version/build2-install-$version.sh
+  work=build-build2
 
-[[ -f build2-install-$version.sh ]]
+  [[ -d $work ]] && /bin/rm -rf "$work"
+  mkdir $work
+  cd $work
 
-sum=$(sha256sum build2-install-$version.sh | awk '{print $1}')
+  curl -sSfO https://download.build2.org/$version/build2-install-$version.sh
 
-[[ "$sum" == "$checksum" ]] || die "checksum does not match!"
+  [[ -f build2-install-$version.sh ]]
 
-sh build2-install-$version.sh $install_to
+  sh build2-install-$version.sh $install_to
+else
+  echo "build2 version $version already installed."
+fi
+
+echo "[re]creating links"
+
+create_link() {
+  binary=$1
+  from="$install_to/bin/$1"
+  to="$HOME/bin/$1"
+  rm -f "$to"
+  ln -s "$from" "$to"
+  echo "$from --> $to"
+}
+
+create_link b
+create_link bdep
+create_link bpkg
