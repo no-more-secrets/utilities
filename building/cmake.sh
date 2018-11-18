@@ -46,7 +46,11 @@ mkdir -p "$tools"
 
 prefix="$tools/${repo,,}-$version"
 
-./bootstrap --prefix=$prefix
+if which cmake; then
+    cmake . -DCMAKE_INSTALL_PREFIX=$prefix
+else
+    ./bootstrap --prefix=$prefix
+fi
 
 if which nproc 2>/dev/null; then
     threads=$(nproc --all)
@@ -62,7 +66,13 @@ $prefix/bin/cmake --version
 mkdir -p ~/bin
 
 rm -f ~/bin/cmake
+rm -f ~/bin/ccmake
 rm -f ~/bin/ctest
 
-ln -s $prefix/bin/cmake ~/bin/cmake
-ln -s $prefix/bin/ctest ~/bin/ctest
+cmake_current="$tools/cmake-current"
+rm -f "$cmake_current"
+
+ln -s $prefix $tools/cmake-current
+ln -s $cmake_current/bin/cmake  ~/bin/cmake
+ln -s $cmake_current/bin/ccmake ~/bin/ccmake
+ln -s $cmake_current/bin/ctest  ~/bin/ctest
