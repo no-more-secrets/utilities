@@ -107,3 +107,9 @@ make -j$threads
 make -j$threads check-clang # optional
 
 make install
+
+# Now create a symlink to the one we just built.
+cd $(dirname $install) # folder containing all the llvm-*
+link='llvm-current'
+rm -f "$link"
+ln -s llvm-$suffix $link
