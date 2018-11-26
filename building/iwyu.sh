@@ -1,4 +1,20 @@
 #!/bin/bash
+# This script by default will build the latest master commit.  It
+# will install it into a folder with a version number.  This version
+# number is derived by using `git rev-list`, i.e. the number of
+# revisions up to the one at current master.
+#
+#    --latest-tag : specifying this will cause the latest tag
+#                   to be built instead of master, and the version
+#                   number will be taken to be the tag name.  Note
+#                   that this may not work properly since the script
+#                   below references `llvm-current` in a few places,
+#                   and so if the llvm-current is not compatible with
+#                   the tag being built then it may not work, though
+#                   it should probably be fine using llvm-current
+#                   because then the llvm version will be "newer"
+#                   than the iwyu version (the tag), but this has
+#                   not been tested.
 set -e
 set -o pipefail
 
@@ -109,3 +125,13 @@ make install
 cd $tools
 rm -f iwyu-current
 ln -s "$our_tag" iwyu-current
+rm -f "$HOME/bin/include-what-you-use"
+ln -s "$prefix/bin/include-what-you-use" "$HOME/bin/include-what-you-use"
+
+# Now we need to copy over the clang headers from the current version
+# of clang into the iwyu/lib folder because that's where it expects to
+# find them (at the time of this writing there doesn't seem to be a
+# simple way to tell it where these headers are).
+echo "Copying headers from llvm-current/lib/clang..."
+mkdir -p $prefix/lib
+cp -r $tools/llvm-current/lib/clang $prefix/lib
