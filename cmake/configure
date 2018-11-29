@@ -87,7 +87,7 @@ if __name__ == '__main__':
                          action='store',
                          nargs='?',
                          type=str,
-                         help='Use gcc and optionally specify path to root' )
+                         help='Use gcc and optionally specify path to g++' )
     parser.add_argument( '--includes',
                          dest='includes',
                          default=None,
@@ -144,8 +144,8 @@ if __name__ == '__main__':
             compiler_path = '%s/dev/tools/gcc-current/bin/g++' % os.environ['HOME']
             compiler_root = '%s/dev/tools/gcc-current' % os.environ['HOME']
         else:
-            compiler_root = args.gcc
-            compiler_path = '%s/bin/g++' % compiler_root
+            compiler_root = os.path.dirname( os.path.dirname( args.gcc ) )
+            compiler_path = '%s' % args.gcc
     else:
         name, path = default_compiler()
         compiler = 'sys-%s' % name
@@ -156,9 +156,9 @@ if __name__ == '__main__':
     compiler_version = get_compiler_version( compiler_path )
 
     compiler_includes = args.includes
-    if not compiler_includes:
-        if args.gcc and args.gcc != 'current':
-            compiler_includes = '%s/include/c++/%s' % (compiler_root, compiler_version)
+    # if not compiler_includes:
+    #     if args.gcc and args.gcc != 'current':
+    #         compiler_includes = '%s/include/c++/%s' % (compiler_root, compiler_version)
 
     log( 'compiler_includes: %s' % compiler_includes )
 
