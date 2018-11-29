@@ -68,10 +68,10 @@ if __name__ == '__main__':
                          dest='tidy',
                          action='store_true',
                          help='Whether to run clang-tidy' )
-    parser.add_argument( '--iwyu',
-                         dest='iwyu',
-                         action='store_true',
-                         help='Whether to run include-what-you-use' )
+    # parser.add_argument( '--iwyu',
+    #                      dest='iwyu',
+    #                      action='store_true',
+    #                      help='Whether to run include-what-you-use' )
     parser.add_argument( '-v', '--verbose',
                          dest='verbose',
                          action='store_true',
