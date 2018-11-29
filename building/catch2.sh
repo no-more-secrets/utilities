@@ -5,7 +5,14 @@
 set -e
 set -o pipefail
 
-cd /tmp
+# At the time of writing, the catch2 testing framework has
+# issues with resolving linked folders, and on OSX it looks
+# like the /tmp folder is some kind of link to /private/tmp,
+# and this causes tests to fail even if we try changing to
+# /private/tmp instead of /tmp (where we usually build). So
+# here we just use a tmp folder in HOME.
+mkdir -p "$HOME/tmp"
+cd "$HOME/tmp"
 
 work=catch2-build
 
@@ -30,7 +37,7 @@ latest_github_repo_tag() {
     curl --silent $api_url | grep '"name":'            \
                            | grep -v -i develop        \
                            | head -n1                  \
-                           | sed -r 's/.*"(.*)",?/\1/'
+                           | sed 's/.*: "\(.*\)".*/\1/'
 }
 
 clone_latest_tag() {

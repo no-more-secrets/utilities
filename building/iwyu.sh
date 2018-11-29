@@ -59,7 +59,7 @@ latest_github_repo_tag() {
     # TO:   v8.1.0338
     curl --silent $api_url | grep '"name":'            \
                            | head -n1                  \
-                           | sed -r 's/.*: "(.*)".*/\1/'
+                           | sed 's/.*: "\(.*\)".*/\1/'
 }
 
 clone_latest_tag() {
