@@ -48,7 +48,7 @@ def default_compiler():
     return ('unrecognized', cxx)
 
 def get_compiler_version( path ):
-    res = sp.run([path, '-dumpversion'], capture_output=True)
+    res = sp.run([path, '-dumpversion'], stdout=sp.PIPE)
     res = res.stdout.strip().decode('ascii')
     log( 'Found compiler version: %s' % res )
     assert(len( res ) < 20)
