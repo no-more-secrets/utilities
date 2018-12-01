@@ -111,7 +111,9 @@ cd build
 cmake -G Ninja $cmake_vars ../llvm
 
 ninja
-ninja check-clang check-libcxx check-libcxxabi # optional
+ninja check-clang
+#ninja check-libcxx
+#ninja check-libcxxabi
 ninja install
 
 # Now create a symlink to the one we just built.
