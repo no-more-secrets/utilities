@@ -257,7 +257,7 @@ if __name__ == '__main__':
     for arg in cmd[2:]:
         log( '     ' + arg )
 
-    log_title( 'cmake running' )
+    log_title( 'configuring...' )
     if args.verbose:
         p = sp.Popen( cmd )
     else:
