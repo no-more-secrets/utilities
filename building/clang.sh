@@ -79,34 +79,40 @@ cd llvm/tools/clang/tools
 svn co -r$rev http://llvm.org/svn/llvm-project/clang-tools-extra/$repo_root extra
 cd ../../../../
 
-# Check out Compiler-RT (optional):
-#cd llvm/projects
-#svn co -r$rev http://llvm.org/svn/llvm-project/compiler-rt/$repo_root compiler-rt
-#cd ../..
+cd llvm/projects
+svn co -r$rev http://llvm.org/svn/llvm-project/libcxx/$repo_root libcxx
+cd ../..
+
+cd llvm/projects
+svn co -r$rev http://llvm.org/svn/llvm-project/libcxxabi/$repo_root libcxxabi
+cd ../..
+
+cd llvm/projects
+svn co -r$rev http://llvm.org/svn/llvm-project/compiler-rt/$repo_root compiler-rt
+cd ../..
 
 # This option would tell it where the libstdc++ is that it would use.
 # -DGCC_INSTALL_PREFIX=
 
+# -DCMAKE_C_COMPILER=$HOME/dev/tools/llvm-current/bin/clang
+# -DCMAKE_CXX_COMPILER=$HOME/dev/tools/llvm-current/bin/clang++
+
+# -DLIBCXX_CXX_ABI=libstdc++
+
 cmake_vars="
   -DCMAKE_BUILD_TYPE=Release
+  -DCOMPILER_RT_INCLUDE_TESTS=OFF
+  -DLLVM_ENABLE_ASSERTIONS=OFF
   -DCMAKE_INSTALL_PREFIX=$install
 "
 
 mkdir build
 cd build
-cmake -G "Unix Makefiles" $cmake_vars ../llvm
+cmake -G Ninja $cmake_vars ../llvm
 
-if which nproc 2>/dev/null; then
-    threads=$(nproc --all)
-else
-    threads=5
-fi
-
-make -j$threads
-
-make -j$threads check-clang # optional
-
-make install
+ninja
+ninja check-clang check-libcxx check-libcxxabi # optional
+ninja install
 
 # Now create a symlink to the one we just built.
 cd $(dirname $install) # folder containing all the llvm-*
