@@ -89,6 +89,10 @@ if __name__ == '__main__':
                          dest='verbose',
                          action='store_true',
                          help='Display verbose output from configure script itself' )
+    parser.add_argument( '--asan',
+                         dest='asan',
+                         action='store_true',
+                         help='Enable address sanitizer instrumentation' )
     parser.add_argument( '--show-commands',
                          dest='show_commands',
                          action='store_true',
@@ -242,6 +246,8 @@ if __name__ == '__main__':
         cmake_args.append( '-DCMAKE_TARGET_MESSAGES=OFF' )
     if args.show_commands:
         cmake_args.append( '-DCMAKE_VERBOSE_MAKEFILE=ON' )
+    if args.asan:
+        cmake_args.append( '-DENABLE_ADDRESS_SANITIZER=ON' )
 
     exe = 'ccmake' if args.gui else 'cmake'
     cmd = [exe, '../..'] + cmake_args
