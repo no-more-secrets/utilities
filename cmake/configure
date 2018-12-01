@@ -8,6 +8,7 @@ cmake_bool = lambda b: 'ON' if b else 'OFF'
 
 # Get terminal columns with fallback values.
 (COLUMNS, _) = shutil.get_terminal_size( (80,20) )
+COLUMNS_HALF = COLUMNS // 2
 
 class bcolors:
     HEADER    = '\033[95m'
@@ -26,14 +27,20 @@ def in_bar( s ):
     if s:
         res = bcolors.HEADER + '===== ' + bcolors.OKBLUE + s + bcolors.ENDC + ' '
         res_no_color = '===== ' + s + ' '
-    return res + bcolors.HEADER + '='*(COLUMNS - len( res_no_color )) + bcolors.ENDC
+    return res + bcolors.HEADER + '='*(COLUMNS_HALF - len( res_no_color )) + bcolors.ENDC
 
 def log( s ):
     if args.verbose:
         print( s )
 
 def log_title( s ):
-    log( in_bar( s ) )
+    if args.verbose:
+        log( in_bar( s ) )
+    else:
+        total = COLUMNS-1
+        clean = ' '*(total-len( s ))
+        back = '\b'*total
+        print( '%s%s%s' % (s, clean, back), end='', flush=True )
 
 def default_compiler():
     cxx = shutil.which( 'c++' )
@@ -68,6 +75,12 @@ if __name__ == '__main__':
                          dest='tidy',
                          action='store_true',
                          help='Whether to run clang-tidy' )
+    parser.add_argument( '--generator',
+                         dest='generator',
+                         type=str,
+                         default=None,
+                         choices=['ninja', 'make'],
+                         help='Choose the generator' )
     # parser.add_argument( '--iwyu',
     #                      dest='iwyu',
     #                      action='store_true',
@@ -76,6 +89,10 @@ if __name__ == '__main__':
                          dest='verbose',
                          action='store_true',
                          help='Display verbose output from configure script itself' )
+    parser.add_argument( '--show-commands',
+                         dest='show_commands',
+                         action='store_true',
+                         help='Show full commands during build' )
     parser.add_argument( '--clang',
                          dest='clang',
                          action='store_true',
@@ -110,7 +127,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    log_title( "Initialization" )
+    log_title( "initialization" )
 
     # root_dir = os.path.abspath( os.path.join( os.path.dirname( __file__ ), '..' ) )
     assert os.path.exists( 'CMakeLists.txt' ),\
@@ -162,11 +179,33 @@ if __name__ == '__main__':
 
     log( 'compiler_includes: %s' % compiler_includes )
 
-    build_dir = '%s-%s-%s%s' % (
+    generator = None
+
+    if args.generator:
+        generator = args.generator
+    else:
+        if shutil.which( 'ninja' ):
+            generator = 'ninja'
+        else:
+            generator = 'make'
+
+    log( 'Using generator: %s' % generator )
+
+    if generator == 'ninja':
+        G = 'Ninja'
+        gen_label = 'ninja'
+    elif generator == 'make':
+        G = 'Unix Makefiles'
+        gen_label = 'make'
+    else:
+        raise Exception( 'invalid generator: %s' % generator )
+
+    build_dir = '%s-%s-%s%s-%s' % (
                     compiler,
                     compiler_version,
                     args.build_type,
-                    '-tidy' if args.tidy else ''
+                    '-tidy' if args.tidy else '',
+                    gen_label
                 )
 
     if os.path.exists( 'current' ):
@@ -186,10 +225,10 @@ if __name__ == '__main__':
     log( 'Deduced CMake build type: ' + build_type )
 
     cmake_args = []
+    cmake_args.append( '-G%s' % G )
     cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % build_type )
     cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( args.tidy ) )
     # cmake_args.append( '-DUSE_IWYU=%s' % cmake_bool( args.iwyu ) )
-    cmake_args.append( '-DCMAKE_TARGET_MESSAGES=OFF' )
     cmake_args.append( '-DCMAKE_INSTALL_PREFIX=%s' % args.prefix )
     cmake_args.append( '-DCMAKE_CXX_COMPILER=%s' % compiler_path )
     # This is temporary until a cmake file bug is fixed in spdlog.
@@ -199,25 +238,38 @@ if __name__ == '__main__':
         cmake_args.append( '-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=%s' % compiler_includes )
     if args.stdlibs:
         cmake_args.append( '-DCMAKE_CXX_STANDARD_LIBRARIES=%s' % args.stdlibs )
+    if gen_label == 'make':
+        cmake_args.append( '-DCMAKE_TARGET_MESSAGES=OFF' )
+    if args.show_commands:
+        cmake_args.append( '-DCMAKE_VERBOSE_MAKEFILE=ON' )
 
     exe = 'ccmake' if args.gui else 'cmake'
     cmd = [exe, '../..'] + cmake_args
 
-    log_title( "CMake Command" )
+    log_title( "cmake command" )
     log( ' '.join( cmd[:2] ) )
     for arg in cmd[2:]:
         log( '     ' + arg )
 
-    log_title( 'CMake Output' )
-    p = sp.Popen( cmd )
+    log_title( 'cmake running' )
+    if args.verbose:
+        p = sp.Popen( cmd )
+    else:
+        with open( 'cmake-stdout.log', 'w' ) as f:
+            p = sp.Popen( cmd, stdout=f )
     p.communicate()
+
+    if p.returncode != 0:
+        log_title( 'errors!' )
+        # Use print here because we want this message to appear
+        # even in non-verbose mode.
+        print( 'Error while running CMake: for CMake\'s stdout see:\n\n    %s\n\nor rerun this script with -v.' % os.path.abspath( 'cmake-stdout.log' ) )
 
     os.chdir( root_dir )
     if p.returncode == 0:
         if os.path.exists( '.builds/current' ):
             os.remove( '.builds/current' )
         os.symlink( build_dir, '.builds/current', target_is_directory=True )
-
-    log_title( 'Finished' )
+        log_title( 'finished' )
 
     exit( p.returncode )
