@@ -192,10 +192,7 @@ if __name__ == '__main__':
     if args.generator:
         generator = args.generator
     else:
-        if shutil.which( 'ninja' ):
-            generator = 'ninja'
-        else:
-            generator = 'make'
+        generator = 'make'
 
     log( 'Using generator: %s' % generator )
 
