@@ -89,6 +89,10 @@ if __name__ == '__main__':
                          dest='verbose',
                          action='store_true',
                          help='Display verbose output from configure script itself' )
+    parser.add_argument( '--testing',
+                         dest='testing',
+                         action='store_true',
+                         help='Build tests and enable testing' )
     parser.add_argument( '--asan',
                          dest='asan',
                          action='store_true',
@@ -230,6 +234,7 @@ if __name__ == '__main__':
 
     cmake_args = []
     cmake_args.append( '-G%s' % G )
+    # cmake_args.append( '--warn-uninitialized' ) # third-party libs are bad with this
     cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % build_type )
     cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( args.tidy ) )
     # cmake_args.append( '-DUSE_IWYU=%s' % cmake_bool( args.iwyu ) )
@@ -237,7 +242,8 @@ if __name__ == '__main__':
     cmake_args.append( '-DCMAKE_CXX_COMPILER=%s' % compiler_path )
     # This is temporary until a cmake file bug is fixed in spdlog.
     # https://github.com/gabime/spdlog/issues/927
-    cmake_args.append( '-DBUILD_TESTING=OFF' )
+    if args.testing:
+        cmake_args.append( '-DBUILD_TESTING=ON' )
     if compiler_includes:
         cmake_args.append( '-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=%s' % compiler_includes )
     if args.stdlibs:
