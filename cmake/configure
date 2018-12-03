@@ -105,6 +105,10 @@ if __name__ == '__main__':
                          dest='clang',
                          action='store_true',
                          help='Use clang' )
+    parser.add_argument( '--libcxx',
+                         dest='libcxx',
+                         action='store_true',
+                         help='Use clang\'s libc++ if it is not already the default on the system.' )
     parser.add_argument( '--gcc',
                          dest='gcc',
                          const='current',
@@ -150,6 +154,9 @@ if __name__ == '__main__':
         os.mkdir( '.builds' )
     log( 'Changing to .builds directory' )
     os.chdir( '.builds' )
+
+    if args.libcxx:
+        assert args.clang, 'Must use --clang if using --libcxx'
 
     assert not (args.clang and args.gcc),\
            'Cannot specify both --clang and --gcc'
@@ -205,11 +212,13 @@ if __name__ == '__main__':
     else:
         raise Exception( 'invalid generator: %s' % generator )
 
-    build_dir = '%s-%s-%s%s-%s' % (
+    build_dir = '%s-%s-%s%s%s-%s%s' % (
                     compiler,
                     compiler_version,
+                    'libc++-' if args.libcxx else '',
                     args.build_type,
                     '-tidy' if args.tidy else '',
+                    'asan-' if args.asan else '',
                     gen_label
                 )
 
@@ -249,6 +258,11 @@ if __name__ == '__main__':
         cmake_args.append( '-DCMAKE_VERBOSE_MAKEFILE=ON' )
     if args.asan:
         cmake_args.append( '-DENABLE_ADDRESS_SANITIZER=ON' )
+    if args.libcxx:
+        cmake_args.append( '-DUSE_LIBCXX=ON' )
+        llvm_current = '%s/dev/tools/llvm-current' % os.environ['HOME']
+        cmake_args.append( '-DCMAKE_CXX_FLAGS_INIT=-stdlib=libc++ -I%(llvm_current)s/include/c++/v1' % locals() )
+        cmake_args.append( '-DCMAKE_EXE_LINKER_FLAGS_INIT=-stdlib=libc++ -lc++abi -L%(llvm_current)s/lib -Wl,-rpath,%(llvm_current)s/lib' % locals() )
 
     exe = 'ccmake' if args.gui else 'cmake'
     cmd = [exe, '../..'] + cmake_args
