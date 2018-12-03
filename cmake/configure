@@ -261,6 +261,7 @@ if __name__ == '__main__':
     if args.libcxx:
         cmake_args.append( '-DUSE_LIBCXX=ON' )
         llvm_current = '%s/dev/tools/llvm-current' % os.environ['HOME']
+        # See: https://libcxx.llvm.org/docs/UsingLibcxx.html
         cmake_args.append( '-DCMAKE_CXX_FLAGS_INIT=-stdlib=libc++ -I%(llvm_current)s/include/c++/v1' % locals() )
         cmake_args.append( '-DCMAKE_EXE_LINKER_FLAGS_INIT=-stdlib=libc++ -lc++abi -L%(llvm_current)s/lib -Wl,-rpath,%(llvm_current)s/lib' % locals() )
 
