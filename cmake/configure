@@ -105,6 +105,10 @@ if __name__ == '__main__':
                          dest='clang',
                          action='store_true',
                          help='Use clang' )
+    parser.add_argument( '--trace',
+                         dest='trace',
+                         action='store_true',
+                         help='Enable trace-level logging' )
     parser.add_argument( '--libcxx',
                          dest='libcxx',
                          action='store_true',
@@ -212,13 +216,14 @@ if __name__ == '__main__':
     else:
         raise Exception( 'invalid generator: %s' % generator )
 
-    build_dir = '%s-%s-%s%s%s-%s%s' % (
+    build_dir = '%s-%s-%s%s%s-%s%s%s' % (
                     compiler,
                     compiler_version,
                     'libc++-' if args.libcxx else '',
                     args.build_type,
                     '-tidy' if args.tidy else '',
                     'asan-' if args.asan else '',
+                    'trace-' if args.trace else '',
                     gen_label
                 )
 
@@ -271,6 +276,8 @@ if __name__ == '__main__':
       cmake_args.append( '-DCMAKE_C_FLAGS=-fcolor-diagnostics' )
     elif 'gcc' in compiler:
       cmake_args.append( '-DCMAKE_C_FLAGS=-fdiagnostics-color' )
+    if args.trace:
+      cmake_args.append( '-DDEBUG_TRACE=ON' )
 
     exe = 'ccmake' if args.gui else 'cmake'
     cmd = [exe, '../..'] + cmake_args
