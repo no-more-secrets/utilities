@@ -109,6 +109,14 @@ if __name__ == '__main__':
                          dest='trace',
                          action='store_true',
                          help='Enable trace-level logging' )
+    parser.add_argument( '--lld',
+                         dest='lld',
+                         action='store_true',
+                        help='Use lld linker (must be using clang)' )
+    parser.add_argument( '--lto',
+                         dest='lto',
+                         action='store_true',
+                        help='Enable link-time optimizations (requires lld)' )
     parser.add_argument( '--libcxx',
                          dest='libcxx',
                          action='store_true',
@@ -158,6 +166,12 @@ if __name__ == '__main__':
         os.mkdir( '.builds' )
     log( 'Changing to .builds directory' )
     os.chdir( '.builds' )
+
+    if args.lto:
+        assert args.lld, 'Must use --lld if using --lto'
+
+    if args.lld:
+        assert args.clang, 'Must use --clang if using --lld'
 
     if args.libcxx:
         assert args.clang, 'Must use --clang if using --libcxx'
@@ -216,9 +230,11 @@ if __name__ == '__main__':
     else:
         raise Exception( 'invalid generator: %s' % generator )
 
-    build_dir = '%s-%s-%s%s%s-%s%s%s' % (
+    build_dir = '%s-%s-%s%s%s%s%s-%s%s%s' % (
                     compiler,
                     compiler_version,
+                    'lld-' if args.lld else '',
+                    'lto-' if args.lto else '',
                     'libc++-' if args.libcxx else '',
                     args.build_type,
                     '-tidy' if args.tidy else '',
@@ -242,6 +258,9 @@ if __name__ == '__main__':
 
     build_type = { 'debug': 'Debug', 'release': 'Release' }[args.build_type]
     log( 'Deduced CMake build type: ' + build_type )
+
+    cmake_cxx_flags_init = []
+    cmake_exe_linker_flags_init = []
 
     cmake_args = []
     cmake_args.append( '-G%s' % G )
@@ -267,8 +286,14 @@ if __name__ == '__main__':
         cmake_args.append( '-DUSE_LIBCXX=ON' )
         llvm_current = '%s/dev/tools/llvm-current' % os.environ['HOME']
         # See: https://libcxx.llvm.org/docs/UsingLibcxx.html
-        cmake_args.append( '-DCMAKE_CXX_FLAGS_INIT=-stdlib=libc++ -I%(llvm_current)s/include/c++/v1' % locals() )
-        cmake_args.append( '-DCMAKE_EXE_LINKER_FLAGS_INIT=-stdlib=libc++ -lc++abi -L%(llvm_current)s/lib -Wl,-rpath,%(llvm_current)s/lib' % locals() )
+        cmake_cxx_flags_init.extend( ['-stdlib=libc++', '-I%s/include/c++/v1' % llvm_current] )
+        cmake_exe_linker_flags_init.extend( ['-stdlib=libc++', '-lc++abi', '-L%s/lib' % llvm_current, '-Wl,-rpath,%s/lib' % llvm_current] )
+    if args.lld:
+      cmake_exe_linker_flags_init.append( '-fuse-ld=lld' )
+    if args.lto:
+      cmake_cxx_flags_init.append( '-flto' )
+      cmake_exe_linker_flags_init.append( '-flto' )
+
     # This is for if we're using Ninja which will redirect the output
     # of the compilers, causing them to disable color diagnostics.  This
     # will tell the compiler to force color diagnostics.
@@ -278,6 +303,12 @@ if __name__ == '__main__':
       cmake_args.append( '-DCMAKE_C_FLAGS=-fdiagnostics-color' )
     if args.trace:
       cmake_args.append( '-DDEBUG_TRACE=ON' )
+
+    # This should be last
+    if cmake_cxx_flags_init:
+      cmake_args.append( '-DCMAKE_CXX_FLAGS_INIT=%s' % ' '.join( cmake_cxx_flags_init ) )
+    if cmake_exe_linker_flags_init:
+      cmake_args.append( '-DCMAKE_EXE_LINKER_FLAGS_INIT=%s' % ' '.join( cmake_exe_linker_flags_init ) )
 
     exe = 'ccmake' if args.gui else 'cmake'
     cmd = [exe, '../..'] + cmake_args
