@@ -75,6 +75,10 @@ cd llvm/tools
 svn co -r$rev http://llvm.org/svn/llvm-project/cfe/$repo_root clang
 cd ../../
 
+cd llvm/tools
+svn co -r$rev http://llvm.org/svn/llvm-project/lld/$repo_root lld
+cd ../../
+
 cd llvm/tools/clang/tools
 svn co -r$rev http://llvm.org/svn/llvm-project/clang-tools-extra/$repo_root extra
 cd ../../../../
@@ -111,7 +115,7 @@ cd build
 cmake -G Ninja $cmake_vars ../llvm
 
 ninja
-ninja check-clang
+ninja check-clang check-lld
 #ninja check-libcxx
 #ninja check-libcxxabi
 ninja install
