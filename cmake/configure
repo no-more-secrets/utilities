@@ -332,7 +332,7 @@ if __name__ == '__main__':
     if args.emit_only:
         print( ' '.join( cmd[:2] ) + ' \\' )
         for arg in cmd[2:]:
-            print( '     ' + arg + ' \\' )
+            print( '    "' + arg + '" \\' )
         exit( 0 )
 
     if args.verbose:
