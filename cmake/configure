@@ -34,6 +34,8 @@ def log( s ):
         print( s )
 
 def log_title( s ):
+    if args.emit_only:
+        return
     if args.verbose:
         log( in_bar( s ) )
     else:
@@ -75,6 +77,10 @@ if __name__ == '__main__':
                          dest='tidy',
                          action='store_true',
                          help='Whether to run clang-tidy' )
+    parser.add_argument( '--emit-only',
+                         dest='emit_only',
+                         action='store_true',
+                         help='Just emit the CMake command that would be run' )
     parser.add_argument( '--generator',
                          dest='generator',
                          type=str,
@@ -150,6 +156,9 @@ if __name__ == '__main__':
                          help='Install prefix' )
 
     args = parser.parse_args()
+
+    if args.emit_only:
+        assert not args.verbose, "Can't use --emit-only with --verbose"
 
     log_title( "initialization" )
 
@@ -319,6 +328,13 @@ if __name__ == '__main__':
         log( '     ' + arg )
 
     log_title( 'configuring...' )
+
+    if args.emit_only:
+        print( ' '.join( cmd[:2] ) + ' \\' )
+        for arg in cmd[2:]:
+            print( '     ' + arg + ' \\' )
+        exit( 0 )
+
     if args.verbose:
         p = sp.Popen( cmd )
     else:
