@@ -273,6 +273,9 @@ if __name__ == '__main__':
 
     cmake_args = []
     cmake_args.append( '-G%s' % G )
+    # -Wno-dev is to suppress cmake warnings that we are getting from
+    # third party libraries (not ideal, but...).
+    cmake_args.append( '-Wno-dev' )
     # cmake_args.append( '--warn-uninitialized' ) # third-party libs are bad with this
     cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % build_type )
     cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( args.tidy ) )
@@ -330,9 +333,14 @@ if __name__ == '__main__':
     log_title( 'configuring...' )
 
     if args.emit_only:
-        print( ' '.join( cmd[:2] ) + ' \\' )
+        # The complexity here is that we want to not only print backslashes
+        # at the end of each line, but we want them to line up because we OCD.
+        max_len = max( map( len, cmd[2:] ) ) + 2
+        fmt_str = '    %%-%ds \\' % max_len
+        fmt_str1 = '%%-%ds \\' % (max_len+4)
+        print( fmt_str1 % ' '.join( cmd[:2] ) )
         for arg in cmd[2:]:
-            print( '    "' + arg + '" \\' )
+            print( fmt_str % ('"%s"' % arg) )
         exit( 0 )
 
     if args.verbose:
