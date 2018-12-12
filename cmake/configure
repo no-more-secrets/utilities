@@ -44,12 +44,24 @@ def log_title( s ):
         back = '\b'*total
         print( '%s%s%s' % (s, clean, back), end='', flush=True )
 
-def default_compiler():
+def default_c_compiler():
+    cc = shutil.which( 'cc' )
+    if not cc:
+        return ('none', 'none')
+    cc = os.path.realpath( cc )
+    log( 'Found default C compiler: %s' % cc )
+    if 'clang' in cc:
+        return ('clang', cc)
+    if 'gcc' in cc:
+        return ('gcc', cc)
+    return ('unrecognized', cc)
+
+def default_cxx_compiler():
     cxx = shutil.which( 'c++' )
     if not cxx:
         return ('none', 'none')
     cxx = os.path.realpath( cxx )
-    log( 'Found default compiler: %s' % cxx )
+    log( 'Found default C++ compiler: %s' % cxx )
     if 'clang' in cxx:
         return ('clang', cxx)
     if 'g++' in cxx:
@@ -134,7 +146,7 @@ if __name__ == '__main__':
                          action='store',
                          nargs='?',
                          type=str,
-                         help='Use gcc and optionally specify path to g++' )
+                         help='Use gcc and optionally specify path X to gcc such that X/bin/gcc exists.  This can be `current` as well.' )
     parser.add_argument( '--includes',
                          dest='includes',
                          default=None,
@@ -194,25 +206,29 @@ if __name__ == '__main__':
 
     if args.clang:
         compiler = 'clang'
-        compiler_path = '%s/dev/tools/llvm-current/bin/clang++' % os.environ['HOME']
+        c_compiler_path = '%s/dev/tools/llvm-current/bin/clang' % os.environ['HOME']
+        cxx_compiler_path = '%s/dev/tools/llvm-current/bin/clang++' % os.environ['HOME']
         compiler_root = '%s/dev/tools/llvm-current' % os.environ['HOME']
     elif args.gcc is not None:
         compiler = 'gcc'
         assert args.gcc, 'gcc cannot be empty!'
         if args.gcc == 'current':
-            compiler_path = '%s/dev/tools/gcc-current/bin/g++' % os.environ['HOME']
+            c_compiler_path = '%s/dev/tools/gcc-current/bin/gcc' % os.environ['HOME']
+            cxx_compiler_path = '%s/dev/tools/gcc-current/bin/g++' % os.environ['HOME']
             compiler_root = '%s/dev/tools/gcc-current' % os.environ['HOME']
         else:
             compiler_root = os.path.dirname( os.path.dirname( args.gcc ) )
-            compiler_path = '%s' % args.gcc
+            c_compiler_path = '%s/bin/gcc' % args.gcc
+            cxx_compiler_path = '%s/bin/g++' % args.gcc
     else:
-        name, path = default_compiler()
-        compiler = 'sys-%s' % name
-        compiler_path = path
+        c_name, c_compiler_path = default_c_compiler()
+        cxx_name, cxx_compiler_path = default_cxx_compiler()
+        assert c_name == cxx_name, 'C and C++ compilers must be of the same type'
+        compiler = 'sys-%s' % c_name
 
     log( 'compiler_root: %s' % compiler_root )
 
-    compiler_version = get_compiler_version( compiler_path )
+    compiler_version = get_compiler_version( c_compiler_path )
 
     compiler_includes = args.includes
     # if not compiler_includes:
@@ -278,10 +294,12 @@ if __name__ == '__main__':
     cmake_args.append( '-Wno-dev' )
     # cmake_args.append( '--warn-uninitialized' ) # third-party libs are bad with this
     cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % build_type )
-    cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( args.tidy ) )
     # cmake_args.append( '-DUSE_IWYU=%s' % cmake_bool( args.iwyu ) )
     cmake_args.append( '-DCMAKE_INSTALL_PREFIX=%s' % args.prefix )
-    cmake_args.append( '-DCMAKE_CXX_COMPILER=%s' % compiler_path )
+    cmake_args.append( '-DCMAKE_C_COMPILER=%s' % c_compiler_path )
+    cmake_args.append( '-DCMAKE_CXX_COMPILER=%s' % cxx_compiler_path )
+    if args.tidy:
+      cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( True ) )
     if args.testing:
         cmake_args.append( '-DBUILD_TESTING=ON' )
     if compiler_includes:
