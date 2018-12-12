@@ -309,9 +309,9 @@ if __name__ == '__main__':
     # This is for if we're using Ninja which will redirect the output
     # of the compilers, causing them to disable color diagnostics.  This
     # will tell the compiler to force color diagnostics.
-    if 'clang' in compiler:
+    if 'clang' in compiler and generator == 'ninja':
       cmake_args.append( '-DCMAKE_C_FLAGS=-fcolor-diagnostics' )
-    elif 'gcc' in compiler:
+    elif 'gcc' in compiler and generator == 'ninja':
       cmake_args.append( '-DCMAKE_C_FLAGS=-fdiagnostics-color' )
     if args.trace:
       cmake_args.append( '-DDEBUG_TRACE=ON' )
