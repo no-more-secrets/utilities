@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import os
+import re
 import shutil
 import subprocess as sp
 
@@ -146,7 +147,7 @@ if __name__ == '__main__':
                          action='store',
                          nargs='?',
                          type=str,
-                         help='Use gcc and optionally specify path X to gcc such that X/bin/gcc exists.  This can be `current` as well.' )
+                         help='Use gcc and optionally specify path to a gcc home or gcc/g++ binary.  This can be `current` as well.' )
     parser.add_argument( '--includes',
                          dest='includes',
                          default=None,
@@ -208,25 +209,65 @@ if __name__ == '__main__':
         compiler = 'clang'
         c_compiler_path = '%s/dev/tools/llvm-current/bin/clang' % os.environ['HOME']
         cxx_compiler_path = '%s/dev/tools/llvm-current/bin/clang++' % os.environ['HOME']
-        compiler_root = '%s/dev/tools/llvm-current' % os.environ['HOME']
     elif args.gcc is not None:
         compiler = 'gcc'
         assert args.gcc, 'gcc cannot be empty!'
-        if args.gcc == 'current':
-            c_compiler_path = '%s/dev/tools/gcc-current/bin/gcc' % os.environ['HOME']
-            cxx_compiler_path = '%s/dev/tools/gcc-current/bin/g++' % os.environ['HOME']
-            compiler_root = '%s/dev/tools/gcc-current' % os.environ['HOME']
+        if os.path.isfile( args.gcc ):
+            real = os.path.realpath( args.gcc )
+            log( 'Realpath to compiler: %s' % real )
+            # User has specified a compiler binary.  Whether it is gcc or g++
+            # (or some variant thereof) we can get the C and CXX compilers by
+            # the following replacement.
+            c_compiler_path = real.replace( '++', 'cc' )
+            cxx_compiler_path = real.replace( 'cc', '++' )
+            compiler_root = os.path.dirname( os.path.dirname( real ) )
         else:
-            compiler_root = os.path.dirname( os.path.dirname( args.gcc ) )
-            c_compiler_path = '%s/bin/gcc' % args.gcc
-            cxx_compiler_path = '%s/bin/g++' % args.gcc
+            if args.gcc == 'current':
+                compiler_root = '%s/dev/tools/gcc-current' % os.environ['HOME']
+                bin = '%s/bin' % compiler_root
+            else:
+              # User has specified a folder.  Now we must find where the binary
+              # is relative to this folder.
+              compiler_root = args.gcc
+              if os.path.basename( compiler_root ) == 'bin':
+                compiler_root = os.path.dirname( compiler_root )
+              bin = compiler_root
+              if os.path.exists( '%s/bin' % compiler_root ):
+                bin = '%s/bin' % compiler_root
+            # At this point, compiler_root and bin should be set, and hopefully
+            # the bin/ folder contains the compilers.
+            gccs = [f for f in os.listdir( bin ) if re.match( '^gcc[0-9-]*$', f )]
+            # This attempts to put the later versions first, assuming there are
+            # multiple versions in the same folder and they have the version
+            # numbers in their name.
+            gccs = sorted( gccs, reverse=True )
+            log( 'found gcc\'s: %s' % gccs )
+            assert gccs, 'failed to find any gcc binaries under %s' % bin
+            # Give priority to 'gcc' if it is present since it may be a symlink
+            # to a versioned one.
+            if 'gcc' in gccs:
+              gcc = 'gcc'
+            else:
+              gcc = gccs[0]
+            c_compiler_path = '%s/%s' % (bin, gcc)
+            cxx_compiler_path = '%s/%s' % (bin, gcc.replace( 'cc', '++' ))
     else:
+        # Find the default compilers on the system
         c_name, c_compiler_path = default_c_compiler()
         cxx_name, cxx_compiler_path = default_cxx_compiler()
         assert c_name == cxx_name, 'C and C++ compilers must be of the same type'
         compiler = 'sys-%s' % c_name
 
+    if not compiler_root:
+      compiler_root = os.path.dirname( os.path.dirname( c_compiler_path ) )
+
+    assert '++' in cxx_compiler_path, 'The cxx_compiler_path must have \'++\' ' \
+        'in the name because some compilers are sensitive to the name (sometimes ' \
+        'a symlink) with which they are called.'
+
     log( 'compiler_root: %s' % compiler_root )
+    log( 'c_compiler_path: %s' % c_compiler_path )
+    log( 'cxx_compiler_path: %s' % cxx_compiler_path )
 
     compiler_version = get_compiler_version( c_compiler_path )
 
