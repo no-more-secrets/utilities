@@ -333,6 +333,9 @@ if __name__ == '__main__':
     cmake_cxx_flags_init = []
     cmake_exe_linker_flags_init = []
 
+    if args.build_type == 'debug':
+        cmake_cxx_flags_init.append( '-Wno-unused-command-line-argument' )
+
     if args.libstdcxx:
         gcc_current = '%s/dev/tools/gcc-current' % os.environ['HOME']
         log( 'Attempting to use libstdc++: %s' % gcc_current )
