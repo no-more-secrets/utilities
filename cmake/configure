@@ -5,6 +5,8 @@ import re
 import shutil
 import subprocess as sp
 
+from glob import glob
+
 cmake_bool = lambda b: 'ON' if b else 'OFF'
 
 # Get terminal columns with fallback values.
@@ -136,15 +138,19 @@ if __name__ == '__main__':
     parser.add_argument( '--lld',
                          dest='lld',
                          action='store_true',
-                        help='Use lld linker (must be using clang)' )
+                         help='Use lld linker (must be using clang)' )
     parser.add_argument( '--lto',
                          dest='lto',
                          action='store_true',
-                        help='Enable link-time optimizations (requires lld)' )
+                         help='Enable link-time optimizations (requires lld)' )
     parser.add_argument( '--libcxx',
                          dest='libcxx',
                          action='store_true',
                          help='Use clang\'s libc++ if it is not already the default on the system.' )
+    parser.add_argument( '--libstdcxx',
+                         dest='libstdcxx',
+                         action='store_true',
+                         help='If using either clang or gcc, can request to use libstdcxx.' )
     parser.add_argument( '--gcc',
                          dest='gcc',
                          const='current',
@@ -153,16 +159,6 @@ if __name__ == '__main__':
                          nargs='?',
                          type=str,
                          help='Use gcc and optionally specify path to a gcc home or gcc/g++ binary.  This can be `current` as well.' )
-    parser.add_argument( '--includes',
-                         dest='includes',
-                         default=None,
-                         type=str,
-                         help='Specify ;-separated list of standard library include folders' )
-    parser.add_argument( '--stdlibs',
-                         dest='stdlibs',
-                         default=None,
-                         type=str,
-                         help='Specify ;-separated list of standard libraries to link against' )
     parser.add_argument( '--gui',
                          dest='gui',
                          action='store_true',
@@ -193,6 +189,9 @@ if __name__ == '__main__':
         os.mkdir( '.builds' )
     log( 'Changing to .builds directory' )
     os.chdir( '.builds' )
+
+    assert not (args.libstdcxx and args.libcxx), \
+            'Cannot specify both --libcxx and --libstdcxx'
 
     if args.lto:
         assert args.lld, 'Must use --lld if using --lto'
@@ -283,13 +282,6 @@ if __name__ == '__main__':
 
     compiler_version = get_compiler_version( c_compiler_path )
 
-    compiler_includes = args.includes
-    # if not compiler_includes:
-    #     if args.gcc and args.gcc != 'current':
-    #         compiler_includes = '%s/include/c++/%s' % (compiler_root, compiler_version)
-
-    log( 'compiler_includes: %s' % compiler_includes )
-
     generator = None
 
     if args.generator:
@@ -340,6 +332,24 @@ if __name__ == '__main__':
     cmake_cxx_flags_init = []
     cmake_exe_linker_flags_init = []
 
+    if args.libstdcxx:
+        gcc_current = '%s/dev/tools/gcc-current' % os.environ['HOME']
+        log( 'Attempting to use libstdc++: %s' % gcc_current )
+        (gcc_inc_home,) = glob( '%s/include/c++/*' % gcc_current )
+        log( 'gcc_inc_home: %s' % gcc_inc_home )
+        if glob( '%s/lib/libstdc++.*' % gcc_current ):
+            lib = 'lib'
+        elif glob( '%s/lib64/libstdc++.*' % gcc_current ):
+            lib = 'lib64'
+        else:
+            raise Exception( 'Cannot find a lib directory under %s containing libstdc++' % gcc_current )
+        gcc_lib_home = '%s/%s' % (gcc_current, lib)
+        log( 'gcc_lib_home: %s' % gcc_lib_home )
+        (gcc_inc_platform,) = glob( '%s/x86_64-*' % gcc_inc_home )
+        log( 'gcc_inc_platform: %s' % gcc_inc_platform )
+        cmake_cxx_flags_init.extend( ['-nostdinc++', '-stdlib=libstdc++', '-I%s' % gcc_inc_home, '-I%s' % gcc_inc_platform] )
+        cmake_exe_linker_flags_init.extend( ['-Wl,-rpath,%s' % gcc_lib_home, '-L%s' % gcc_lib_home] )
+
     cmake_args = []
     cmake_args.append( '-G%s' % G )
     # -Wno-dev is to suppress cmake warnings that we are getting from
@@ -355,10 +365,6 @@ if __name__ == '__main__':
       cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( True ) )
     if args.testing:
         cmake_args.append( '-DBUILD_TESTING=ON' )
-    if compiler_includes:
-        cmake_args.append( '-DCMAKE_CXX_STANDARD_INCLUDE_DIRECTORIES=%s' % compiler_includes )
-    if args.stdlibs:
-        cmake_args.append( '-DCMAKE_CXX_STANDARD_LIBRARIES=%s' % args.stdlibs )
     if gen_label == 'make':
         cmake_args.append( '-DCMAKE_TARGET_MESSAGES=OFF' )
     if args.show_commands:
