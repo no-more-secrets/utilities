@@ -83,16 +83,42 @@ def get_compiler_version( path ):
     assert(len( res ) < 20)
     return res
 
+def platform_identifier( *args, **params ):
+    chain = []
+
+    chain.append( params['compiler'] )
+    chain.append( params['compiler_version'] )
+
+    if params['lld']:
+        chain.append( 'lld' )
+
+    if params['lto']:
+        chain.append( 'lto' )
+
+    if params['stdlib']:
+        chain.append( params['stdlib'] )
+
+    chain.append( params['build_type'] )
+
+    if params['tidy']:
+        chain.append( 'tidy' )
+
+    if params['asan']:
+        chain.append( 'asan' )
+
+    if params['trace']:
+        chain.append( 'trace' )
+
+    return '-'.join( chain )
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Configure CMake Build' )
 
-    parser.add_argument( '--type',
-                         dest='build_type',
-                         type=str,
-                         default='debug',
-                         choices=['debug', 'release'],
-                         help='Set the build configuration' )
+    parser.add_argument( '--release',
+                         dest='release',
+                         action='store_true',
+                         help='Do a release build' )
     parser.add_argument( '-t', '--tidy',
                          dest='tidy',
                          action='store_true',
@@ -267,7 +293,7 @@ if __name__ == '__main__':
         c_name, c_compiler_path = default_c_compiler()
         cxx_name, cxx_compiler_path = default_cxx_compiler()
         assert c_name == cxx_name, 'C and C++ compilers must be of the same type'
-        compiler = 'sys-%s' % c_name
+        compiler = '%s-system' % c_name
 
     if not compiler_root:
       compiler_root = os.path.dirname( os.path.dirname( c_compiler_path ) )
@@ -300,19 +326,25 @@ if __name__ == '__main__':
     else:
         raise Exception( 'invalid generator: %s' % generator )
 
-    build_dir = '%s-%s-%s%s%s%s%s%s-%s%s%s' % (
-                    compiler,
-                    compiler_version,
-                    'lld-' if args.lld else '',
-                    'lto-' if args.lto else '',
-                    'libc++-' if args.libcxx else '',
-                    'libstdc++-' if args.libstdcxx else '',
-                    args.build_type,
-                    '-tidy' if args.tidy else '',
-                    'asan-' if args.asan else '',
-                    'trace-' if args.trace else '',
-                    gen_label
-                )
+    if args.libcxx:
+        stdlib = 'libc++'
+    elif args.libstdcxx:
+        stdlib = 'libstdc++'
+    else:
+        # TODO: figure out which stdlib a compiler is using.
+        stdlib = None
+
+    build_type = 'debug' if not args.release else 'release'
+
+    build_dir = platform_identifier( compiler=compiler,
+                                     compiler_version=compiler_version,
+                                     lld=args.lld,
+                                     lto=args.lto,
+                                     stdlib=stdlib,
+                                     build_type=build_type,
+                                     tidy=args.tidy,
+                                     asan=args.asan,
+                                     trace=args.trace )
 
     if os.path.exists( 'current' ):
         os.remove( 'current' )
@@ -327,13 +359,13 @@ if __name__ == '__main__':
         log( 'Removing CMakeCache.txt' )
         os.remove( 'CMakeCache.txt' )
 
-    build_type = { 'debug': 'Debug', 'release': 'Release' }[args.build_type]
-    log( 'Deduced CMake build type: ' + build_type )
+    cmake_build_type = { 'debug': 'Debug', 'release': 'Release' }[build_type]
+    log( 'Deduced CMake build type: ' + cmake_build_type )
 
     cmake_cxx_flags_init = []
     cmake_exe_linker_flags_init = []
 
-    if args.build_type == 'debug':
+    if build_type == 'debug':
         cmake_cxx_flags_init.append( '-Wno-unused-command-line-argument' )
 
     if args.libstdcxx:
@@ -362,7 +394,7 @@ if __name__ == '__main__':
     # third party libraries (not ideal, but...).
     cmake_args.append( '-Wno-dev' )
     # cmake_args.append( '--warn-uninitialized' ) # third-party libs are bad with this
-    cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % build_type )
+    cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % cmake_build_type )
     # cmake_args.append( '-DUSE_IWYU=%s' % cmake_bool( args.iwyu ) )
     cmake_args.append( '-DCMAKE_INSTALL_PREFIX=%s' % args.prefix )
     cmake_args.append( '-DCMAKE_C_COMPILER=%s' % c_compiler_path )
