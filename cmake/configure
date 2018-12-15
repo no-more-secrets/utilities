@@ -127,6 +127,10 @@ if __name__ == '__main__':
                          dest='emit_only',
                          action='store_true',
                          help='Just emit the CMake command that would be run' )
+    parser.add_argument( '-f', '--force',
+                         dest='force',
+                         action='store_true',
+                         help='Force re-configure even if build directory already exists' )
     parser.add_argument( '--generator',
                          dest='generator',
                          type=str,
@@ -352,7 +356,7 @@ if __name__ == '__main__':
     if not os.path.isdir( build_dir ):
         log( 'Creating "%s" directory' % build_dir )
         os.mkdir( build_dir )
-    else:
+    elif not args.force:
         # Already exists, so just point the link to it and exit
         log( 'Build directory %s already exists, activating it.' % build_dir )
         os.symlink( build_dir, 'current', target_is_directory=True )
