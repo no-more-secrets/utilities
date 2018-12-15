@@ -352,6 +352,12 @@ if __name__ == '__main__':
     if not os.path.isdir( build_dir ):
         log( 'Creating "%s" directory' % build_dir )
         os.mkdir( build_dir )
+    else:
+        # Already exists, so just point the link to it and exit
+        log( 'Build directory %s already exists, activating it.' % build_dir )
+        os.symlink( build_dir, 'current', target_is_directory=True )
+        exit( 0 )
+
     log( 'Changing to "%s" directory' % build_dir )
     os.chdir( build_dir )
 
