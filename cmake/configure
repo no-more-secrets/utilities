@@ -14,12 +14,12 @@ cmake_bool = lambda b: 'ON' if b else 'OFF'
 COLUMNS_HALF = COLUMNS // 2
 
 class bcolors:
-    HEADER    = '\033[95m'
-    OKBLUE    = '\033[94m'
-    OKGREEN   = '\033[92m'
-    WARNING   = '\033[93m'
-    FAIL      = '\033[91m'
-    ENDC      = '\033[0m'
+    PURPLE    = '\033[95m'
+    BLUE      = '\033[94m'
+    GREEN     = '\033[92m'
+    YELLOW    = '\033[93m'
+    RED       = '\033[91m'
+    NORMAL    = '\033[0m'
     BOLD      = '\033[1m'
     UNDERLINE = '\033[4m'
 
@@ -33,9 +33,9 @@ def in_bar( s ):
     res = ''
     res_no_color = '' # need this to take string length
     if s:
-        res = bcolors.HEADER + '===== ' + bcolors.OKBLUE + s + bcolors.ENDC + ' '
+        res = bcolors.HEADER + '===== ' + bcolors.BLUE + s + bcolors.NORMAL + ' '
         res_no_color = '===== ' + s + ' '
-    return res + bcolors.HEADER + '='*(COLUMNS_HALF - len( res_no_color )) + bcolors.ENDC
+    return res + bcolors.HEADER + '='*(COLUMNS_HALF - len( res_no_color )) + bcolors.NORMAL
 
 def log( s ):
     if args.verbose:
@@ -360,6 +360,8 @@ if __name__ == '__main__':
         # Already exists, so just point the link to it and exit
         log( 'Build directory %s already exists, activating it.' % build_dir )
         os.symlink( build_dir, 'current', target_is_directory=True )
+        print( '%s%sNOTE%s: Switching to existing `%s%s%s` configuration; use %s%s--force%s to reconfigure.'
+                % (bcolors.BOLD, bcolors.YELLOW, bcolors.NORMAL, bcolors.GREEN, build_dir, bcolors.NORMAL, bcolors.BOLD, bcolors.PURPLE, bcolors.NORMAL) )
         exit( 0 )
 
     log( 'Changing to "%s" directory' % build_dir )
