@@ -13,15 +13,18 @@ cmake_bool = lambda b: 'ON' if b else 'OFF'
 (COLUMNS, _) = shutil.get_terminal_size( (80,20) )
 COLUMNS_HALF = COLUMNS // 2
 
-class bcolors:
-    PURPLE    = '\033[95m'
-    BLUE      = '\033[94m'
-    GREEN     = '\033[92m'
-    YELLOW    = '\033[93m'
-    RED       = '\033[91m'
-    NORMAL    = '\033[0m'
-    BOLD      = '\033[1m'
-    UNDERLINE = '\033[4m'
+class BColors( object ):
+    def __init__( self ):
+        self.PURPLE    = '\033[95m'
+        self.BLUE      = '\033[94m'
+        self.GREEN     = '\033[92m'
+        self.YELLOW    = '\033[93m'
+        self.RED       = '\033[91m'
+        self.NORMAL    = '\033[0m'
+        self.BOLD      = '\033[1m'
+        self.UNDERLINE = '\033[4m'
+
+bcolors = BColors()
 
 is_linux = (os.uname()[0] == 'Linux')
 is_osx   = (os.uname()[0] == 'Darwin')
@@ -33,9 +36,9 @@ def in_bar( s ):
     res = ''
     res_no_color = '' # need this to take string length
     if s:
-        res = bcolors.HEADER + '===== ' + bcolors.BLUE + s + bcolors.NORMAL + ' '
+        res = bcolors.PURPLE + '===== ' + bcolors.BLUE + s + bcolors.NORMAL + ' '
         res_no_color = '===== ' + s + ' '
-    return res + bcolors.HEADER + '='*(COLUMNS_HALF - len( res_no_color )) + bcolors.NORMAL
+    return res + bcolors.PURPLE + '='*(COLUMNS_HALF - len( res_no_color )) + bcolors.NORMAL
 
 def log( s ):
     if args.verbose:
@@ -193,6 +196,10 @@ if __name__ == '__main__':
                          dest='gui',
                          action='store_true',
                          help='Use CMake GUI' )
+    parser.add_argument( '--no-color',
+                         dest='no_color',
+                         action='store_true',
+                         help='No colors in output' )
     parser.add_argument( '--prefix',
                          dest='prefix',
                          type=str,
@@ -200,6 +207,10 @@ if __name__ == '__main__':
                          help='Install prefix' )
 
     args = parser.parse_args()
+
+    if args.no_color:
+        for k,v in bcolors.__dict__.items():
+            bcolors.__dict__[k] = ''
 
     if args.emit_only:
         assert not args.verbose, "Can't use --emit-only with --verbose"
