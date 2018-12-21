@@ -134,6 +134,10 @@ if __name__ == '__main__':
                          dest='force',
                          action='store_true',
                          help='Force re-configure even if build directory already exists' )
+    parser.add_argument( '--sdl-local',
+                         dest='sdl_local',
+                         action='store_true',
+                         help='Use the SDL2 libraries in the ~dev/tools/sdl folder.' )
     parser.add_argument( '--generator',
                          dest='generator',
                          type=str,
@@ -247,6 +251,31 @@ if __name__ == '__main__':
            'Cannot specify both --clang and --gcc'
 
     log( 'args.gcc: %s' % args.gcc )
+
+    if args.sdl_local:
+        # If we have local SDL2 builds in the usual location then
+        # we will set environment variables pointing to them.
+        # These environment variables are read as hints by the
+        # various FindSDL2* scripts. For some reason it appears
+        # to us environment variables instead of cmake variables.
+        log( 'using local SDL2 libraries.' )
+        sdl = '%s/dev/tools/sdl' % os.environ['HOME']
+        link = '%s/sdl-current' % sdl
+        if os.path.exists( link ):
+            log( 'using local SDL2.' )
+            os.environ['SDL2DIR'] = link
+        link = '%s/sdl-image-current' % sdl
+        if os.path.exists( link ):
+            log( 'using local SDL2_image.' )
+            os.environ['SDL2IMAGEDIR'] = link
+        link = '%s/sdl-mixer-current' % sdl
+        if os.path.exists( link ):
+            log( 'using local SDL2_mixer.' )
+            os.environ['SDL2MIXERDIR'] = link
+        link = '%s/sdl-ttf-current' % sdl
+        if os.path.exists( link ):
+            log( 'using local SDL2_ttf.' )
+            os.environ['SDL2TTFDIR'] = link
 
     compiler_root = None # may not be needed
 
