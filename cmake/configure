@@ -417,7 +417,7 @@ if __name__ == '__main__':
     cmake_cxx_flags_init = []
     cmake_exe_linker_flags_init = []
 
-    if build_type == 'debug':
+    if build_type == 'debug' and 'gcc' not in compiler:
         cmake_cxx_flags_init.append( '-Wno-unused-command-line-argument' )
 
     if args.libstdcxx:
