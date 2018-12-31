@@ -114,10 +114,23 @@ def platform_identifier( *args, **params ):
 
     return '-'.join( chain )
 
+def do_st():
+    build_dir = os.path.basename( os.path.realpath( '.builds/current' ) )
+    if build_dir == 'current':
+        return 1
+    print( 'configuration: %s%s%s%s'
+                % (bcolors.BOLD, bcolors.GREEN, build_dir, bcolors.NORMAL) )
+    return 0
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Configure CMake Build' )
 
+    parser.add_argument( dest='mode',
+                         default='configure',
+                         nargs='?',
+                         choices=['configure', 'st'],
+                         help='Select mode' )
     parser.add_argument( '--release',
                          dest='release',
                          action='store_true',
@@ -211,6 +224,9 @@ if __name__ == '__main__':
                          help='Install prefix' )
 
     args = parser.parse_args()
+
+    if args.mode == 'st':
+        exit( do_st() )
 
     if args.no_color:
         for k,v in bcolors.__dict__.items():
