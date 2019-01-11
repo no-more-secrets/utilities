@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+
+echo 'Disabling the Qualcomm Atheros Wifi/Bluetooth Card.'
+
+cd '/sys/devices/pci0000:00/0000:00:1c.1/0000:03:00.0'
+
+sudo bash -c 'echo 1 >remove'
