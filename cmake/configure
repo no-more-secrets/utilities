@@ -122,14 +122,39 @@ def do_st():
                 % (bcolors.BOLD, bcolors.GREEN, build_dir, bcolors.NORMAL) )
     return 0
 
+def do_rc():
+    build_dir = os.path.basename( os.path.realpath( '.builds/current' ) )
+    if build_dir == 'current':
+        return 1
+    os.chdir( '.builds/current' )
+    if not os.path.exists( 'cmake-command.sh' ):
+      print( '%s%serror%s: cached %s%scmake-command.sh%s not found.' % (bcolors.BOLD, bcolors.RED, bcolors.NORMAL, bcolors.BOLD, bcolors.YELLOW, bcolors.NORMAL) )
+      return 1
+    log_title( 'reconfiguring %s%s%s%s...' % (bcolors.BOLD, bcolors.GREEN, build_dir, bcolors.NORMAL) )
+    cmd = ['bash', 'cmake-command.sh']
+    if args.verbose:
+        p = sp.Popen( cmd )
+    else:
+      with open( 'cmake-stdout.log', 'w' ) as f:
+          p = sp.Popen( cmd, stdout=f )
+    p.communicate()
+
+    if p.returncode != 0:
+        log_title( 'errors!' )
+        # Use print here because we want this message to appear
+        # even in non-verbose mode.
+        print( 'Error while running CMake: for CMake\'s stdout see:\n\n    %s\n\nor rerun this script with -v.' % os.path.abspath( 'cmake-stdout.log' ) )
+
+    return p.returncode
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Configure CMake Build' )
 
     parser.add_argument( dest='mode',
-                         default='configure',
+                         default='c',
                          nargs='?',
-                         choices=['configure', 'st'],
+                         choices=['c', 'rc', 'st'],
                          help='Select mode' )
     parser.add_argument( '--release',
                          dest='release',
@@ -143,10 +168,6 @@ if __name__ == '__main__':
                          dest='emit_only',
                          action='store_true',
                          help='Just emit the CMake command that would be run' )
-    parser.add_argument( '-f', '--force',
-                         dest='force',
-                         action='store_true',
-                         help='Force re-configure even if build directory already exists' )
     parser.add_argument( '--sdl-local',
                          dest='sdl_local',
                          action='store_true',
@@ -227,6 +248,9 @@ if __name__ == '__main__':
 
     if args.mode == 'st':
         exit( do_st() )
+
+    if args.mode == 'rc':
+        exit( do_rc() )
 
     if args.no_color:
         for k,v in bcolors.__dict__.items():
@@ -412,11 +436,11 @@ if __name__ == '__main__':
     if not os.path.isdir( build_dir ):
         log( 'Creating "%s" directory' % build_dir )
         os.mkdir( build_dir )
-    elif not args.force:
+    else:
         # Already exists, so just point the link to it and exit
         log( 'Build directory %s already exists, activating it.' % build_dir )
         os.symlink( build_dir, 'current', target_is_directory=True )
-        print( '%s%sNOTE%s: Switching to existing `%s%s%s` configuration; use %s%s--force%s to reconfigure.'
+        print( '%s%sNOTE%s: Using cached `%s%s%s`; run `%s%scmc rc%s` (re-configure) to force a rerun of this configuration.'
                 % (bcolors.BOLD, bcolors.YELLOW, bcolors.NORMAL, bcolors.GREEN, build_dir, bcolors.NORMAL, bcolors.BOLD, bcolors.PURPLE, bcolors.NORMAL) )
         exit( 0 )
 
@@ -528,6 +552,14 @@ if __name__ == '__main__':
         log( '     ' + arg )
 
     log_title( 'configuring...' )
+
+    # First write the CMake command to a file in the build
+    # folder. We will use this later to reconfigure this mode
+    # without the user having to reproduce the exact cmc command
+    # line that was used originally.
+    with open( 'cmake-command.sh', 'w' ) as f:
+        for arg in cmd:
+            f.write( '"%s" \\\n' % arg )
 
     if args.emit_only:
         # The complexity here is that we want to not only print backslashes
