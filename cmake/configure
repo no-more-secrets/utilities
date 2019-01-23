@@ -130,7 +130,7 @@ def get_all_builds():
     if cur_dir == 'current':
       cur_dir = None
     builds = list(filter( lambda f: f != 'current', os.listdir( '.builds' ) ))
-    return cur_dir, builds
+    return cur_dir, sorted( builds )
 
 def do_ls():
     cur_build, builds = get_all_builds()
