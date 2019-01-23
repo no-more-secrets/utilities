@@ -122,6 +122,46 @@ def do_st():
                 % (bcolors.BOLD, bcolors.GREEN, build_dir, bcolors.NORMAL) )
     return 0
 
+def get_all_builds():
+    build_dir = os.path.basename( os.path.realpath( '.builds' ) )
+    if not os.path.exists( build_dir ):
+      return None, []
+    cur_dir = os.path.basename( os.path.realpath( '.builds/current' ) )
+    if cur_dir == 'current':
+      cur_dir = None
+    builds = list(filter( lambda f: f != 'current', os.listdir( '.builds' ) ))
+    return cur_dir, builds
+
+def do_ls():
+    cur_build, builds = get_all_builds()
+    for b in builds:
+      if b == cur_build:
+        print( '%sconfiguration%s: >>%s%s%s%s<<'
+                    % (bcolors.BOLD, bcolors.NORMAL, bcolors.BOLD, bcolors.GREEN, b, bcolors.NORMAL) )
+      else:
+        print( 'configuration:   %s%s%s'
+                    % (bcolors.GREEN, b, bcolors.NORMAL) )
+    return 0
+
+def do_sel():
+    cur_build, builds = get_all_builds()
+    if not builds:
+      return 1
+    builds = [b if not b == cur_build else b+' (current)' for b in builds]
+    cmd = ['fzf']
+    p = sp.Popen( cmd, stdin=sp.PIPE, stdout=sp.PIPE )
+    stdout, stderr = p.communicate( input='\n'.join( builds ).encode( 'utf-8' ) )
+    if p.returncode != 0:
+      return 1
+    sel = stdout.decode( 'utf-8' ).strip()
+    if 'current' in sel:
+      return 0
+    os.remove( '.builds/current' )
+    os.symlink( sel, '.builds/current', target_is_directory=True )
+    print( 'new ', end='' )
+    do_st()
+    return 0
+
 def do_rc():
     build_dir = os.path.basename( os.path.realpath( '.builds/current' ) )
     if build_dir == 'current':
@@ -154,7 +194,7 @@ if __name__ == '__main__':
     parser.add_argument( dest='mode',
                          default='c',
                          nargs='?',
-                         choices=['c', 'rc', 'st'],
+                         choices=['c', 'rc', 'st', 'ls', 'sel'],
                          help='Select mode' )
     parser.add_argument( '--release',
                          dest='release',
@@ -251,6 +291,12 @@ if __name__ == '__main__':
 
     if args.mode == 'rc':
         exit( do_rc() )
+
+    if args.mode == 'ls':
+        exit( do_ls() )
+
+    if args.mode == 'sel':
+        exit( do_sel() )
 
     if args.no_color:
         for k,v in bcolors.__dict__.items():
