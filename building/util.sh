@@ -19,6 +19,15 @@ die() {
   exit 1
 }
 
+# This is for compatibility between linux/osx.
+real_path() {
+  if which grealpath &>/dev/null; then
+      grealpath "$@"
+  else
+      realpath "$@"
+  fi
+}
+
 # Creates a symlink in the ~/bin folder to the current version of
 # the tool.  Note: it assumes that the link name will be the same
 # as the binary name and that the binary is located in:
@@ -55,6 +64,8 @@ is_package_installed() {
 }
 
 check_apt_dependencies() {
+  # If we're not on linux then do nothing here.
+  [[ "$(uname)" == Linux ]] || return 0
   local list="$1"
   for package in $list; do
     log "checking for apt dependency $package..."

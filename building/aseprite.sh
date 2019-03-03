@@ -43,7 +43,7 @@ skia_current="$tools/skia-current"
 [[ -e "$skia_current" ]] || \
     die "Skia not found (the above script should have built it)."
 
-skia_real_version=$(realpath $skia_current)
+skia_real_version=$(real_path $skia_current)
 log "skia_real_version: $skia_real_version"
 
 # ---------------------------------------------------------------
@@ -99,7 +99,8 @@ prefix="$tools/$project_key-$version"
 # ---------------------------------------------------------------
 # This will check for the presence of (but not install) apt pack-
 # ages that are required for the build. These are taken from the
-# Aseprite INSTALL.md file, and may change with time.
+# Aseprite INSTALL.md file, and may change with time. This will
+# be a no-op on OSX.
 check_apt_dependencies "
   libx11-dev
   libxcursor-dev
@@ -127,6 +128,11 @@ cmake .. -DSKIA_DIR=$skia_real_version    \
 # Build/Test
 # ---------------------------------------------------------------
 ninja && ninja install
+
+# Apparently needed on OSX (though still needs to be run from the
+# bin folder. This may be fixed in a future version.
+cd "$prefix"/bin
+ln -s ../share/aseprite/data data
 
 $prefix/bin/aseprite --version
 
