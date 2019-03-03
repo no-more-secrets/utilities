@@ -28,6 +28,8 @@ die() {
 bin_links() {
     [[ -z "$tools" ]] && \
         die "the 'tools' variable must be set in bin_links."
+    [[ -d "$tools" ]] || \
+        die "the 'tools' folder ($tools) must exist."
     local what="$1"
     mkdir -p ~/bin
     rm -f ~/bin/$what
@@ -39,11 +41,13 @@ bin_links() {
 tools_link() {
     [[ -z "$tools" ]] && \
         die "the 'tools' variable must be set in tools_link."
+    [[ -d "$tools" ]] || \
+        die "the 'tools' folder ($tools) must exist."
     local what="$1"
-    pushd $tools
+    pushd $tools &>/dev/null
     rm -f $what-current
     ln -s $what-$version $what-current
-    popd
+    popd &>/dev/null
 }
 
 is_package_installed() {

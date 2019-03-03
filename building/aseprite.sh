@@ -34,16 +34,6 @@ mkdir -p $work && cd $work
 tools="$HOME/dev/tools"
 mkdir -p "$tools"
 
-# This will check for the presence of (but not install) apt pack-
-# ages that are required for the build. These are taken from the
-# Aseprite INSTALL.md file, and may change with time.
-check_apt_dependencies "
-  libx11-dev
-  libxcursor-dev
-  libgl1-mesa-dev
-  libfontconfig1-dev
-"
-
 # ---------------------------------------------------------------
 # Build `skia` if necessary.
 # ---------------------------------------------------------------
@@ -103,6 +93,19 @@ version=$(latest_github_repo_tag $acct $repo)
 }
 
 prefix="$tools/$project_key-$version"
+
+# ---------------------------------------------------------------
+# Check apt Dependencies
+# ---------------------------------------------------------------
+# This will check for the presence of (but not install) apt pack-
+# ages that are required for the build. These are taken from the
+# Aseprite INSTALL.md file, and may change with time.
+check_apt_dependencies "
+  libx11-dev
+  libxcursor-dev
+  libgl1-mesa-dev
+  libfontconfig1-dev
+"
 
 # ---------------------------------------------------------------
 # Clone repo
