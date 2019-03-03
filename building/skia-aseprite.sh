@@ -48,7 +48,7 @@ latest_github_repo_branch() {
     curl --silent $api_url | grep '"name":'             \
                            | grep 'aseprite-m[0-9]\+"'  \
                            | sed 's/.*: "\(.*\)".*/\1/' \
-                           | sort -rV                   \
+                           | sort -rn                   \
                            | head -n1
 }
 

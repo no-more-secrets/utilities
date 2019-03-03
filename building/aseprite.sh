@@ -34,16 +34,6 @@ mkdir -p $work && cd $work
 tools="$HOME/dev/tools"
 mkdir -p "$tools"
 
-# This will check for the presence of (but not install) apt pack-
-# ages that are required for the build. These are taken from the
-# Aseprite INSTALL.md file, and may change with time.
-check_apt_dependencies "
-  libx11-dev
-  libxcursor-dev
-  libgl1-mesa-dev
-  libfontconfig1-dev
-"
-
 # ---------------------------------------------------------------
 # Build `skia` if necessary.
 # ---------------------------------------------------------------
@@ -53,7 +43,7 @@ skia_current="$tools/skia-current"
 [[ -e "$skia_current" ]] || \
     die "Skia not found (the above script should have built it)."
 
-skia_real_version=$(realpath $skia_current)
+skia_real_version=$(real_path $skia_current)
 log "skia_real_version: $skia_real_version"
 
 # ---------------------------------------------------------------
@@ -105,6 +95,20 @@ version=$(latest_github_repo_tag $acct $repo)
 prefix="$tools/$project_key-$version"
 
 # ---------------------------------------------------------------
+# Check apt Dependencies
+# ---------------------------------------------------------------
+# This will check for the presence of (but not install) apt pack-
+# ages that are required for the build. These are taken from the
+# Aseprite INSTALL.md file, and may change with time. This will
+# be a no-op on OSX.
+check_apt_dependencies "
+  libx11-dev
+  libxcursor-dev
+  libgl1-mesa-dev
+  libfontconfig1-dev
+"
+
+# ---------------------------------------------------------------
 # Clone repo
 # ---------------------------------------------------------------
 clone_latest_tag $acct $repo
@@ -124,6 +128,11 @@ cmake .. -DSKIA_DIR=$skia_real_version    \
 # Build/Test
 # ---------------------------------------------------------------
 ninja && ninja install
+
+# Apparently needed on OSX (though still needs to be run from the
+# bin folder. This may be fixed in a future version.
+cd "$prefix"/bin
+ln -s ../share/aseprite/data data
 
 $prefix/bin/aseprite --version
 
