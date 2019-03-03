@@ -83,7 +83,9 @@ post_install_message() {
   while true; do
       read line || break
       line="$line                                                                              "
-      line=$(sed -r 's/^(.{65}).*/\1/g' <<< "$line")
+      local regex="^(.{65}).*"
+      [[ "$line" =~ $regex ]]
+      line="${BASH_REMATCH[1]}"
       echo -e "${c_green}|${c_norm} $line${c_green}|${c_norm}"
   done <<< "$1"
 
