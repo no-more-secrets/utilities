@@ -134,3 +134,15 @@ tools_link $project_key
 bin_links  $project_key
 
 log "Success."
+
+post_install_message "
+  If on Linux then Aseprite's default Alt-Click shortcut for
+  the eyedropper tool will not work because of the window
+  managers behavior of capturing Alt-Click to move a window.
+  To disable this behavior in the window manager follow these
+  steps:
+
+    1) Install and open Dconf-Editor
+    2) Go to: org > cinnamon > desktop > wm > preferences
+    3) Change the mouse-button-modifier to <Super> (not blank!)
+"

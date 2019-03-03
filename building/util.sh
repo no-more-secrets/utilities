@@ -3,7 +3,6 @@
 
 c_norm="\033[00m"
 c_green="\033[32m"
-c_green="\033[32m"
 c_red="\033[31m"
 
 log() {
@@ -59,4 +58,19 @@ check_apt_dependencies() {
     fi
   done
   return 0
+}
+
+post_install_message() {
+  echo -e "${c_green}+==================================================================+${c_norm}"
+  echo -e "${c_green}|${c_norm} Post-Installation Notes/Instructions                             ${c_green}|${c_norm}"
+  echo -e "${c_green}+==================================================================+${c_norm}"
+
+  while true; do
+      read line || break
+      line="$line                                                                              "
+      line=$(sed -r 's/^(.{65}).*/\1/g' <<< "$line")
+      echo -e "${c_green}|${c_norm} $line${c_green}|${c_norm}"
+  done <<< "$1"
+
+  echo -e "${c_green}+==================================================================+${c_norm}"
 }
