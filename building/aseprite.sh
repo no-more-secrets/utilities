@@ -35,18 +35,6 @@ tools="$HOME/dev/tools"
 mkdir -p "$tools"
 
 # ---------------------------------------------------------------
-# Build `skia` if necessary.
-# ---------------------------------------------------------------
-$this/skia-aseprite.sh
-
-skia_current="$tools/skia-current"
-[[ -e "$skia_current" ]] || \
-    die "Skia not found (the above script should have built it)."
-
-skia_real_version=$(real_path $skia_current)
-log "skia_real_version: $skia_real_version"
-
-# ---------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------
 latest_github_repo_tag() {
@@ -93,6 +81,18 @@ version=$(latest_github_repo_tag $acct $repo)
 }
 
 prefix="$tools/$project_key-$version"
+
+# ---------------------------------------------------------------
+# Build `skia` if necessary.
+# ---------------------------------------------------------------
+$this/skia-aseprite.sh
+
+skia_current="$tools/skia-current"
+[[ -e "$skia_current" ]] || \
+    die "Skia not found (the above script should have built it)."
+
+skia_real_version=$(real_path $skia_current)
+log "skia_real_version: $skia_real_version"
 
 # ---------------------------------------------------------------
 # Check apt Dependencies
