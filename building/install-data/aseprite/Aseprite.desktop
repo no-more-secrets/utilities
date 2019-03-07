@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Aseprite
+Exec=/home/dsicilia/bin/aseprite
+Comment=Pixel Art & Sprite Editor
+Terminal=false
+Icon=/home/dsicilia/.local/share/aseprite/icon.png
+Categories=Graphics
+Type=Application

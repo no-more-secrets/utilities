@@ -65,6 +65,12 @@ clone_latest_tag() {
               https://github.com/$acct/$repo
 }
 
+supplemental_install() {
+    supp_inst="$this/install-data/$project_key/install"
+    log "Running supplemental install script for $project_key"
+    "$supp_inst"
+}
+
 # ---------------------------------------------------------------
 # Check version and if it already exists.
 # ---------------------------------------------------------------
@@ -77,6 +83,7 @@ version=$(latest_github_repo_tag $acct $repo)
     log "$project_key-$version already exists, activating it."
     tools_link $project_key
     bin_links $project_key
+    supplemental_install
     exit 0
 }
 
@@ -135,6 +142,11 @@ cd "$prefix"/bin
 ln -s ../share/aseprite/data data
 
 $prefix/bin/aseprite --version
+
+# ---------------------------------------------------------------
+# Supplemental Installation Steps
+# ---------------------------------------------------------------
+supplemental_install
 
 # ---------------------------------------------------------------
 # Make symlinks

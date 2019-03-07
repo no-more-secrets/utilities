@@ -1,0 +1,39 @@
+#!/bin/bash
+# ---------------------------------------------------------------
+# Aseprite: Installer for extra files
+# ---------------------------------------------------------------
+# Installs some menu/icon files for Aseprite on Linux.
+set -e
+set -o pipefail
+
+# Must be done first.
+this=$(cd $(dirname $0) && pwd)
+cd $this
+
+# ---------------------------------------------------------------
+# Utilities
+# ---------------------------------------------------------------
+source ../../util.sh
+
+# ---------------------------------------------------------------
+# Initialization
+# ---------------------------------------------------------------
+# This is only for linux.
+[[ "$(uname)" == Linux ]] || {
+    log "Skipping install on non-Linux system."
+    exit 0
+}
+
+share="$HOME/.local/share"
+
+# ---------------------------------------------------------------
+# Setup icons/menu
+# ---------------------------------------------------------------
+mkdir -p "$share/aseprite"
+cp icon.png "$share/aseprite"
+
+log "Adding icon to desktop."
+cp Aseprite.desktop "$HOME/Desktop"
+
+log "Adding icon to menu."
+cp Aseprite.desktop "$share/applications"
