@@ -40,6 +40,9 @@ def in_bar( s ):
         res_no_color = '===== ' + s + ' '
     return res + bcolors.PURPLE + '='*(COLUMNS_HALF - len( res_no_color )) + bcolors.NORMAL
 
+def warning( s ):
+  print( '%s%sWARNING%s: %s' % (bcolors.BOLD, bcolors.YELLOW, bcolors.NORMAL, s) )
+
 def log( s ):
     if args.verbose:
         print( s )
@@ -336,6 +339,9 @@ if __name__ == '__main__':
     assert not (args.clang and args.gcc),\
            'Cannot specify both --clang and --gcc'
 
+    if args.clang and not args.lld:
+      warning( 'using clang but not lld.' )
+
     log( 'args.gcc: %s' % args.gcc )
 
     if args.sdl_local:
@@ -486,8 +492,8 @@ if __name__ == '__main__':
         # Already exists, so just point the link to it and exit
         log( 'Build directory %s already exists, activating it.' % build_dir )
         os.symlink( build_dir, 'current', target_is_directory=True )
-        print( '%s%sNOTE%s: Using cached `%s%s%s`; run `%s%scmc rc%s` (re-configure) to force a rerun of this configuration.'
-                % (bcolors.BOLD, bcolors.YELLOW, bcolors.NORMAL, bcolors.GREEN, build_dir, bcolors.NORMAL, bcolors.BOLD, bcolors.PURPLE, bcolors.NORMAL) )
+        print( '%sNOTE%s: Using cached `%s%s%s`; run `%s%scmc rc%s` (re-configure) to force a rerun of this configuration.'
+                % (bcolors.BLUE, bcolors.NORMAL, bcolors.GREEN, build_dir, bcolors.NORMAL, bcolors.BOLD, bcolors.PURPLE, bcolors.NORMAL) )
         exit( 0 )
 
     log( 'Changing to "%s" directory' % build_dir )
