@@ -165,3 +165,14 @@ tools_link $project_key
 bin_links  $project_key
 
 log "Success."
+
+post_install_message "
+  If you are having scaling issues on HiDPI screens on Linux
+  then this may help:
+
+    export QT_SCALE_FACTOR=1
+    export QT_AUTO_SCREEN_SCALE_FACTOR=0
+    export QT_SCREEN_SCALE_FACTORS=2
+
+  Might want to set those at startup.
+"
