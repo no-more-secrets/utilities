@@ -75,6 +75,13 @@ check_apt_dependencies() {
   return 0
 }
 
+install_apt_dependencies() {
+  # If we're not on linux then do nothing here.
+  [[ "$(uname)" == Linux ]] || return 0
+  local list="$1"
+  sudo apt install $list
+}
+
 post_install_message() {
   echo -e "${c_green}+==================================================================+${c_norm}"
   echo -e "${c_green}|${c_norm} Post-Installation Notes/Instructions                             ${c_green}|${c_norm}"
