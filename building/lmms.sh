@@ -1,6 +1,6 @@
 #!/bin/bash
 # ---------------------------------------------------------------
-# Aseprite: Pixel Art Editor
+# LMMS
 # ---------------------------------------------------------------
 # This script will build and install LMMS.
 set -e
@@ -137,9 +137,6 @@ cd $repo && mkdir build && cd build
 # ---------------------------------------------------------------
 # Run CMake
 # ---------------------------------------------------------------
-# Use the deferenced path for the skia directory because we are
-# building against it and so we don't want a given version of
-# aseprite to break if the skia-current symlink changes.
 cmake .. -DCMAKE_INSTALL_PREFIX="$prefix"  \
          -DCMAKE_BUILD_TYPE=RelWithDebInfo \
          -DWANT_QT5=ON                     \
@@ -150,8 +147,6 @@ cmake .. -DCMAKE_INSTALL_PREFIX="$prefix"  \
 # ---------------------------------------------------------------
 ninja
 ninja install
-
-#$prefix/bin/aseprite --version
 
 # ---------------------------------------------------------------
 # Supplemental Installation Steps
