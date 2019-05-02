@@ -5,4 +5,15 @@ pgrep fluidsynth &>/dev/null && {
   exit 1
 }
 
-fluidsynth --server --audio-driver=alsa /usr/share/sounds/sf2/FluidR3_GM.sf2
+echo 'Select sound font:'
+
+sf_dir=/usr/share/sounds/sf2
+
+sf=$(ls $sf_dir | fzf)
+
+[[ -z "$sf" ]] && {
+  echo 'no sound font selected.'
+  exit 1
+}
+
+fluidsynth --server --audio-driver=alsa $sf_dir/$sf
