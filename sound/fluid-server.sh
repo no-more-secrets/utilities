@@ -1,4 +1,6 @@
 #!/bin/bash
+set -e
+set -o pipefail
 
 pgrep fluidsynth &>/dev/null && {
   echo 'already running.'
@@ -7,9 +9,15 @@ pgrep fluidsynth &>/dev/null && {
 
 echo 'Select sound font:'
 
-sfs="/usr/share/sounds/sf2/*.sf2 $HOME/dev/sound/sf2/*.sf2"
+sfs="/usr/share/sounds/sf2/*.sf2"
 
-sf=$(ls $sfs | fzf)
+[[ -d "$HOME/dev/sound/sf2" ]] &&
+    sfs="$sfs $HOME/dev/sound/sf2/*.sf2"
+
+sf=$(ls $sfs | fzf --no-select-1) || {
+  echo 'failed to search for sound fonts.'
+  exit 1
+}
 
 [[ -z "$sf" ]] && {
   echo 'no sound font selected.'
