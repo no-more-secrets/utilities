@@ -7,7 +7,7 @@ set -o pipefail
 # ╚═════════════════════════════════════════════════════════════╝
 # Version  to be checked out. There should be a corresponding tag
 # in the repo called gcc-$version-release.
-version=8_2_0
+version=9_1_0
 # How many threads to use during compilation.
 threads=4
 # The gcc folder will be placed inside this one.
