@@ -423,7 +423,15 @@ if __name__ == '__main__':
             c_compiler_path = '%s/%s' % (bin, gcc)
             cxx_compiler_path = '%s/%s' % (bin, gcc.replace( 'cc', '++' ))
             if is_linux and 'gcc-current' in compiler_root:
-                env_vars['LD_LIBRARY_PATH'] = '%s/lib' % compiler_root
+                # On 64 bit both the lib64 and lib are needed
+                # since they contain different libraries: lib
+                # contains the libraries that gcc needs itself to
+                # run, while lib64 contains the libraries needed
+                # to run program compiled with it.  Currently
+                # we use the same LD_LIBRARY_PATH value for both
+                # situations (running the compiler and running
+                # the compiled) which should probably be fixed.
+                env_vars['LD_LIBRARY_PATH'] = '%s/lib64:%s/lib' % (compiler_root, compiler_root)
     else:
         # Find the default compilers on the system
         c_name, c_compiler_path = default_c_compiler()
