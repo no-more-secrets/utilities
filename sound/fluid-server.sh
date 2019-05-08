@@ -2,6 +2,8 @@
 set -e
 set -o pipefail
 
+[[ "$(uname)" == Linux ]] && is_linux=1 || is_linux=0
+
 pgrep fluidsynth &>/dev/null && {
   echo 'already running.'
   exit 1
@@ -9,7 +11,9 @@ pgrep fluidsynth &>/dev/null && {
 
 echo 'Select sound font:'
 
-sfs="/usr/share/sounds/sf2/*.sf2"
+(( is_linux )) &&                      \
+  sfs="/usr/share/sounds/sf2/*.sf2" || \
+  sfs="/opt/local/share/sounds/sf2/*.sf2"
 
 [[ -d "$HOME/dev/sound/sf2" ]] &&
     sfs="$sfs $HOME/dev/sound/sf2/*.sf2"
@@ -26,4 +30,6 @@ sf=$(ls $sfs | fzf --no-select-1) || {
 
 echo "selected: $sf"
 
-fluidsynth --server --audio-driver=alsa $sf
+(( is_linux )) && driver=alsa || driver=coreaudio
+
+fluidsynth --server --audio-driver=$driver $sf
