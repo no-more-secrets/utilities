@@ -1,0 +1,37 @@
+#!/bin/bash
+# This script will set the cpu scaling governor to the "perfor-
+# mance" setting. This should prevent the cloc speed from being
+# throttled down during light load situations and may slightly
+# increase system performance, but at the expense of shorter bat-
+# tery life.
+set -e
+set -o pipefail
+
+cpus=$(ls -d /sys/devices/system/cpu/cpu?)
+
+[[ -z "$cpus" ]] && {
+  echo "no cpus found!"
+  exit 1
+}
+
+echo "Disabling CPU Scaling for:"
+echo
+for cpu in $cpus; do
+  echo "  $cpu"
+done
+echo
+
+echo -n "Proceed? [y/n]: "
+read input
+
+[[ "$input" != "y" ]] && {
+  echo "cancelling."
+  exit 0
+}
+
+for cpu in $cpus; do
+  echo performance | sudo tee "$cpu/cpufreq/scaling_governor"
+  echo "$cpu/cpufreq/scaling_governor ==> performance"
+done
+
+echo "finished."
