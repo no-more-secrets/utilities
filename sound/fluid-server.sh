@@ -32,9 +32,9 @@ echo "selected: $sf"
 
 (( is_linux )) && driver=alsa || driver=coreaudio
 
-pgrep jackd >/dev/null && {
-  echo 'jack detected: using --audio-driver=jack'
-  driver=jack
-}
+#pgrep jackd >/dev/null && {
+#  echo 'jack detected: using --audio-driver=jack'
+#  driver=jack
+#}
 
 fluidsynth --server --audio-driver=$driver $sf
