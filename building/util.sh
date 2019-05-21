@@ -98,3 +98,15 @@ post_install_message() {
 
   echo -e "${c_green}+==================================================================+${c_norm}"
 }
+
+build_threads() {
+  local threads=4
+  if [[ "$(uname)" == Linux ]]; then
+    threads=$(nproc --all)
+  elif [[ "$(uname)" == Darwin ]]; then
+    threads=$(sysctl -n hw.ncpu)
+  fi
+  [[ -z "$threads" ]] && return 1
+  echo "$threads"
+  return 0
+}
