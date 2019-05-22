@@ -211,6 +211,13 @@ if __name__ == '__main__':
                          dest='emit_only',
                          action='store_true',
                          help='Just emit the CMake command that would be run' )
+    # This is not on by default because otherwise CMake emits a
+    # warning for projects that don't use the CMAKE_C_COMPILER
+    # variable (i.e., projects that don't compiler .c files).
+    parser.add_argument( '--include-c-compiler',
+                         dest='include_c_compiler',
+                         action='store_true',
+                         help='Also specify CMAKE_C_COMPILER when running CMake.' )
     parser.add_argument( '--sdl-local',
                          dest='sdl_local',
                          action='store_true',
@@ -549,7 +556,8 @@ if __name__ == '__main__':
     cmake_args.append( '-DCMAKE_BUILD_TYPE=%s' % cmake_build_type )
     # cmake_args.append( '-DUSE_IWYU=%s' % cmake_bool( args.iwyu ) )
     cmake_args.append( '-DCMAKE_INSTALL_PREFIX=%s' % args.prefix )
-    cmake_args.append( '-DCMAKE_C_COMPILER=%s' % c_compiler_path )
+    if args.include_c_compiler:
+      cmake_args.append( '-DCMAKE_C_COMPILER=%s' % c_compiler_path )
     cmake_args.append( '-DCMAKE_CXX_COMPILER=%s' % cxx_compiler_path )
     if args.tidy:
       cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( True ) )
