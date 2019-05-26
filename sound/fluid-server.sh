@@ -30,11 +30,17 @@ sf=$(ls $sfs | fzf --no-select-1) || {
 
 echo "selected: $sf"
 
-(( is_linux )) && driver=alsa || driver=coreaudio
-
-#pgrep jackd >/dev/null && {
-#  echo 'jack detected: using --audio-driver=jack'
-#  driver=jack
-#}
+if (( is_linux )); then
+    driver=alsa
+    if which jack_lsp &>/dev/null; then
+        jack_lsp &>/dev/null && {
+          echo '*** JACK running: using --audio-driver=jack'
+          driver=jack
+        }
+    fi
+else
+    # OSX
+    driver=coreaudio
+fi
 
 fluidsynth --server --audio-driver=$driver $sf
