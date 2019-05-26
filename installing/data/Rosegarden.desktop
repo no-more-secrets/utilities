@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Rosegarden
+Exec=/usr/bin/env QT_AUTO_SCREEN_SCALE_FACTOR=1 /usr/bin/rosegarden
+Comment=Rosegarden: MIDI Sequencer & Editor
+Terminal=false
+Icon=rosegarden
+Type=Application
