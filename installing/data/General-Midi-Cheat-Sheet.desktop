@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=General Midi Cheat Sheet
+Exec=/usr/bin/gnome-terminal --geometry=40x60 -- /bin/sh /home/dsicilia/dev/utilities/sound/gm-list.sh
+Comment=List of General Midi Intruments and Indices
+Terminal=false
+Icon=rhythmbox
+Type=Application
