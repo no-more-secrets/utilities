@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=Rosegarden
+Exec=/home/dsicilia/dev/tools/rosegarden-current/bin/rosegarden
+Comment=Rosegarden: MIDI Sequencer & Editor
+Terminal=false
+Icon=/home/dsicilia/.local/share/rosegarden/icon/rosegarden.png
+Type=Application

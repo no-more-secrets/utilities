@@ -1,0 +1,14 @@
+#!/bin/bash
+# This script will place a launcher on the desktop.
+set -e
+set -o pipefail
+
+cd "$(dirname "$0")"
+
+icon_folder="$HOME/.local/share/rosegarden/icon"
+
+mkdir -p "$icon_folder"
+
+# Change to 64x64 for non-HiDPI systems.
+cp rosegarden-icon-128x128.png "$icon_folder"/rosegarden.png
+cp Rosegarden.desktop ~/Desktop
