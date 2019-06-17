@@ -1,17 +1,17 @@
 #!/bin/bash
+# ---------------------------------------------------------------
+# GNU C/C++ Compiler
+# ---------------------------------------------------------------
 set -eE
 set -o pipefail
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                        Change these                         ║
-# ╚═════════════════════════════════════════════════════════════╝
-# Version  to be checked out. There should be a corresponding tag
-# in the repo called gcc-$version-release.
-version=9_1_0
-# How many threads to use during compilation.
-threads=4
-# The gcc folder will be placed inside this one.
-install_to="$HOME/dev/tools"
+# Must be done first.
+this=$(cd $(dirname $0) && pwd)
+cd $this
+
+# ---------------------------------------------------------------
+#                           Settings
+# ---------------------------------------------------------------
 # Should be gcc (not clang as it might be on mac).
 c_compiler=/usr/bin/gcc
 cxx_compiler=/usr/bin/g++
@@ -26,11 +26,67 @@ cxx_compiler=/usr/bin/g++
 # 0).
 only_64bit=1
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                  Shouldn't Have to Change                   ║
-# ╚═════════════════════════════════════════════════════════════╝
-program_suffix=${version//_/-}
-install_prefix="$install_to/gcc-$program_suffix"
+# ---------------------------------------------------------------
+# Includes
+# ---------------------------------------------------------------
+source util.sh
+
+# ---------------------------------------------------------------
+# Initialization
+# ---------------------------------------------------------------
+# This must be a lowercase short word with no spaces describing
+# the software being built. Folders/links will be named with
+# this.
+project_key="gcc"
+
+tools="$HOME/dev/tools"
+mkdir -p "$tools"
+
+# ---------------------------------------------------------------
+# Functions
+# ---------------------------------------------------------------
+latest_github_repo_tag() {
+    local acct="$1"
+    local repo="$2"
+    local api_url="https://api.github.com/repos/$acct/$repo/tags"
+    # FROM: "name": "gcc-9_1_0-release",
+    # TO:   9_1_0
+    curl --silent $api_url | grep '"name":'                            \
+                           | sed 's/.*: "v\?gcc-\(.*\)-release".*/\1/' \
+                           | grep '^[0-9]'                             \
+                           | sort -rV                                  \
+                           | head -n1
+}
+
+# ---------------------------------------------------------------
+# Check version and if it already exists.
+# ---------------------------------------------------------------
+# Version to be checked out. There should be a corresponding tag
+# in the repo called gcc-$version-release.
+version=$(latest_github_repo_tag gcc-mirror gcc)
+log "latest version: $version"
+
+regex='^[0-9]+_[0-9]+_[0-9]+$'
+[[ "$version" =~ $regex ]] ||
+    die "version \"$version\" does not match regex."
+
+# 9_1_0 --> 9-1-0
+version_dashes=${version//_/-}
+
+[[ -e "$tools/$project_key-$version_dashes" ]] && {
+    log "$project_key-$version already exists, activating it."
+    version="$version_dashes"
+    tools_link $project_key
+    # no bin_links here.
+    #supplemental_install
+    exit 0
+}
+
+# ---------------------------------------------------------------
+#                    Shouldn't Have to Change
+# ---------------------------------------------------------------
+program_suffix="$version_dashes"
+install_prefix="$tools/$project_key-$program_suffix"
 git_repo=git://gcc.gnu.org/git/gcc.git
 build_logs=$install_prefix/build-logs
 work_prefix=/tmp # may not exist yet
@@ -61,9 +117,9 @@ c_red="\033[31m"
 (( only_64bit )) && multilib="--disable-multilib" \
                  || multilib="--enable-multilib"
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                            Check                            ║
-# ╚═════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------
+#                              Check
+# ---------------------------------------------------------------
 fail() {
     echo "$@"
     return 1
@@ -73,9 +129,9 @@ fail() {
 [[ -x "$c_compiler"   ]] || fail "$c_compiler does not exist."
 [[ -x "$cxx_compiler" ]] || fail "$cxx_compiler does not exist."
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                          Utilities                          ║
-# ╚═════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------
+#                            Utilities
+# ---------------------------------------------------------------
 run() {
     local desc=$1
     local func=$2
@@ -115,20 +171,22 @@ die() {
 trap die ERR
 
 make_check_install() {
-    make -j$threads && make check -j$threads && make install
+    make -j$(build_threads)       && \
+    make check -j$(build_threads) && \
+    make install
 }
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                       Initialization                        ║
-# ╚═════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------
+#                         Initialization
+# ---------------------------------------------------------------
 init() {
     mkdir -p $install_prefix
     mkdir -p $work_prefix
 }
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                         Clone Repo                          ║
-# ╚═════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------
+#                           Clone Repo
+# ---------------------------------------------------------------
 clone() {
     cd $work_prefix
 
@@ -158,18 +216,18 @@ clone() {
 # function twice.
 clone2() { clone "$@"; }
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                   Download Prerequisites                    ║
-# ╚═════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------
+#                     Download Prerequisites
+# ---------------------------------------------------------------
 download_prerequisites() {
     cd $work_path
     mkdir -p $gcc_deps
     bash contrib/download_prerequisites --directory=$gcc_deps
 }
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                   Building Prerequisites                    ║
-# ╚═════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------
+#                     Building Prerequisites
+# ---------------------------------------------------------------
 build_gmp() {
     cd $gcc_deps && cd $(ls -d gmp-*/)
     mkdir -p build && cd build
@@ -219,9 +277,9 @@ build_mpc() {
     make_check_install
 }
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                          Build gcc                          ║
-# ╚═════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------
+#                            Build gcc
+# ---------------------------------------------------------------
 build_gcc() {
     cd $work_path
     mkdir -p build && cd build
@@ -237,12 +295,12 @@ build_gcc() {
                  --enable-languages=$languages \
                  --program-suffix=-$program_suffix
 
-    make -j$threads && make install
+    make -j$(build_threads) && make install
 }
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                          Test gcc                           ║
-# ╚═════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------
+#                            Test gcc
+# ---------------------------------------------------------------
 test_gcc() {
     local gcc=$install_prefix/bin/gcc-$program_suffix
     local gpp=$install_prefix/bin/g++-$program_suffix
@@ -269,9 +327,9 @@ test_gcc() {
     ./a.out
 }
 
-# ╔═════════════════════════════════════════════════════════════╗
-# ║                        Main Program                         ║
-# ╚═════════════════════════════════════════════════════════════╝
+# ---------------------------------------------------------------
+#                          Main Program
+# ---------------------------------------------------------------
 main() {
     run "initializing"              init
     run "cloning gcc"               clone
@@ -286,3 +344,10 @@ main() {
 }
 
 main
+
+# ---------------------------------------------------------------
+# Make symlinks
+# ---------------------------------------------------------------
+version="$version_dashes"
+tools_link $project_key
+# no bin_link here.
