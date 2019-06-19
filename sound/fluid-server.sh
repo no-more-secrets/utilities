@@ -43,4 +43,6 @@ else
     driver=coreaudio
 fi
 
+echo "Using driver: $driver"
+
 fluidsynth --server --audio-driver=$driver $sf
