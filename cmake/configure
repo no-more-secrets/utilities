@@ -296,6 +296,12 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    script_dir = os.path.dirname( os.path.realpath( __file__ ) )
+    log( "script directory: " + script_dir )
+
+    if not os.path.exists( 'Makefile' ):
+        os.symlink( os.path.join(script_dir, 'build.mk'), 'Makefile', target_is_directory=False )
+
     if args.mode == 'st':
         exit( do_st() )
 
