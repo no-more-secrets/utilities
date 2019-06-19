@@ -300,7 +300,7 @@ if __name__ == '__main__':
     log( "script directory: " + script_dir )
 
     if not os.path.exists( 'Makefile' ):
-        os.symlink( os.path.join(script_dir, 'build.mk'), 'Makefile', target_is_directory=False )
+      os.symlink( os.path.join(os.path.relpath( script_dir ), 'build.mk'), 'Makefile', target_is_directory=False )
 
     if args.mode == 'st':
         exit( do_st() )
