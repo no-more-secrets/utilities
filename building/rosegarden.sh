@@ -82,11 +82,16 @@ prefix="$tools/$project_key-$version"
 # and/or with Linux distribution. This will be a no-op on OSX.
 echo 'You may be asked for your password to install apt dependencies:'
 apt_deps="
-    libjack-dev
-    ladspa-sdk-dev
     dssi-dev
+    ladspa-sdk-dev
+    libfftw3-dev
+    libjack-dev
     liblo-dev
     liblrdf-dev
+    libsamplerate-dev
+    libsndfile-dev
+    qttools5-dev
+    qttools5-dev-tools
 "
 echo -e "$apt_deps"
 
