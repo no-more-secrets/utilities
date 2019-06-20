@@ -18,15 +18,15 @@ ifneq (,$(wildcard $(build-current)/Makefile))
     # also do not just put the whole command into a variable
     # and just define the targets once.
     $(possible_targets): $(build-current)
-	    @touch $(stamp-file)
 	    @cd $(build-current) && $(MAKE) -s $@
+	    @touch $(stamp-file)
 else
     # Use cmake to build here because it is the preferred
     # way to go when it works for us (which it does in this
     # case).
     $(possible_targets): $(build-current)
-	    @touch $(stamp-file)
 	    @cd $(build-current) && cmake --build . --target $@
+	    @touch $(stamp-file)
 endif
 
 clean-target := $(if $(wildcard $(builds)),clean,)
