@@ -43,6 +43,7 @@ update:
 	@cmc rc
 	@bash $(cmake-utils)/outdated.sh -v
 	@$(MAKE) -s all
+	@$(MAKE) -s test
 
 what:
 	@scripts/outdated.sh
