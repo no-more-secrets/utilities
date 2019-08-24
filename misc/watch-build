@@ -4,9 +4,16 @@
 # of  them  to change. As soon as one changes then a make command
 # will be run with a target if one has been specified.
 
+where="$1"; shift
+
+if [[ ! -d "$where" ]]; then
+    echo 'Root folder must be first parameter.'
+    exit 1
+fi
+
 bash_script="
     /usr/bin/make "$@"
     echo '-----------------------------------------------------------'
 "
 
-find . \( -name "*.?pp" -or -name "*.c" \) | entr -c /bin/bash -c "$bash_script"
+find "$where" \( -name "*.?pp" -or -name "*.c" \) | entr -c /bin/bash -c "$bash_script"
