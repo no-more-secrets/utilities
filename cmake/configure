@@ -553,6 +553,8 @@ if __name__ == '__main__':
             cmake_cxx_flags_init.append( '-stdlib=libstdc++' )
         cmake_exe_linker_flags_init.extend( ['-Wl,-rpath,%s' % gcc_lib_home, '-L%s' % gcc_lib_home] )
 
+    llvm_current = '%s/dev/tools/llvm-current' % os.environ['HOME']
+
     cmake_args = []
     cmake_args.append( '-G%s' % G )
     # -Wno-dev is to suppress cmake warnings that we are getting from
@@ -575,9 +577,10 @@ if __name__ == '__main__':
         cmake_args.append( '-DCMAKE_VERBOSE_MAKEFILE=ON' )
     if args.asan:
         cmake_args.append( '-DENABLE_ADDRESS_SANITIZER=ON' )
+        if compiler == 'clang':
+          env_vars['ASAN_SYMBOLIZER_PATH'] = '%s/bin/llvm-symbolizer' % llvm_current
     if args.libcxx:
         cmake_args.append( '-DUSE_LIBCXX=ON' )
-        llvm_current = '%s/dev/tools/llvm-current' % os.environ['HOME']
         # See: https://libcxx.llvm.org/docs/UsingLibcxx.html
         cmake_cxx_flags_init.extend( ['-stdlib=libc++', '-I%s/include/c++/v1' % llvm_current] )
         cmake_exe_linker_flags_init.extend( ['-stdlib=libc++', '-lc++abi', '-L%s/lib' % llvm_current, '-Wl,-rpath,%s/lib' % llvm_current] )
