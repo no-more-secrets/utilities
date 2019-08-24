@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+import colorsys
+import time
+
+def drawRainbow():
+  with open( "/sys/devices/platform/system76/leds/system76::kbd_backlight/color_left", "r+" ) as f:
+    for i in range( 1000 ):
+      r, g, b = colorsys.hsv_to_rgb(i/100, 1.0, 1.0)
+      hexcolor = '%02x%02x%02x' % ( int(r*255), int(g*255), int(b*255) )
+      f.write( hexcolor )
+      f.flush()
+      time.sleep( 2 )
+
+while True:
+  drawRainbow()
