@@ -510,12 +510,9 @@ if __name__ == '__main__':
         log( 'Creating "%s" directory' % build_dir )
         os.mkdir( build_dir )
     else:
-        # Already exists, so just point the link to it and exit
+        # Already exists, so just activate it and then proceed to reconfigure.
         log( 'Build directory %s already exists, activating it.' % build_dir )
         os.symlink( build_dir, 'current', target_is_directory=True )
-        print( '%sNOTE%s: Using cached `%s%s%s`; run `%s%scmc rc%s` (re-configure) to force a rerun of this configuration.'
-                % (bcolors.BLUE, bcolors.NORMAL, bcolors.GREEN, build_dir, bcolors.NORMAL, bcolors.BOLD, bcolors.PURPLE, bcolors.NORMAL) )
-        exit( 0 )
 
     log( 'Changing to "%s" directory' % build_dir )
     os.chdir( build_dir )
