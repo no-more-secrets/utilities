@@ -199,6 +199,10 @@ if __name__ == '__main__':
                          nargs='?',
                          choices=['c', 'rc', 'st', 'ls', 'sel'],
                          help='Select mode' )
+    parser.add_argument( '--cached',
+                         dest='cached',
+                         action='store_true',
+                         help='If configuration already exists then switch to it but do not reconfigure.' )
     parser.add_argument( '--release',
                          dest='release',
                          action='store_true',
@@ -510,9 +514,13 @@ if __name__ == '__main__':
         log( 'Creating "%s" directory' % build_dir )
         os.mkdir( build_dir )
     else:
-        # Already exists, so just activate it and then proceed to reconfigure.
+        # Already exists, so just activate it.
         log( 'Build directory %s already exists, activating it.' % build_dir )
         os.symlink( build_dir, 'current', target_is_directory=True )
+        if args.cached:
+            print( '%sNOTE%s: Using cached `%s%s%s`.'
+                    % (bcolors.BLUE, bcolors.NORMAL, bcolors.GREEN, build_dir, bcolors.NORMAL) )
+            exit( 0 )
 
     log( 'Changing to "%s" directory' % build_dir )
     os.chdir( build_dir )
