@@ -51,6 +51,8 @@ tools_link() {
         die "the 'tools' variable must be set in tools_link."
     [[ -d "$tools" ]] || \
         die "the 'tools' folder ($tools) must exist."
+    [[ -z "$version" ]] && \
+        die "the 'version' variable must be set."
     local what="$1"
     pushd $tools &>/dev/null
     rm -f $what-current
