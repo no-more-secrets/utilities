@@ -115,6 +115,9 @@ def platform_identifier( *args, **params ):
     if params['trace']:
         chain.append( 'trace' )
 
+    if params['generator'] and params['generator'] != 'make':
+        chain.append( params['generator'] )
+
     return '-'.join( chain )
 
 def do_st():
@@ -505,7 +508,8 @@ if __name__ == '__main__':
                                      build_type=build_type,
                                      tidy=args.tidy,
                                      asan=args.asan,
-                                     trace=args.trace )
+                                     trace=args.trace,
+                                     generator=gen_label )
 
     if os.path.exists( 'current' ):
         os.remove( 'current' )
