@@ -25,7 +25,7 @@ else
     # way to go when it works for us (which it does in this
     # case).
     $(possible_targets): $(build-current)
-	    @cd $(build-current) && cmake --build . --target $@
+	    @cd $(build-current) && ninja $@
 	    @touch $(stamp-file)
 endif
 
