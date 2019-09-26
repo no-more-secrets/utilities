@@ -38,10 +38,11 @@ bin_links() {
         die "the 'tools' variable must be set in bin_links."
     [[ -d "$tools" ]] || \
         die "the 'tools' folder ($tools) must exist."
-    local what="$1"
+    local project_key="$1"
+    [[ -z "$2" ]] && exe=$project_key || exe=$2
     mkdir -p ~/bin
-    rm -f ~/bin/$what
-    ln -s $tools/$what-current/bin/$what ~/bin/$what
+    rm -f ~/bin/$exe
+    ln -s $tools/$project_key-current/bin/$exe ~/bin/$exe
 }
 
 # Creates link in the tools folder to the current version of a
