@@ -119,7 +119,12 @@ log "skia_real_version: $skia_real_version"
 # Clone repo
 # ---------------------------------------------------------------
 clone_latest_tag $acct $repo
-cd $repo && mkdir build && cd build
+cd $repo && mkdir -p build && cd build
+
+# tmp hack.
+cd ..
+sed -r -i 's/third_party\/skcms/include\/third_party\/skcms/' laf/os/CMakeLists.txt
+cd build
 
 # ---------------------------------------------------------------
 # Run CMake
@@ -127,8 +132,11 @@ cd $repo && mkdir build && cd build
 # Use the deferenced path for the skia directory because we are
 # building against it and so we don't want a given version of
 # aseprite to break if the skia-current symlink changes.
-cmake .. -DSKIA_DIR=$skia_real_version    \
-         -DCMAKE_INSTALL_PREFIX="$prefix" \
+cmake .. -DSKIA_DIR=$skia_real_version                 \
+         -DCMAKE_INSTALL_PREFIX="$prefix"              \
+         -DLAF_OS_BACKEND=skia                         \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo             \
+         -DSKIA_OUT_DIR=$skia_real_version/out/Release \
          -G Ninja
 
 # ---------------------------------------------------------------
