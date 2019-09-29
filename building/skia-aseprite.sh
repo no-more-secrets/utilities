@@ -45,11 +45,12 @@ latest_github_repo_branch() {
     local api_url="https://api.github.com/repos/$acct/$repo/branches"
     # FROM: "name": "v8.1.0338",
     # TO:   v8.1.0338
-    curl --silent $api_url | grep '"name":'             \
-                           | grep 'aseprite-m[0-9]\+"'  \
-                           | sed 's/.*: "\(.*\)".*/\1/' \
-                           | sort -rn                   \
-                           | head -n1
+    #curl --silent $api_url | grep '"name":'             \
+    #                       | grep 'aseprite-m[0-9]\+"'  \
+    #                       | sed 's/.*: "\(.*\)".*/\1/' \
+    #                       | sort -rn                   \
+    #                       | head -n1
+    echo aseprite-m71
 }
 
 clone_latest_branch() {

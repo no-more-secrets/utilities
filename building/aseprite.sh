@@ -121,11 +121,6 @@ log "skia_real_version: $skia_real_version"
 clone_latest_tag $acct $repo
 cd $repo && mkdir -p build && cd build
 
-# tmp hack.
-cd ..
-sed -r -i 's/third_party\/skcms/include\/third_party\/skcms/' laf/os/CMakeLists.txt
-cd build
-
 # ---------------------------------------------------------------
 # Run CMake
 # ---------------------------------------------------------------
