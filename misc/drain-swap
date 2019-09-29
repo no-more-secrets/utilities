@@ -1,0 +1,8 @@
+#!/bin/bash
+# This will drain usage of swap space by temporarily disabling
+# swap, then re-enabling. Only run this if there is enough RAM
+# available otherwise system can become unstable.
+set -e
+
+sudo swapoff -a
+sudo swapon -a
