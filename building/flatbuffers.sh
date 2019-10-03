@@ -76,7 +76,9 @@ cd $repo
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Configure
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-mkdir build && cd build
+# "build" conflicts on OSX with a file called BUILD
+# (case-insensitive file system).
+mkdir build1 && cd build1
 
 cmake ..                               \
      -DCMAKE_BUILD_TYPE=RelWithDebInfo \
