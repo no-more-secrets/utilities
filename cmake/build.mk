@@ -18,6 +18,7 @@ ifneq (,$(wildcard $(build-current)/Makefile))
     # also do not just put the whole command into a variable
     # and just define the targets once.
     $(possible_targets): $(build-current)
+	    @bash $(cmake-utils)/outdated.sh -v
 	    @cd $(build-current) && $(MAKE) -s $@
 	    @touch $(stamp-file)
 else
@@ -25,6 +26,7 @@ else
     # way to go when it works for us (which it does in this
     # case).
     $(possible_targets): $(build-current)
+	    @bash $(cmake-utils)/outdated.sh -v
 	    @cd $(build-current) && ninja $@
 	    @touch $(stamp-file)
 endif
