@@ -8,6 +8,8 @@ cmake-utils   := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 -include $(build-current)/env-vars.mk
 
+pre-build := $(if $(wildcard scripts/pre-build.sh),scripts/pre-build.sh,:)
+
 possible_targets := all run clean test
 
 build-config := $(notdir $(realpath $(build-current)))
@@ -19,6 +21,7 @@ ifneq (,$(wildcard $(build-current)/Makefile))
     # and just define the targets once.
     $(possible_targets): $(build-current)
 	    @bash $(cmake-utils)/outdated.sh -v
+	    @$(pre-build)
 	    @cd $(build-current) && $(MAKE) -s $@
 	    @touch $(stamp-file)
 else
@@ -27,6 +30,7 @@ else
     # case).
     $(possible_targets): $(build-current)
 	    @bash $(cmake-utils)/outdated.sh -v
+	    @$(pre-build)
 	    @cd $(build-current) && ninja $@
 	    @touch $(stamp-file)
 endif
