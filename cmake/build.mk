@@ -43,7 +43,6 @@ update:
 	@git pull origin `git rev-parse --abbrev-ref HEAD` --quiet
 	@git submodule update --init
 	@cmc rc
-	@bash $(cmake-utils)/outdated.sh -v
 	@$(MAKE) -s all
 	@$(MAKE) -s test
 
