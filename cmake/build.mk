@@ -45,6 +45,7 @@ distclean: $(clean-target)
 
 update:
 	@git pull origin `git rev-parse --abbrev-ref HEAD` --quiet
+	@git submodule sync --quiet
 	@git submodule update --init
 	@cmc rc
 	@$(MAKE) -s all
