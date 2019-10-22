@@ -232,7 +232,7 @@ if __name__ == '__main__':
     parser.add_argument( '--generator',
                          dest='generator',
                          type=str,
-                         default=None,
+                         default='ninja',
                          choices=['ninja', 'make'],
                          help='Choose the generator' )
     # parser.add_argument( '--iwyu',
@@ -474,10 +474,7 @@ if __name__ == '__main__':
 
     generator = None
 
-    if args.generator:
-        generator = args.generator
-    else:
-        generator = 'make'
+    generator = args.generator
 
     log( 'Using generator: %s' % generator )
 
