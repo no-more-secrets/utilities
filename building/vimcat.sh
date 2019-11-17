@@ -29,8 +29,7 @@ cd $work_dir
 tools="$HOME/dev/tools"
 mkdir -p "$tools"
 
-repo_name_lower="${repo_name,,}"
-prefix="$tools/$repo_name_lower-$version"
+prefix="$tools/$repo_name-$version"
 
 echo prefix: $prefix
 mkdir -p "$prefix"

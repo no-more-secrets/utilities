@@ -149,6 +149,11 @@ cmake_vars="
   -DCMAKE_INSTALL_PREFIX=$install
 "
 
+[[ "$(uname)" == Darwin ]] && {
+  export CFLAGS="-I/opt/local/include"
+  export CXXFLAGS="-I/opt/local/include"
+}
+
 mkdir build
 cd build
 cmake -G Ninja $cmake_vars ../llvm
