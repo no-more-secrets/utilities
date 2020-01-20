@@ -1,0 +1,60 @@
+#!/bin/bash
+set -e
+set -o pipefail
+
+wifi_interface() {
+  iw dev | awk '/^\s+Interface/ { print $2 }'
+}
+
+(( $(wifi_interface | wc -l) != 1 )) && {
+  echo 1>&2 "error: could not find precisely one wifi interface.  Instead found:"
+  wifi_interface | nl 1>&2
+  exit 1
+}
+
+interface=$(wifi_interface)
+echo "found wifi interface: $interface"
+
+get_ip() {
+  local interface=$1
+  ifconfig $interface \
+      | tr '\t' ' '   \
+      | sed -nr 's/ *inet ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/p'
+}
+
+ipv4_address=$(get_ip $interface)
+
+[[ "$ipv4_address" =~ ^([0-9]+\.[0-9]+\.[0-9]+)\.[0-9]+$ ]] || {
+  echo 1>&2 "error: '$ipv4_address' is not a valid IP address."
+  exit 1
+}
+echo "found ip address: $ipv4_address"
+
+first_three_components=${BASH_REMATCH[1]}
+[[ "$first_three_components" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
+  echo 1>&2 "error: '$first_three_components' are not valid initial components of IP address."
+  exit 1
+}
+
+echo "scanning $first_three_components.*:"
+echo "--------------------------------------------------------------"
+
+{
+  echo "host ip name status"
+  echo "------- ---------------- ----------------------------- -------"
+  nmap -oG - -sP "$first_three_components.0/24" | grep -v '^#'
+} | awk '{print $2, $3, $4, $5, $6}' | column -t 
+
+exit $?
+
+# The below alternative will tell nmap to output in XML, then
+# will use the xmltodict module to parse the XML and convert it
+# to a python dictionary, then will pretty-print the result. If
+# you want to run this, apt install python-xmltodict.
+xmltodict='
+import xmltodict, pprint, json, sys
+pp = pprint.PrettyPrinter(indent=4)
+print json.dumps( xmltodict.parse( sys.stdin.read() ), indent=4 )
+'
+
+nmap -oX - -sP "$first_three_components.0/24" | python -c "$xmltodict"
