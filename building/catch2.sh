@@ -57,7 +57,8 @@ cd build
 
 prefix="$HOME/.local"
 
-cmake .. -DCMAKE_INSTALL_PREFIX="$prefix"
+cmake .. -DCMAKE_INSTALL_PREFIX="$prefix" \
+         -DCMAKE_INSTALL_LIBDIR="$prefix/lib"
 
 if which nproc 2>/dev/null; then
     threads=$(nproc --all)
