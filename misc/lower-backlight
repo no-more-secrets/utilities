@@ -1,0 +1,54 @@
+#!/bin/bash
+# This script will allow setting the screen backlight to a value
+# that is a fraction of the current brightness. This allows set-
+# ting it below the default minimum brightness. It will present
+# an interactive menu with a few brightness levels. For example,
+# selecting "25%" will lower the brightness to 25% of its current
+# level.
+#
+# Recommended usage: first use the usual controls on the keyboard
+# to lower the brightness down to the minimum level, then run
+# this script to lower it further (will require admin password).
+set -e
+set -o pipefail
+
+die() {
+  echo -e "error: $*"
+  exit 1
+}
+
+intel_backlight="/sys/class/backlight/intel_backlight"
+
+[[ -d "$intel_backlight" ]] || die "cannot find $intel_backlight folder."
+
+cd "$intel_backlight" || die "failed to change to $intel_backlight folder."
+
+[[ -f brightness     ]] || die "failed to find 'brightness' file."
+[[ -f max_brightness ]] || die "failed to find 'max_brightness' file."
+
+echo "Current brightness: $(cat brightness)/$(cat max_brightness)."
+
+brightness="$(cat brightness)"
+
+(( brightness >= 10 )) || die "current brightness ($brightness) is not adjustable."
+
+echo
+echo "Select new brightness level relative to current (the smaller, the darker):"
+
+select level in "75%" "66%" "50%" "33%" "25%"; do
+  case "$level" in
+    "75%") new_brightness=$(( brightness*3/4 )); break ;;
+    "66%") new_brightness=$(( brightness*2/3 )); break ;;
+    "50%") new_brightness=$(( brightness/2   )); break ;;
+    "33%") new_brightness=$(( brightness/3   )); break ;;
+    "25%") new_brightness=$(( brightness/4   )); break ;;
+        *) die "invalid option selected."              ;;
+  esac
+done
+
+(( new_brightness >= 10 )) || die "new brightness level ($new_brightness) is too low."
+
+echo "Setting brightness level to: $new_brightness."
+echo "(you may be asked for admin password)"
+
+sudo su -c "echo $new_brightness > brightness"
