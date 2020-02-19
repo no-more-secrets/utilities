@@ -561,6 +561,11 @@ if __name__ == '__main__':
 
     llvm_current = '%s/dev/tools/llvm-current' % os.environ['HOME']
 
+    # List of absolute paths of shared libraries to be preloaded
+    # before any binary is run (includes both compiler and the
+    # compiled program).
+    ld_preload = []
+
     cmake_args = []
     cmake_args.append( '-G%s' % G )
     # -Wno-dev is to suppress cmake warnings that we are getting from
@@ -588,6 +593,25 @@ if __name__ == '__main__':
           suppressions = '%s/scripts/lsan.suppressions' % root_dir
           if os.path.exists( suppressions ):
             env_vars['LSAN_OPTIONS'] = 'suppressions=%s' % suppressions
+        # When running under ASan it is necessary to prevent any dynamically loaded shared
+        # libraries from being dlclose'd. This is because, if the loaded library causes
+        # some memory leak then ASan will list it as an "unknown module" in its final re-
+        # port because it will not know how to map the memory address to a library because
+        # that library was unloaded (via dlclose) before ASan produces its final report.
+        #
+        # Unfortunately, it does appear that preventing shared libraries from being un-
+        # loaded also may completely take away the memory leaks (as reported by ASan) if
+        # that leaked memory is still accessible from somewhere in the shared library. In
+        # that case, ASan will still not display the name of that library since the leak
+        # has gone away, from its point of view.
+        #
+        # That said, doing this is still good since there are still genuine leaks that can
+        # be created within a dynamically loaded library (i.e., ones whose memory actually
+        # becomes inaccessible before the library is unloaded).
+        libdlclose_noop = '%s/dev/utilities/ld-preload/output/libdlclose-noop.so' % os.environ['HOME']
+        if is_linux and os.path.exists( libdlclose_noop ):
+          ld_preload.append( libdlclose_noop )
+
     if args.libcxx:
         cmake_args.append( '-DUSE_LIBCXX=ON' )
         # See: https://libcxx.llvm.org/docs/UsingLibcxx.html
@@ -614,6 +638,9 @@ if __name__ == '__main__':
       cmake_args.append( '-DCMAKE_CXX_FLAGS_INIT=%s' % ' '.join( cmake_cxx_flags_init ) )
     if cmake_exe_linker_flags_init:
       cmake_args.append( '-DCMAKE_EXE_LINKER_FLAGS_INIT=%s' % ' '.join( cmake_exe_linker_flags_init ) )
+
+    if ld_preload:
+      env_vars['LD_PRELOAD'] = ':'.join( ld_preload )
 
     exe = 'ccmake' if args.gui else 'cmake'
     cmd = [exe, '../..'] + cmake_args
