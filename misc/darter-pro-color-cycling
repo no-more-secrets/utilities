@@ -7,6 +7,7 @@ def drawRainbow():
     for i in range( 1000 ):
       r, g, b = colorsys.hsv_to_rgb(i/100, 1.0, 1.0)
       hexcolor = '%02x%02x%02x' % ( int(r*255), int(g*255), int(b*255) )
+      print( '> hexcolor: ' + hexcolor )
       f.write( hexcolor )
       f.flush()
       time.sleep( 2 )

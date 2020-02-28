@@ -1,0 +1,4 @@
+#!/usr/bin/env python3
+with open( "/sys/devices/platform/system76/leds/system76::kbd_backlight/color_left", "r+" ) as f:
+  f.write( 'FF5B00' )
+  f.flush()
