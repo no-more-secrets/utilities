@@ -6,14 +6,19 @@ wifi_interface() {
   iw dev | awk '/^\s+Interface/ { print $2 }'
 }
 
-(( $(wifi_interface | wc -l) != 1 )) && {
-  echo 1>&2 "error: could not find precisely one wifi interface.  Instead found:"
-  wifi_interface | nl 1>&2
+(( $(wifi_interface | wc -l) == 0 )) && {
+  echo 1>&2 "error: could not find any WiFi interfaces."
   exit 1
 }
 
-interface=$(wifi_interface)
-echo "found wifi interface: $interface"
+if (( $(wifi_interface | wc -l) > 1 )); then
+  echo -ne "select wifi interface:"
+  interface=$(wifi_interface | fzf)
+else
+  interface=$(wifi_interface)
+fi
+
+echo "using wifi interface: $interface"
 
 get_ip() {
   local interface=$1
