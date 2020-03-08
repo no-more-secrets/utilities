@@ -48,7 +48,7 @@ echo "--------------------------------------------------------------"
   echo "host ip name status"
   echo "------- ---------------- ----------------------------- -------"
   nmap -oG - -sP "$first_three_components.0/24" | grep -v '^#'
-} | awk '{print $2, $3, $4, $5, $6}' | column -t 
+} | awk '{print $2, $3, $4, $5, $6}' | tr '()' ' ' | column -t -s' '
 
 exit $?
 
