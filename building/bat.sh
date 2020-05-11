@@ -112,6 +112,7 @@ bin_links $project_key
 
 # Special for bat: link config file.
 rm -f ~/.config/bat/config
+mkdir -p ~/.config/bat
 ln -s ~/.dotfiles/dot/config/bat/config ~/.config/bat/config
 
 # ---------------------------------------------------------------
