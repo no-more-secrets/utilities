@@ -98,6 +98,8 @@ cd $repo
 # ---------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------
+export LLVM_CONFIG_PATH=~/dev/tools/llvm-current/bin/llvm-config
+
 cargo build --bins
 cargo test
 cargo install --path=. --root=$prefix
