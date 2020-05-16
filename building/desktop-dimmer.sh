@@ -49,6 +49,13 @@ current_installed_version() {
 }
 
 # ---------------------------------------------------------------
+# Dependencies
+# ---------------------------------------------------------------
+check_apt_dependencies '
+  gdebi
+'
+
+# ---------------------------------------------------------------
 # Check version and if it already exists.
 # ---------------------------------------------------------------
 acct="sidneys"
@@ -56,7 +63,8 @@ repo="desktop-dimmer"
 
 version=$(latest_github_repo_tag $acct $repo)
 
-installed_version=v$(current_installed_version)
+installed_version_no_v=$(current_installed_version)
+installed_version="v$installed_version_no_v"
 
 [[ "$version" == "$installed_version" ]] && {
     log "version $version is already installed."
@@ -66,7 +74,7 @@ installed_version=v$(current_installed_version)
 log "latest version: $version"
 
 # Uninstall if already installed.
-[[ ! -z "$installed_version" ]] && {
+[[ ! -z "$installed_version_no_v" ]] && {
   log "uninstalled existing version."
   sudo apt remove -y desktop-dimmer
 }
