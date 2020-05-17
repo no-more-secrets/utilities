@@ -17,11 +17,13 @@ die() {
   exit 1
 }
 
-intel_backlight="/sys/class/backlight/intel_backlight"
+backlight="/sys/class/backlight/intel_backlight"
+[[ ! -e "$backlight" ]] && \
+    backlight="/sys/class/backlight/gmux_backlight"
+[[ ! -e "$backlight" ]] && \
+    die "cannot find suitable backlight folder."
 
-[[ -d "$intel_backlight" ]] || die "cannot find $intel_backlight folder."
-
-cd "$intel_backlight" || die "failed to change to $intel_backlight folder."
+cd "$backlight" || die "failed to change to $backlight folder."
 
 [[ -f brightness     ]] || die "failed to find 'brightness' file."
 [[ -f max_brightness ]] || die "failed to find 'max_brightness' file."
