@@ -427,7 +427,7 @@ if __name__ == '__main__':
                 bin = '%s/bin' % compiler_root
             # At this point, compiler_root and bin should be set, and hopefully
             # the bin/ folder contains the compilers.
-            gccs = [f for f in os.listdir( bin ) if re.match( '^gcc[0-9-]*$', f )]
+            gccs = [f for f in os.listdir( bin ) if re.match( '^gcc[0-9-.]*$', f )]
             # This attempts to put the later versions first, assuming there are
             # multiple versions in the same folder and they have the version
             # numbers in their name.

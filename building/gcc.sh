@@ -49,12 +49,11 @@ latest_github_repo_tag() {
     local acct="$1"
     local repo="$2"
     local api_url="https://api.github.com/repos/$acct/$repo/tags"
-    # FROM: "name": "gcc-9_1_0-release",
-    # TO:   9_1_0
-    curl --silent $api_url | grep '"name":'                            \
-                           | sed 's/.*: "v\?gcc-\(.*\)-release".*/\1/' \
-                           | grep '^[0-9]'                             \
-                           | sort -rV                                  \
+    # FROM: "name": "releases/gcc-9.1.0",
+    # TO:   9.1.0
+    curl --silent $api_url | grep '"name":'                              \
+                           | sed -rn 's/.*: "releases\/gcc-(.*)".*/\1/p' \
+                           | sort -rV                                    \
                            | head -n1
 }
 
@@ -66,16 +65,13 @@ latest_github_repo_tag() {
 version=$(latest_github_repo_tag gcc-mirror gcc)
 log "latest version: $version"
 
-regex='^[0-9]+_[0-9]+_[0-9]+$'
+regex='^[0-9]+\.[0-9]+\.[0-9]+$'
 [[ "$version" =~ $regex ]] ||
     die "version \"$version\" does not match regex."
 
-# 9_1_0 --> 9-1-0
-version_dashes=${version//_/-}
-
-[[ -e "$tools/$project_key-$version_dashes" ]] && {
+[[ -e "$tools/$project_key-$version" ]] && {
     log "$project_key-$version already exists, activating it."
-    version="$version_dashes"
+    version="$version"
     tools_link $project_key
     # no bin_links here.
     #supplemental_install
@@ -85,7 +81,7 @@ version_dashes=${version//_/-}
 # ---------------------------------------------------------------
 #                    Shouldn't Have to Change
 # ---------------------------------------------------------------
-program_suffix="$version_dashes"
+program_suffix="$version"
 install_prefix="$tools/$project_key-$program_suffix"
 git_repo=git://gcc.gnu.org/git/gcc.git
 build_logs=$install_prefix/build-logs
@@ -192,7 +188,7 @@ clone() {
 
     # Hopefully gcc always follows this convention for mapping
     # version number to tag name.
-    local tag=gcc-$version-release
+    local tag="releases/gcc-$version"
 
     # Don't remove it if it already exists because it takes too
     # long to clone again, so if it exists then just run a git
@@ -348,6 +344,6 @@ main
 # ---------------------------------------------------------------
 # Make symlinks
 # ---------------------------------------------------------------
-version="$version_dashes"
+version="$version"
 tools_link $project_key
 # no bin_link here.
