@@ -20,7 +20,7 @@ source util.sh
 # This must be a lowercase short word with no spaces describing
 # the software being built. Folders/links will be named with
 # this.
-project_key="bat"
+project_key="exa"
 
 tools="$HOME/dev/tools"
 mkdir -p "$tools"
@@ -73,8 +73,8 @@ clone_latest_tag() {
 # ---------------------------------------------------------------
 # Check version and if it already exists.
 # ---------------------------------------------------------------
-acct="sharkdp"
-repo="bat"
+acct="ogham"
+repo="exa"
 
 version=$(latest_github_repo_tag $acct $repo)
 
@@ -98,10 +98,9 @@ cd $repo
 # ---------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------
-export LLVM_CONFIG_PATH=~/dev/tools/llvm-current/bin/llvm-config
+#export LLVM_CONFIG_PATH=~/dev/tools/llvm-current/bin/llvm-config
 
-cargo build --bins --release
-cargo test
+cargo build --release
 cargo install --path=. --root=$prefix
 
 # ---------------------------------------------------------------
