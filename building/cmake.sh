@@ -49,9 +49,15 @@ mkdir -p "$tools"
 prefix="$tools/${repo_lower}-$version"
 
 if which cmake; then
-    cmake . -DCMAKE_INSTALL_PREFIX=$prefix
+    # Use system curl library so that we can install the one with
+    # SSL support and have CMake use that. This then appears to
+    # avoid errors that would otherwise happen when CMake tries
+    # to download using https links.
+    cmake .                                 \
+        -DCMAKE_INSTALL_PREFIX=$prefix      \
+        -DCMAKE_USE_SYSTEM_LIBRARY_CURL=YES
 else
-    ./bootstrap --prefix=$prefix
+    ./bootstrap --prefix=$prefix --system-curl
 fi
 
 if which nproc 2>/dev/null; then
