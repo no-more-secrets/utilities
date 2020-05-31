@@ -41,14 +41,28 @@ first_three_components=${BASH_REMATCH[1]}
   exit 1
 }
 
+awk_pgrm='
+  {
+    $1=""
+    $4=""
+    print
+  }
+'
+
 echo "scanning $first_three_components.*:"
-echo "--------------------------------------------------------------"
+echo "---------------------------------------------------------"
 
 {
-  echo "host ip name status"
-  echo "------- ---------------- ----------------------------- -------"
+  echo "host ip name - status"
+  echo "------- ---------------- ----------------------------- - ------"
   nmap -oG - -sP "$first_three_components.0/24" | grep -v '^#'
-} | awk '{print $2, $3, $4, $5, $6}' | tr '()' ' ' | column -t -s' '
+} | awk "$awk_pgrm"     \
+  | sed 's/()/[blank]/' \
+  | tr '()' ' '         \
+  | column -t -s' '     \
+  | sed 's/^/ /'
+
+echo "---------------------------------------------------------"
 
 exit $?
 
