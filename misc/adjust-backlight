@@ -28,7 +28,9 @@ cd "$backlight" || die "failed to change to $backlight folder."
 [[ -f brightness     ]] || die "failed to find 'brightness' file."
 [[ -f max_brightness ]] || die "failed to find 'max_brightness' file."
 
-echo "Current brightness: $(cat brightness)/$(cat max_brightness)."
+max_brightness=$(cat max_brightness)
+
+echo "Current brightness: $(cat brightness)/$max_brightness."
 
 brightness="$(cat brightness)"
 
@@ -37,8 +39,10 @@ brightness="$(cat brightness)"
 echo
 echo "Select new brightness level relative to current (the smaller, the darker):"
 
-select level in "75%" "66%" "50%" "33%" "25%"; do
+select level in "150%" "125%" "75%" "66%" "50%" "33%" "25%"; do
   case "$level" in
+   "150%") new_brightness=$(( brightness*3/2 )); break ;;
+   "125%") new_brightness=$(( brightness*5/4 )); break ;;
     "75%") new_brightness=$(( brightness*3/4 )); break ;;
     "66%") new_brightness=$(( brightness*2/3 )); break ;;
     "50%") new_brightness=$(( brightness/2   )); break ;;
@@ -49,6 +53,7 @@ select level in "75%" "66%" "50%" "33%" "25%"; do
 done
 
 (( new_brightness >= 10 )) || die "new brightness level ($new_brightness) is too low."
+(( new_brightness < max_brightness )) || die "new brightness level ($new_brightness) is too high."
 
 echo "Setting brightness level to: $new_brightness."
 echo "(you may be asked for admin password)"

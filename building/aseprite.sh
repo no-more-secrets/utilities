@@ -104,9 +104,28 @@ check_apt_dependencies "
 "
 
 # ---------------------------------------------------------------
+# Clone repo
+# ---------------------------------------------------------------
+clone_latest_tag $acct $repo
+cd $repo
+
+# ---------------------------------------------------------------
 # Build `skia` if necessary.
 # ---------------------------------------------------------------
-$this/skia-aseprite.sh
+get_skia_version() {
+  local ver=$(cat INSTALL.md                    \
+      | sed -rn 's/.*(aseprite-m[0-9]+).*/\1/p' \
+      | sort -ru)
+  echo "$ver"
+}
+
+log "getting skia version..."
+skia_version="$(get_skia_version)"
+log "found skia version: $skia_version."
+[[ "$skia_version" =~ ^aseprite-m[0-9]+$ ]] || \
+    die "failed to find skia version."
+
+$this/skia-aseprite.sh "$skia_version"
 
 skia_current="$tools/skia-current"
 [[ -e "$skia_current" ]] || \
@@ -114,24 +133,24 @@ skia_current="$tools/skia-current"
 
 skia_real_version=$(real_path $skia_current)
 log "skia_real_version: $skia_real_version"
-
-# ---------------------------------------------------------------
-# Clone repo
-# ---------------------------------------------------------------
-clone_latest_tag $acct $repo
-cd $repo && mkdir -p build && cd build
+skia_lib_dir="$skia_real_version/out/Release"
+log "skia_lib_dir: $skia_lib_dir"
 
 # ---------------------------------------------------------------
 # Run CMake
 # ---------------------------------------------------------------
+cd /tmp/$work/$repo && mkdir -p build && cd build
 # Use the deferenced path for the skia directory because we are
 # building against it and so we don't want a given version of
 # aseprite to break if the skia-current symlink changes.
 cmake .. -DSKIA_DIR=$skia_real_version                 \
+         -DSKIA_LIBRARY_DIR=$skia_lib_dir              \
          -DCMAKE_INSTALL_PREFIX="$prefix"              \
-         -DLAF_OS_BACKEND=skia                         \
+         -DLAF_BACKEND=skia                            \
          -DCMAKE_BUILD_TYPE=RelWithDebInfo             \
          -DSKIA_OUT_DIR=$skia_real_version/out/Release \
+         -DLAF_WITH_EXAMPLES=OFF                       \
+         -DLAF_WITH_TESTS=OFF                          \
          -G Ninja
 
 # ---------------------------------------------------------------

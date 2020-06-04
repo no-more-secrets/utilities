@@ -20,6 +20,13 @@ cd $this
 source util.sh
 
 # ---------------------------------------------------------------
+# Get Version
+# ---------------------------------------------------------------
+target_branch="$1"
+[[ -z "$target_branch" ]] && die "first arg must be target branch."
+log "target version: $target_branch."
+
+# ---------------------------------------------------------------
 # Initialization
 # ---------------------------------------------------------------
 # This must be a lowercase short word with no spaces describing
@@ -39,27 +46,10 @@ mkdir -p "$tools"
 # ---------------------------------------------------------------
 # Functions
 # ---------------------------------------------------------------
-latest_github_repo_branch() {
-    local acct="$1"
-    local repo="$2"
-    local api_url="https://api.github.com/repos/$acct/$repo/branches"
-    # FROM: "name": "v8.1.0338",
-    # TO:   v8.1.0338
-    #curl --silent $api_url | grep '"name":'             \
-    #                       | grep 'aseprite-m[0-9]\+"'  \
-    #                       | sed 's/.*: "\(.*\)".*/\1/' \
-    #                       | sort -rn                   \
-    #                       | head -n1
-    echo aseprite-m71
-}
-
 clone_latest_branch() {
     local acct="$1"
     local repo="$2"
-    # non-local
-    version=$(latest_github_repo_branch $acct $repo)
-    log "latest version of $acct/$repo: $version"
-    sleep 3
+    local version="$3"
     git clone --depth=1         \
               --branch=$version \
               --recursive       \
@@ -72,7 +62,7 @@ clone_latest_branch() {
 acct="aseprite"
 repo="skia"
 
-version=$(latest_github_repo_branch $acct $repo)
+version="$target_branch"
 
 [[ -e "$tools/$project_key-$version" ]] && {
     log "$project_key-$version already exists, activating it."
@@ -91,7 +81,7 @@ export PATH="$PWD/depot_tools:$PATH"
 # ---------------------------------------------------------------
 # Clone aseprite-skia repo and dependencies
 # ---------------------------------------------------------------
-clone_latest_branch $acct $repo
+clone_latest_branch $acct $repo "$target_branch"
 
 cd skia
 
@@ -114,7 +104,7 @@ gn gen out/Release --args="
 # ---------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------
-ninja -C out/Release skia
+ninja -C out/Release all
 
 # ---------------------------------------------------------------
 # Install/Copy
