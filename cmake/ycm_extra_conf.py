@@ -1,7 +1,7 @@
 import os, sys, json
 import subprocess as sp
 
-files = json.loads( file( '.builds/current/compile_commands.json', 'r' ).read() )
+files = json.loads( open( '.builds/current/compile_commands.json', 'r' ).read() )
 
 flags = {}
 directories = {}
@@ -103,4 +103,4 @@ def FlagsForFile( filename, **kwargs ):
     return { 'flags': result }
 
 if __name__ == '__main__':
-    print FlagsForFile( os.path.realpath( sys.argv[1] ) )
+    print(FlagsForFile( os.path.realpath( sys.argv[1] ) ))

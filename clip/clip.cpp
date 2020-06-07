@@ -30,11 +30,7 @@ int main( int argc, char** argv ) {
   if( argc != 2 )
       die( "%s", "usage: clip <max_columns>" );
 
-  auto* columns_c_str = argv[1];
-  if( !columns_c_str )
-    die( "%s", "COLUMNS environment variable not set." );
-
-  auto columns = atoi( columns_c_str );
+  auto columns = atoi( argv[1] );
   if( columns <= 0 )
     die( "integer columns is invalid: %d", columns );
 
