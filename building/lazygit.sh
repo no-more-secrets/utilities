@@ -40,7 +40,7 @@ cd $work
 # Dependencies
 # ---------------------------------------------------------------
 export GOPATH=/tmp/go-path-tmp
-[[ -e "$GOPATH" ]] && rm -r "$GOPATH"
+[[ -e "$GOPATH" ]] && rm -rf "$GOPATH"
 mkdir -p "$GOPATH"
 
 install_apt_dependencies '
@@ -102,6 +102,7 @@ cd $repo
 # ---------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------
+go get -d # Download dependencies but don't install.
 go build
 ./lazygit --help
 
