@@ -28,7 +28,7 @@ files="$(find . -not -name '.*' -not -wholename '*/.*' -type f -newer "$stamp" |
 [[ -z "$files" ]] && exit 0
 
 (( verbose )) && {
-  echo -e "*********** ${c_yellow}${s_bold}files changed since last successful build $c_norm***********"
+  echo -e "------- ${c_yellow}${s_bold}files changed since last successful build $c_norm-------"
   echo -en "$c_red"
 }
 
@@ -36,7 +36,7 @@ echo -e "$files"
 
 (( verbose )) && {
   echo -en "$c_norm"
-  echo "*****************************************************************"
+  echo "---------------------------------------------------------"
 }
 
 true
