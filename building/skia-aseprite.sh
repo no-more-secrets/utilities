@@ -85,6 +85,33 @@ clone_latest_branch $acct $repo "$target_branch"
 
 cd skia
 
+# If you get a weird transient git error while cloning a repo,
+# e.g.:
+#
+#   inflate data stream error invalid "distance too far back"
+#
+# Then do the following:
+#
+#   1. Open the /tmp/skia-build/skia/tools/git-sync-deps file and
+#      find the lines that do the git clone and git checkout and
+#      remove the --quiet and --no-checkout from them, e.g.:
+#
+#        subprocess.check_call([git, 'clone', repo, directory])
+#        subprocess.check_call([git, 'checkout', commithash], cwd=directory)
+#
+#   2. Copy the resulting file to /tmp.
+#   3. Uncomment the `cp` command below.
+#
+# The suspicion is that the build system is doing too many git
+# clones in parallel and runs into transient errors. By removing
+# the --checkout flag it may perturb the process (slowing it down
+# a bit) so that it doesn't fail.
+#
+# If this doesn't work then maybe need to look into changing the
+# skia build script so that it does not parallelize the cloning
+# of the git repos.
+#
+#cp /tmp/git-sync-deps tools/git-sync-deps # UNCOMMENT
 python tools/git-sync-deps
 
 # ---------------------------------------------------------------
