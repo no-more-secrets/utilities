@@ -24,9 +24,10 @@ script_dl="curl -sSL https://get.haskellstack.org/"
 # ---------------------------------------------------------------
 # Check version and if it already exists.
 # ---------------------------------------------------------------
-version=$($script_dl | grep '^STACK_VERSION=' \
-                     | cut -f2 -d=            \
-                     | tr -d "\"")
+echo 'Go to https://docs.haskellstack.org/en/stable/ChangeLog/'
+echo 'and look at the latest stack version and enter it here'
+echo 'without the leading v:'
+read -p '> ' version
 
 log "latest version: $version"
 
@@ -56,5 +57,16 @@ ln -s "$dest/stack" "$dest/bin/stack"
 # ---------------------------------------------------------------
 tools_link $project_key
 bin_links  $project_key
+
+# ---------------------------------------------------------------
+# Test Version
+# ---------------------------------------------------------------
+# Get the version of stack and make sure that it lines up exactly
+# with what the user entered.
+actual_version=$(stack --version \
+                   | sed -rn 's/^Version ([0-9.]+),.*/\1/p')
+[[ "$actual_version" == "$version" ]] || \
+    die "Actual version of Stack ($actual_version) does not " \
+        "match with version entered ($version)."
 
 log "Success."
