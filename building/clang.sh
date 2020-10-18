@@ -75,3 +75,7 @@ cd $(dirname $install) # folder containing all the llvm-*
 link='llvm-current'
 rm -f "$link"
 ln -s llvm-$suffix $link
+
+cd ~/bin
+rm -f clang-format
+ln -s $HOME/dev/tools/llvm-current/bin/clang-format clang-format
