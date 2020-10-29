@@ -1,6 +1,15 @@
 #!/bin/bash
-set -e
+set -eE
 set -o pipefail
+
+# Must be done first.
+this=$(cd $(dirname $0) && pwd)
+cd $this
+
+# ---------------------------------------------------------------
+# Includes
+# ---------------------------------------------------------------
+source util.sh
 
 cd /tmp
 
@@ -19,6 +28,8 @@ acct="Kitware"
 repo="CMake"
 # The ${X,,} construct doesn't seem to work on OSX's bash
 repo_lower="cmake"
+project_key="$repo_lower"
+tools="$HOME/dev/tools"
 
 latest_github_repo_tag() {
     local acct_name="$1"
@@ -35,15 +46,23 @@ clone_latest_tag() {
     local acct_name="$1"
     local repo_name="$2"
     # non-local
-    version=$(latest_github_repo_tag $acct_name $repo_name)
     echo "Latest version of $acct_name/$repo_name: $version"
     git clone --depth=1 --branch=$version https://github.com/$acct_name/$repo_name
+}
+
+version=$(latest_github_repo_tag $acct $repo)
+
+[[ -e "$tools/$project_key-$version" ]] && {
+    log "$project_key-$version already exists, activating it."
+    tools_link $project_key
+    bin_links $project_key
+    #supplemental_install
+    exit 0
 }
 
 clone_latest_tag $acct $repo
 cd $repo
 
-tools="$HOME/dev/tools"
 mkdir -p "$tools"
 
 prefix="$tools/${repo_lower}-$version"
