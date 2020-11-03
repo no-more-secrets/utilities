@@ -21,6 +21,8 @@ backlight="/sys/class/backlight/intel_backlight"
 [[ ! -e "$backlight" ]] && \
     backlight="/sys/class/backlight/gmux_backlight"
 [[ ! -e "$backlight" ]] && \
+    backlight="/sys/class/backlight/nvidia_0"
+[[ ! -e "$backlight" ]] && \
     die "cannot find suitable backlight folder."
 
 cd "$backlight" || die "failed to change to $backlight folder."
