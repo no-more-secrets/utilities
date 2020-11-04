@@ -55,7 +55,7 @@ while true; do
     esac
   done
 
-  (( new_brightness >= 10 )) || die "new brightness level ($new_brightness) is too low."
+  (( new_brightness >= 3 )) || die "new brightness level ($new_brightness) is too low."
   (( new_brightness < max_brightness )) || die "new brightness level ($new_brightness) is too high."
 
   echo "Setting brightness level to: $new_brightness."
