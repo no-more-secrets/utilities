@@ -3,7 +3,7 @@ set -e
 set -o pipefail
 
 wifi_interface() {
-  iw dev | awk '/^\s+Interface/ { print $2 }'
+  iw dev | awk '/^[ \t]+Interface/ { print $2 }'
 }
 
 (( $(wifi_interface | wc -l) == 0 )) && {
@@ -58,7 +58,7 @@ echo "---------------------------------------------------------"
   nmap -oG - -sP "$first_three_components.0/24" | grep -v '^#'
 } | awk "$awk_pgrm"     \
   | sed 's/()/[blank]/' \
-  | tr '()' ' '         \
+  | tr -d '()'          \
   | column -t -s' '     \
   | sed 's/^/ /'
 
