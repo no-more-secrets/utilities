@@ -45,7 +45,8 @@ cd $repo
 
 # -DLIBCXX_CXX_ABI=libstdc++
 
-subprojects='clang;clang-tools-extra;libcxx;libcxxabi;compiler-rt;lld'
+subprojects='clang;clang-tools-extra;libcxx;libcxxabi;compiler-rt'
+[[ "$(uname)" != Darwin ]] && subprojects="$subprojects;lld"
 
 cmake_vars="
   -DCMAKE_BUILD_TYPE=Release
@@ -65,7 +66,8 @@ cd build
 cmake -G Ninja $cmake_vars ../llvm
 
 ninja
-ninja check-clang check-lld
+ninja check-clang
+[[ "$(uname)" != Darwin ]] && ninja check-lld
 #ninja check-libcxx # FIXME enable these?
 #ninja check-libcxxabi # FIXME enable these?
 ninja install
