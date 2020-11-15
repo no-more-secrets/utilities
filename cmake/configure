@@ -556,6 +556,11 @@ if __name__ == '__main__':
         log( 'gcc_lib_home: %s' % gcc_lib_home )
         (gcc_inc_platform,) = glob( '%s/x86_64-*' % gcc_inc_home )
         log( 'gcc_inc_platform: %s' % gcc_inc_platform )
+        if compiler == 'clang':
+            # This is being added being clang seems to complain
+            # (in some specific cases, for reason unknown) that
+            # the "-nostdinc++" parameter added next is unused.
+            cmake_cxx_flags_init.append( '-Wno-unused-command-line-argument' )
         cmake_cxx_flags_init.extend( ['-nostdinc++', '-I%s' % gcc_inc_home, '-I%s' % gcc_inc_platform] )
         if compiler == 'clang' and is_osx:
             cmake_cxx_flags_init.append( '-stdlib=libstdc++' )
