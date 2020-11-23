@@ -18,9 +18,10 @@ die() {
 #   origin  git@github.com:dpacbach/sol2 (fetch)
 #   origin  git@github.com:dpacbach/sol2 (push)
 #
-repo="$(git remote -v show | awk '{print $2}' | awk -F/ '{print $2}' | sort -u)"
+repo="$(git remote -v show | awk '{print $2}' | awk -F/ '{print $NF}' | sort -u)"
 
 [[ -z "$repo" ]] && die "failed to find repo."
+repo=${repo//.git/}
 
 py_code='
 import json, sys
