@@ -10,7 +10,7 @@ cmake-utils   := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 pre-build := $(if $(wildcard scripts/pre-build.sh),scripts/pre-build.sh,:)
 
-possible_targets := all run clean test
+possible_targets := all run clean test rn
 
 build-config := $(notdir $(realpath $(build-current)))
 ifneq (,$(wildcard $(build-current)/Makefile))
