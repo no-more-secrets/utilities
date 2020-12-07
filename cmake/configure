@@ -279,6 +279,10 @@ if __name__ == '__main__':
                          dest='libstdcxx',
                          action='store_true',
                          help='If using either clang or gcc, can request to use libstdcxx.' )
+    parser.add_argument( '--no-symlink',
+                         dest='no_symlink',
+                         action='store_true',
+                         help='If true, the .builds/current symlink will not be changed.' )
     parser.add_argument( '--gcc',
                          dest='gcc',
                          const='current',
@@ -509,12 +513,13 @@ if __name__ == '__main__':
                                      generator=gen_label )
 
     if os.path.exists( 'current' ):
-        os.remove( 'current' )
+        if not args.no_symlink:
+            os.remove( 'current' )
 
     if not os.path.isdir( build_dir ):
         log( 'Creating "%s" directory' % build_dir )
         os.mkdir( build_dir )
-    else:
+    elif not args.no_symlink:
         # Already exists, so just activate it.
         log( 'Build directory %s already exists, activating it.' % build_dir )
         os.symlink( build_dir, 'current', target_is_directory=True )
@@ -523,7 +528,7 @@ if __name__ == '__main__':
                     % (bcolors.BLUE, bcolors.NORMAL, bcolors.GREEN, build_dir, bcolors.NORMAL) )
             exit( 0 )
 
-    builds_current = os.path.abspath( 'current' )
+    builds_current = os.path.abspath( build_dir )
 
     log( 'Changing to "%s" directory' % build_dir )
     os.chdir( build_dir )
@@ -718,9 +723,10 @@ if __name__ == '__main__':
 
     os.chdir( root_dir )
     if p.returncode == 0:
-        if os.path.exists( '.builds/current' ):
-            os.remove( '.builds/current' )
-        os.symlink( build_dir, '.builds/current', target_is_directory=True )
+        if not args.no_symlink:
+            if os.path.exists( '.builds/current' ):
+                os.remove( '.builds/current' )
+            os.symlink( build_dir, '.builds/current', target_is_directory=True )
         log_title( 'finished' )
 
     exit( p.returncode )
