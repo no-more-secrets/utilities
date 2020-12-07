@@ -12,6 +12,13 @@ pre-build := $(if $(wildcard scripts/pre-build.sh),scripts/pre-build.sh,:)
 
 possible_targets := all run clean test rn
 
+ifeq ($(origin, NINJA_STATUS_PRINT_MODE),)
+	NINJA_STATUS_PRINT_MODE=scrolling
+endif
+
+export DSICILIA_NINJA_STATUS_PRINT_MODE=$(NINJA_STATUS_PRINT_MODE)
+export DSICILIA_NINJA_REFORMAT_MODE=pretty
+
 build-config := $(notdir $(realpath $(build-current)))
 ifneq (,$(wildcard $(build-current)/Makefile))
     # Here we are invoking $(MAKE) directly instead of using
@@ -20,7 +27,6 @@ ifneq (,$(wildcard $(build-current)/Makefile))
     # also do not just put the whole command into a variable
     # and just define the targets once.
     $(possible_targets): $(build-current)
-	    @bash $(cmake-utils)/outdated.sh -v
 	    @$(pre-build)
 	    @cd $(build-current) && $(MAKE) -s $@
 	    @touch $(stamp-file)
@@ -29,7 +35,6 @@ else
     # way to go when it works for us (which it does in this
     # case).
     $(possible_targets): $(build-current)
-	    @bash $(cmake-utils)/outdated.sh -v
 	    @$(pre-build)
 	    @cd $(build-current) && ninja $@
 	    @touch $(stamp-file)
@@ -47,6 +52,7 @@ update:
 	@git pull origin `git rev-parse --abbrev-ref HEAD` --quiet
 	@git submodule sync --quiet
 	@git submodule update --init
+	@bash $(cmake-utils)/outdated.sh -v
 	@cmc rc
 	@$(MAKE) -s all
 	@$(MAKE) -s test

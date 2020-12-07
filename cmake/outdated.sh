@@ -19,6 +19,13 @@ c_yellow="\033[93m"
 
 stamp="$current/last-build-stamp"
 
+print_bar() {
+  n=$1
+  for (( i=0; i < $n; i++ )); do
+    echo -n '-'
+  done
+}
+
 [[ -f "$stamp" ]] || exit 0
 
 [[ "$1" == "-v" ]] && verbose=1 || verbose=0
@@ -27,8 +34,15 @@ files="$(find . -not -name '.*' -not -wholename '*/.*' -type f -newer "$stamp" |
 
 [[ -z "$files" ]] && exit 0
 
+[[ -z "$COLUMNS" ]] && COLUMNS=65
+
 (( verbose )) && {
-  echo -e "------- ${c_yellow}${s_bold}files changed since last successful build $c_norm-------"
+  title="files changed since last successful build"
+  len_title=${#title}
+  print_bar $(( ( COLUMNS - len_title -2 )/2 ))
+  echo -en " ${c_yellow}${s_bold}$title$c_norm "
+  print_bar $(( ( COLUMNS - len_title -2 )/2 ))
+  echo
   echo -en "$c_red"
 }
 
@@ -36,7 +50,7 @@ echo -e "$files"
 
 (( verbose )) && {
   echo -en "$c_norm"
-  echo "---------------------------------------------------------"
+  print_bar $(( COLUMNS ))
 }
 
 true
