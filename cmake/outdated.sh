@@ -51,6 +51,7 @@ echo -e "$files"
 (( verbose )) && {
   echo -en "$c_norm"
   print_bar $(( COLUMNS ))
+  echo
 }
 
 true
