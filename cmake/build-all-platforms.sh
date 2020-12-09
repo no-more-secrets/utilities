@@ -124,7 +124,8 @@ platforms=( )
 
 # for cc in --clang '' --gcc=current; do
 for cc in --clang --gcc=current; do
-  for lib in '' --libcxx --libstdcxx; do
+  # for lib in '' --libcxx --libstdcxx; do
+  for lib in --libcxx --libstdcxx; do
     for opt in '' --release; do
       for asan in --asan ''; do
         [[ "$cc" =~ gcc && "$lib" =~ libcxx ]] && continue
