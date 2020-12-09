@@ -117,7 +117,7 @@ run_for_args() {
     platform="$(echo "$flags" \
       | sed -r 's/,+/,/g; s/(.*),$/\1/; s/--//g')"
   fi
-  echo "$platform $status" >> $logfile
+  echo -e "$platform $status" >> $logfile
 }
 
 platforms=( )
