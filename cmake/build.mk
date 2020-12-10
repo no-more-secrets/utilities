@@ -52,13 +52,13 @@ update:
 	@git pull origin `git rev-parse --abbrev-ref HEAD` --quiet
 	@git submodule sync --quiet
 	@git submodule update --init
-	@bash $(cmake-utils)/outdated.sh -v
+	@: bash $(cmake-utils)/outdated.sh -v
 	@cmc rc
 	@$(MAKE) -s all
 	@$(MAKE) -s test
 
 what:
-	@scripts/outdated.sh
+	@$(cmake-utils)/outdated.sh -v
 
 $(build-current):
 	@cmc
