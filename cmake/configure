@@ -708,6 +708,20 @@ if __name__ == '__main__':
             print( fmt_str % ('"%s"' % arg) )
         exit( 0 )
 
+    # Seems like CMake might be testing ninja and expecting some
+    # particular output, so we need to unset these variables to
+    # make sure that it behaves in the usual way. When these
+    # variables were set, there were occasions when CMake would
+    # fail with some seemingly unrelated error, such as "failed
+    # to find SDL". Not sure what is happening there. But the
+    # problem seems to go away when these are unset.
+    ninja_print_mode = os.environ.get( 'DSICILIA_NINJA_STATUS_PRINT_MODE', None )
+    ninja_reformat_mode = os.environ.get( 'DSICILIA_NINJA_REFORMAT_MODE', None )
+    if ninja_print_mode:
+        del os.environ['DSICILIA_NINJA_STATUS_PRINT_MODE']
+    if ninja_reformat_mode:
+        del os.environ['DSICILIA_NINJA_REFORMAT_MODE']
+
     if args.verbose:
         p = sp.Popen( cmd )
     else:
