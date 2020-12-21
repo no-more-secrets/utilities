@@ -26,8 +26,10 @@ script_dl="curl -sSL https://get.haskellstack.org/"
 # ---------------------------------------------------------------
 echo 'Go to https://docs.haskellstack.org/en/stable/ChangeLog/'
 echo 'and look at the latest stack version and enter it here'
-echo 'without the leading v:'
+echo 'without the leading v (enter to skip this installation):'
 read -p '> ' version
+
+[[ -z "$version" ]] && exit 0
 
 log "latest version: $version"
 
