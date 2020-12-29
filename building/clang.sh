@@ -14,11 +14,16 @@ die() {
   exit 1
 }
 
+tools="$HOME/dev/tools"
+mkdir -p "$tools"
+
 suffix=$(date +"%Y-%m-%d-%M.%H.%S")
 [[ -z "$suffix"  ]] && die "suffix variable not populated."
 
 install=$HOME/dev/tools/llvm-$suffix
 [[ -d "$install" ]] && die "$install already exists."
+
+[[ "$1" == "--use-clang" ]] && use_clang=1
 
 version="$suffix"
 echo
@@ -27,6 +32,10 @@ echo
 echo "  LLVM/clang version: $version"
 echo
 echo "  To folder: $install"
+(( use_clang )) && {
+echo
+echo "  Built using clang/llvm-current."
+}
 echo
 echo -n "Press enter to continue..."
 read
@@ -39,10 +48,6 @@ cd $repo
 
 # This option would tell it where the libstdc++ is that it would use.
 # -DGCC_INSTALL_PREFIX=
-
-# -DCMAKE_C_COMPILER=$HOME/dev/tools/llvm-current/bin/clang
-# -DCMAKE_CXX_COMPILER=$HOME/dev/tools/llvm-current/bin/clang++
-
 # -DLIBCXX_CXX_ABI=libstdc++
 
 subprojects='clang;clang-tools-extra;libcxx;libcxxabi;compiler-rt'
@@ -55,6 +60,12 @@ cmake_vars="
   -DLLVM_ENABLE_PROJECTS=$subprojects
   -DCMAKE_INSTALL_PREFIX=$install
 "
+
+(( use_clang )) && {
+  cmake_vars="$cmake_vars -DCMAKE_C_COMPILER=$tools/llvm-current/bin/clang"
+  cmake_vars="$cmake_vars -DCMAKE_CXX_COMPILER=$tools/llvm-current/bin/clang++"
+  cmake_vars="$cmake_vars -DLLVM_USE_LINKER=lld"
+}
 
 [[ "$(uname)" == Darwin ]] && {
   export CFLAGS="-I/opt/local/include"
@@ -80,4 +91,4 @@ ln -s llvm-$suffix $link
 
 cd ~/bin
 rm -f clang-format
-ln -s $HOME/dev/tools/llvm-current/bin/clang-format clang-format
+ln -s $tools/llvm-current/bin/clang-format clang-format
