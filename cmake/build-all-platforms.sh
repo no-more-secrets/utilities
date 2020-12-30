@@ -123,9 +123,9 @@ run_for_args() {
 platforms=( )
 
 # for cc in --clang '' --gcc=current; do
-for cc in --clang --gcc=current; do
+for cc in --gcc=current --clang; do
   # for lib in '' --libcxx --libstdcxx; do
-  for lib in --libcxx --libstdcxx; do
+  for lib in --libstdcxx --libcxx; do
     for opt in '' --release; do
       for asan in --asan ''; do
         [[ "$cc" =~ gcc && "$lib" =~ libcxx ]] && continue
