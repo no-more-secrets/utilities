@@ -7,7 +7,7 @@ sudo true
 clear
 
 python ~/dev/utilities/color/24-bit-color.py
-echo 'Select the same color twice to choose; escape to exit.'
+echo 'enter to select and exit; escape for default.'
 
 prev_color=
 
