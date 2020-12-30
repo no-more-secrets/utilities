@@ -27,6 +27,11 @@ cxx_compiler=/usr/bin/g++
 only_64bit=1
 
 # ---------------------------------------------------------------
+# CLI Params
+# ---------------------------------------------------------------
+[[ "$1" == "--trunk" ]] && trunk=1 || trunk=0
+
+# ---------------------------------------------------------------
 # Includes
 # ---------------------------------------------------------------
 source util.sh
@@ -60,14 +65,21 @@ latest_github_repo_tag() {
 # ---------------------------------------------------------------
 # Check version and if it already exists.
 # ---------------------------------------------------------------
-# Version to be checked out. There should be a corresponding tag
-# in the repo called gcc-$version-release.
-version=$(latest_github_repo_tag gcc-mirror gcc)
-log "latest version: $version"
+if (( ! trunk )); then
+  # Version to be checked out. There should be a corresponding
+  # tag in the repo called gcc-$version-release.
+  version=$(latest_github_repo_tag gcc-mirror gcc)
+  log "latest version: $version"
 
-regex='^[0-9]+\.[0-9]+\.[0-9]+$'
-[[ "$version" =~ $regex ]] ||
-    die "version \"$version\" does not match regex."
+  regex='^[0-9]+\.[0-9]+\.[0-9]+$'
+  [[ "$version" =~ $regex ]] ||
+      die "version \"$version\" does not match regex."
+else
+  suffix=$(date +"%Y-%m-%d-%M.%H.%S")
+  [[ -z "$suffix"  ]] && die "suffix variable not populated."
+  version=$suffix
+  log "building trunk (master), version $version."
+fi
 
 [[ -e "$tools/$project_key-$version" ]] && {
     log "$project_key-$version already exists, activating it."
@@ -186,17 +198,22 @@ init() {
 clone() {
     cd $work_prefix
 
-    # Hopefully gcc always follows this convention for mapping
-    # version number to tag name.
-    local tag="releases/gcc-$version"
+    local branch
+    if (( ! trunk )); then
+      # Hopefully gcc always follows this convention for mapping
+      # version number to tag name.
+      branch="releases/gcc-$version"
+    else
+      branch="master"
+    fi
 
     # Don't remove it if it already exists because it takes too
     # long to clone again, so if it exists then just run a git
     # clean on it.
 
     if [[ ! -d $work_folder ]]; then
-        # Do a shallow clone only of the tag
-        git clone --depth=1 --branch=$tag $git_repo $work_folder
+        # Do a shallow clone only of the branch
+        git clone --depth=1 --branch=$branch $git_repo $work_folder
         cd $work_folder
     else
         cd $work_folder
@@ -205,7 +222,7 @@ clone() {
         git clean -fxdf
     fi
 
-    git checkout $tag
+    git checkout $branch
 }
 
 # Needs to be a different name because we need to perform this
