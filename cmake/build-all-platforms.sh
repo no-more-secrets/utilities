@@ -3,8 +3,6 @@
 
 (( osx )) && lld_default= || lld_default='--lld'
 
-[[ "$1" == '--print-only' ]] && print_only=1
-
 c_norm="\033[00m"
 c_green="\033[32m"
 c_red="\033[31m"
@@ -31,10 +29,6 @@ configure() {
   flags="$@"
   cmd="cmc c $flags --no-symlink"
   # echo "cmd: $cmd"
-  if (( print_only )); then
-    echo "$cmd"
-    return
-  fi
   # log "configuration: $flags"
   if ! $cmd; then
     error "configure failed for flags: $flags"
@@ -138,6 +132,10 @@ for cc in --gcc=current --clang; do
   done
 done
 
+# Do --lto just once since it can take a really long time.
+# cc=--clang; lib=; opt=--release; asan=; lto=--lto;
+# run_for_args
+
 pids=
 for flags in "${platforms[@]}"; do
   # echo "platform: $flags"
@@ -169,12 +167,17 @@ for flags in "${platforms[@]}"; do
   run_for_args "$flags"
 done
 
-# Do --lto just once since it can take a really long time.
-# cc=--clang; lib=; opt=--release; asan=; lto=--lto;
-# run_for_args
+native_gcc_version() {
+  gcc --version | head -n1 | fmt --width=0 | tail -n1 | tr '.' ' '
+}
+
+native_gcc_major_version="$(native_gcc_version | awk '{ print $1 }')"
+native_gcc_minor_version="$(native_gcc_version | awk '{ print $2 }')"
+native_gcc_patch_version="$(native_gcc_version | awk '{ print $3 }')"
 
 # Restore to default devel flags.
-(( print_only )) || cmc --cached --clang --lld --asan
+(( native_gcc_major_version >= 10 )) && cmc --cached --clang --lld --asan \
+                                     || cmc --cached --clang --lld --asan --libstdcxx
 
 print_table() {
   {
