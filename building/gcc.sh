@@ -29,7 +29,17 @@ only_64bit=1
 # ---------------------------------------------------------------
 # CLI Params
 # ---------------------------------------------------------------
-[[ "$1" == "--trunk" ]] && trunk=1 || trunk=0
+case "$1" in
+  "--trunk")
+    branch=trunk
+    ;;
+  "--coroutines")
+    branch=coroutines
+    ;;
+  *)
+    branch=release  # pick latest release
+    ;;
+esac
 
 # ---------------------------------------------------------------
 # Includes
@@ -65,21 +75,33 @@ latest_github_repo_tag() {
 # ---------------------------------------------------------------
 # Check version and if it already exists.
 # ---------------------------------------------------------------
-if (( ! trunk )); then
-  # Version to be checked out. There should be a corresponding
-  # tag in the repo called gcc-$version-release.
-  version=$(latest_github_repo_tag gcc-mirror gcc)
-  log "latest version: $version"
+case "$branch" in
+  release)
+    # Version to be checked out. There should be a corresponding
+    # tag in the repo called gcc-$version-release.
+    version=$(latest_github_repo_tag gcc-mirror gcc)
+    log "latest version: $version"
 
-  regex='^[0-9]+\.[0-9]+\.[0-9]+$'
-  [[ "$version" =~ $regex ]] ||
-      die "version \"$version\" does not match regex."
-else
-  suffix=$(date +"%Y-%m-%d-%M.%H.%S")
-  [[ -z "$suffix"  ]] && die "suffix variable not populated."
-  version=$suffix
-  log "building trunk (master), version $version."
-fi
+    regex='^[0-9]+\.[0-9]+\.[0-9]+$'
+    [[ "$version" =~ $regex ]] ||
+        die "version \"$version\" does not match regex."
+    ;;
+  trunk)
+    suffix=$(date +"%Y-%m-%d-%M.%H.%S")
+    [[ -z "$suffix"  ]] && die "suffix variable not populated."
+    version=$suffix
+    log "building trunk (master), version $version."
+    ;;
+  coroutines)
+    suffix=coroutines-$(date +"%Y-%m-%d-%M.%H.%S")
+    [[ -z "$suffix"  ]] && die "suffix variable not populated."
+    version=$suffix
+    log "building coroutines branch, version $version."
+    ;;
+  *)
+    die "unhandled branch: $branch."
+    ;;
+esac
 
 [[ -e "$tools/$project_key-$version" ]] && {
     log "$project_key-$version already exists, activating it."
@@ -198,22 +220,31 @@ init() {
 clone() {
     cd $work_prefix
 
-    local branch
-    if (( ! trunk )); then
-      # Hopefully gcc always follows this convention for mapping
-      # version number to tag name.
-      branch="releases/gcc-$version"
-    else
-      branch="master"
-    fi
+    local repo_branch
+    case "$branch" in
+      release)
+        # Hopefully gcc always follows this convention for mapping
+        # version number to tag name.
+        repo_branch="releases/gcc-$version"
+        ;;
+      trunk)
+        repo_branch="master"
+        ;;
+      coroutines)
+        repo_branch="devel/c++-coroutines"
+        ;;
+      *)
+        die "unhandled branch: $branch."
+        ;;
+    esac
 
     # Don't remove it if it already exists because it takes too
     # long to clone again, so if it exists then just run a git
     # clean on it.
 
     if [[ ! -d $work_folder ]]; then
-        # Do a shallow clone only of the branch
-        git clone --depth=1 --branch=$branch $git_repo $work_folder
+        # Do a shallow clone only of the repo_branch
+        git clone --depth=1 --branch=$repo_branch $git_repo $work_folder
         cd $work_folder
     else
         cd $work_folder
@@ -222,7 +253,7 @@ clone() {
         git clean -fxdf
     fi
 
-    git checkout $branch
+    git checkout $repo_branch
 }
 
 # Needs to be a different name because we need to perform this
