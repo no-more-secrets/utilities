@@ -65,6 +65,8 @@ cmake_vars="
   cmake_vars="$cmake_vars -DCMAKE_C_COMPILER=$tools/llvm-current/bin/clang"
   cmake_vars="$cmake_vars -DCMAKE_CXX_COMPILER=$tools/llvm-current/bin/clang++"
   cmake_vars="$cmake_vars -DLLVM_USE_LINKER=lld"
+  cmake_vars="$cmake_vars -DCMAKE_CXX_FLAGS=-fexperimental-new-pass-manager"
+  cmake_vars="$cmake_vars -DLLVM_ENABLE_LTO=Thin"
 }
 
 [[ "$(uname)" == Darwin ]] && {
