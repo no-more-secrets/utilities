@@ -38,6 +38,8 @@ usage_exit() {
   echo "    --skip-confirmation: Don't wait for the user to hit enter before"
   echo "                  proceeding with the build."
   echo "    --skip-tests  Don't run 'make check'."
+  echo "    --no-retry    Do not retry on failed build."
+  echo "    --use-commit  Checkout the given commit."
   echo
   exit 1
 }
@@ -67,6 +69,9 @@ while [[ $# > 0 ]]; do
       [[ -x "$use_clang/bin/clang" ]] || \
         die "use_clang: invalid llvm root folder: $use_clang."
       ;;
+    --no-retry)
+      no_retry=1
+      ;;
     --clang-opts)
       clang_opts=1
       ;;
@@ -78,6 +83,11 @@ while [[ $# > 0 ]]; do
       ;;
     --skip-confirmation)
       skip_confirmation=1
+      ;;
+    --use-commit)
+      use_commit="$1"
+      [[ -z "$use_commit" ]] && die "use_commit: must take a value."
+      shift
       ;;
     --with-pgo)
       with_pgo="$1"
@@ -210,7 +220,14 @@ cmake_add CMAKE_INSTALL_PREFIX      $install
 # ---------------------------------------------------------------
 llvm_github="https://github.com/llvm"
 repo='llvm-project'
-git clone --depth=1 --branch=master $llvm_github/$repo.git
+if [[ ! -z "$use_commit" ]]; then
+  git clone $llvm_github/$repo.git
+  cd $repo
+  git checkout "$use_commit"
+  cd -
+else
+  git clone --depth=1 --branch=master $llvm_github/$repo.git
+fi
 cd $repo
 
 # ---------------------------------------------------------------
@@ -234,13 +251,28 @@ cmake -G Ninja                       \
 # ---------------------------------------------------------------
 #                        Build/Test/Install
 # ---------------------------------------------------------------
-ninja
-(( ! skip_tests )) && {
-  ninja check-clang
-  [[ "$(uname)" != Darwin ]] && ninja check-lld
-  #ninja check-libcxx # FIXME enable these?
-  #ninja check-libcxxabi # FIXME enable these?
+# On some machines the build fails with internal compiler errors
+# (such as segfaults) that seem to go away on retries (??).
+ninja_retry() {
+  local target="$1"
+  local cmd
+  [[ ! -z "$target" ]] && cmd="ninja $target" || cmd=ninja
+  while true; do
+    $cmd && break
+    (( no_retry )) && die "failed to build (target \"$target\")."
+    sleep 60
+  done
 }
+
+ninja_retry
+(( ! skip_tests )) && {
+  ninja_retry check-clang
+  [[ "$(uname)" != Darwin ]] && ninja_retry check-lld
+  #ninja_retry check-libcxx # FIXME enable these?
+  #ninja_retry check-libcxxabi # FIXME enable these?
+}
+
+# No retry here.
 ninja install
 
 # ---------------------------------------------------------------

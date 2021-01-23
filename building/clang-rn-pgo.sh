@@ -88,7 +88,7 @@ if [[ ! -e "$profdata" && ! -e "$tools/llvm-pgo-current" ]]; then
   #
   # Note at this point llvm-current points to the instrumented
   # build.
-  cmc --clang --lld --asan
+  cmc --clang --lld --libstdcxx --asan
   ccache --clear
   make all
   popd
