@@ -29,8 +29,7 @@ popd
 # Stage 1, typically already built.
 if [[ ! -e "$tools/llvm-current" ]]; then
   ./clang.sh --skip-confirmation \
-             --skip-tests        \
-             --clang-opts
+             --skip-tests
 else
   echo "Skipping stage 1 as it is already built."
 fi
