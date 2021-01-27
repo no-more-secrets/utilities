@@ -192,6 +192,19 @@ cmake_add LLVM_ENABLE_ASSERTIONS    OFF
 cmake_add LLVM_ENABLE_PROJECTS      $subprojects
 cmake_add CMAKE_INSTALL_PREFIX      $install
 
+# This is needed so that the profile output files can be written
+# and read in a compressed manner (hence both the instrumentation
+# build and normal builds of clang need this). We need to use
+# FORCE_ON because if we just use ON then the CMake files will
+# silently set it to OFF if it cannot find zlib on the system,
+# which we don't want.
+cmake_add LLVM_ENABLE_ZLIB          FORCE_ON
+# On debian CMake somehow loses the ability to find zlib under
+# circumstances whose conditions are not understood, and this
+# seems to fix it, though shouldn't hurt on other platforms.
+libz=/usr/lib/x86_64-linux-gnu/libz.so
+[[ -e "$libz" ]] && cmake_add ZLIB_LIBRARY "$libz"
+
 [[ ! -z "$use_clang" ]] && {
   cmake_add CMAKE_C_COMPILER   "$use_clang/bin/clang"
   cmake_add CMAKE_CXX_COMPILER "$use_clang/bin/clang++"

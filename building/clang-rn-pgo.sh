@@ -80,12 +80,6 @@ if [[ ! -e "$profdata" && ! -e "$tools/llvm-pgo-current" ]]; then
   git clone ssh://git@github.com/dpacbach/revolution-now-game \
             /tmp/revolution-now-game --recursive
   pushd /tmp/revolution-now-game
-  # The instructions for PGO currently state that the runtime li-
-  # brary (including libclang_rt) should not be build in the in-
-  # strumented build because it causes issues, but this then pre-
-  # vents using the instrumented build to build with ASan. So
-  # here we drop the --asan.
-  #
   # Note at this point llvm-current points to the instrumented
   # build.
   cmc --clang --lld --libstdcxx --asan
@@ -93,7 +87,7 @@ if [[ ! -e "$profdata" && ! -e "$tools/llvm-pgo-current" ]]; then
   make all
   popd
   echo "Merging profraw files..."
-  $tools/llvm-inst-current/bin/llvm-profdata merge -output=$profdata $profiles/*.profraw
+  $tools/llvm-current-bak/bin/llvm-profdata merge -output=$profdata $profiles/*.profraw
   echo "wrote $profdata."
 else
   echo "Skipping profdata generation as it is already built."
