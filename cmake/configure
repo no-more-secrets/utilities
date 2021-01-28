@@ -112,8 +112,11 @@ def platform_identifier( *args, **params ):
     if params['asan']:
         chain.append( 'asan' )
 
-    if params['trace']:
-        chain.append( 'trace' )
+    if params['tracelog']:
+        chain.append( 'tracelog' )
+
+    if params['profile_compilation']:
+        chain.append( 'timetrace' )
 
     if params['generator'] and params['generator'] != 'make':
         chain.append( params['generator'] )
@@ -255,12 +258,16 @@ if __name__ == '__main__':
                          dest='show_commands',
                          action='store_true',
                          help='Show full commands during build' )
+    parser.add_argument( '--profile-compilation',
+                         dest='profile_compilation',
+                         action='store_true',
+                         help='Have Clang emit profile information on the compile process' )
     parser.add_argument( '--clang',
                          dest='clang',
                          action='store_true',
                          help='Use clang' )
-    parser.add_argument( '--trace',
-                         dest='trace',
+    parser.add_argument( '--tracelog',
+                         dest='tracelog',
                          action='store_true',
                          help='Enable trace-level logging' )
     parser.add_argument( '--lld',
@@ -350,6 +357,9 @@ if __name__ == '__main__':
 
     assert not (args.libstdcxx and args.libcxx), \
             'Cannot specify both --libcxx and --libstdcxx'
+
+    assert (args.clang or not args.profile_compilation), \
+            '--profile-compilation requires --clang'
 
     if args.lto:
         assert args.lld, 'Must use --lld if using --lto'
@@ -509,8 +519,9 @@ if __name__ == '__main__':
                                      build_type=build_type,
                                      tidy=args.tidy,
                                      asan=args.asan,
-                                     trace=args.trace,
-                                     generator=gen_label )
+                                     tracelog=args.tracelog,
+                                     generator=gen_label,
+                                     profile_compilation=args.profile_compilation)
 
     if os.path.exists( 'current' ):
         if not args.no_symlink:
@@ -545,6 +556,9 @@ if __name__ == '__main__':
 
     if build_type == 'debug' and 'gcc' not in compiler:
         cmake_cxx_flags_init.append( '-Wno-unused-command-line-argument' )
+
+    if args.profile_compilation:
+        cmake_cxx_flags_init.append( '-ftime-trace' )
 
     if args.libstdcxx:
         gcc_current = '%s/dev/tools/gcc-current' % os.environ['HOME']
@@ -642,7 +656,7 @@ if __name__ == '__main__':
       cmake_args.append( '-DCMAKE_C_FLAGS=-fcolor-diagnostics' )
     elif 'gcc' in compiler and generator == 'ninja':
       cmake_args.append( '-DCMAKE_C_FLAGS=-fdiagnostics-color' )
-    if args.trace:
+    if args.tracelog:
       cmake_args.append( '-DDEBUG_TRACE=ON' )
 
     if generator == 'ninja':
