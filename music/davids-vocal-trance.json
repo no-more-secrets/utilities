@@ -381,5 +381,19 @@
       "Cate Kanell"
     ],
     "album_name": "Shipwreck"
+  },
+  {
+    "song_name": "Thousand Pieces",
+    "album_artists": [
+      "A & Z",
+      "Claudiu Adam",
+      "Clara Yates"
+    ],
+    "contrib_artists": [
+      "A & Z",
+      "Claudiu Adam",
+      "Clara Yates"
+    ],
+    "album_name": "Thousand Pieces"
   }
 ]
