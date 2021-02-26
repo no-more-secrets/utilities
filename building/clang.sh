@@ -239,7 +239,8 @@ if [[ ! -z "$use_commit" ]]; then
   git checkout "$use_commit"
   cd -
 else
-  git clone --depth=1 --branch=master $llvm_github/$repo.git
+  # llvm now uses "main" instead of "master".
+  git clone --depth=1 --branch=main $llvm_github/$repo.git
 fi
 cd $repo
 
