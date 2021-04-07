@@ -47,16 +47,14 @@
     "album_name": "I Don't Deserve You"
   },
   {
-    "song_name": "Man On The Run - Radio Edit",
+    "song_name": "Man On The Run",
     "album_artists": [
       "Dash Berlin",
       "Cerf, Mitiska & Jaren"
     ],
     "contrib_artists": [
       "Dash Berlin",
-      "Cerf",
-      "Mitiska",
-      "Jaren"
+      "Cerf, Mitiska & Jaren"
     ],
     "album_name": "Man On The Run"
   },
@@ -395,5 +393,31 @@
       "Clara Yates"
     ],
     "album_name": "Thousand Pieces"
+  },
+  {
+    "song_name": "Serenity - Eximinds Remix",
+    "album_artists": [
+      "Roman Messer",
+      "Cari"
+    ],
+    "contrib_artists": [
+      "Roman Messer",
+      "Cari",
+      "Eximinds"
+    ],
+    "album_name": "Serenity (Eximinds Remix)"
+  },
+  {
+    "song_name": "Black Hole - Jorn van Deynhoven Remix",
+    "album_artists": [
+      "Craig Connelly",
+      "Christina Novelli"
+    ],
+    "contrib_artists": [
+      "Craig Connelly",
+      "Christina Novelli",
+      "Jorn Van Deynhoven"
+    ],
+    "album_name": "Black Hole (The Remixes)"
   }
 ]
