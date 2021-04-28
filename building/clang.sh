@@ -257,6 +257,7 @@ cd build
 # Do the c/cxx flags here because their values may contain spaces
 # in them.
 cmake -G Ninja                       \
+      -Wno-dev                       \
        $cmake_vars                   \
       -DCMAKE_CXX_FLAGS="$cxx_flags" \
       -DCMAKE_C_FLAGS="$c_flags"     \
