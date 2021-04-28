@@ -85,6 +85,19 @@ install_apt_dependencies() {
   sudo apt install $list
 }
 
+install_if_not_installed() {
+  # If we're not on linux then do nothing here.
+  [[ "$(uname)" == Linux ]] || return 0
+  local list="$1"
+  for package in $list; do
+    log "checking for apt dependency $package..."
+    if ! is_package_installed $package; then
+      sudo apt install $package
+    fi
+  done
+  return 0
+}
+
 post_install_message() {
   echo -e "${c_green}+==================================================================+${c_norm}"
   echo -e "${c_green}|${c_norm} Post-Installation Notes/Instructions                             ${c_green}|${c_norm}"
