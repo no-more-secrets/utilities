@@ -67,7 +67,9 @@ clone_latest_tag() {
 # Check version and if it already exists.
 # ---------------------------------------------------------------
 # Change this `acct` to "Koihik" after he releases the the next
-# tag (likely 1.3.6) that includes your changes.
+# tag (likely 1.3.6) that includes your changes. In the mean
+# time, if you make a change you need to add a new tag to your
+# repo so that it will be picked up by this script.
 acct="dpacbach"
 repo="LuaFormatter"
 
