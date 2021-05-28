@@ -1,4 +1,6 @@
 *.swp
 *~
 
+/music/.cache
+
 /ld-preload/output
