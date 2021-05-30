@@ -618,7 +618,7 @@ if __name__ == '__main__':
           env_vars['ASAN_SYMBOLIZER_PATH'] = '%s/bin/llvm-symbolizer' % llvm_current
           suppressions = '%s/scripts/lsan.suppressions' % root_dir
           if os.path.exists( suppressions ):
-            env_vars['LSAN_OPTIONS'] = 'suppressions=%s' % suppressions
+            env_vars['LSAN_OPTIONS'] = 'print_suppressions=false,suppressions=%s' % suppressions
         # When running under ASan it is necessary to prevent any dynamically loaded shared
         # libraries from being dlclose'd. This is because, if the loaded library causes
         # some memory leak then ASan will list it as an "unknown module" in its final re-
