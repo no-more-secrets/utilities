@@ -139,6 +139,13 @@ log "skia_lib_dir: $skia_lib_dir"
 # ---------------------------------------------------------------
 # Run CMake
 # ---------------------------------------------------------------
+# Need to ensure that the system ninja is installed in at the
+# front of the path so that CMake does not try to use our custom
+# ninja which causes issues when it is testing compilation.
+export PATH="/usr/bin:$PATH"
+[[ "$(which ninja)" == "/usr/bin/ninja" ]] || \
+  die "need to install ninja on the system."
+
 cd /tmp/$work/$repo && mkdir -p build && cd build
 # Use the deferenced path for the skia directory because we are
 # building against it and so we don't want a given version of
