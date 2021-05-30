@@ -26,12 +26,12 @@ popd
 # ---------------------------------------------------------------
 #                            Stage 1
 # ---------------------------------------------------------------
-# Stage 1, typically already built.
+# Stage 1, download if necessary (only for new machines).
 if [[ ! -e "$tools/llvm-current" ]]; then
-  ./clang.sh --skip-confirmation \
-             --skip-tests
+  bash download-llvm.sh
+  [[ -e "$tools/llvm-current" ]]
 else
-  echo "Skipping stage 1 as it is already built."
+  echo "Skipping stage 1 as it already exists."
 fi
 
 # Record which folder it is so that we can restore it.
