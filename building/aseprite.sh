@@ -90,17 +90,16 @@ version=$(latest_github_repo_tag $acct $repo)
 prefix="$tools/$project_key-$version"
 
 # ---------------------------------------------------------------
-# Check apt Dependencies
+# Install apt Dependencies
 # ---------------------------------------------------------------
-# This will check for the presence of (but not install) apt pack-
-# ages that are required for the build. These are taken from the
-# Aseprite INSTALL.md file, and may change with time. This will
-# be a no-op on OSX.
-check_apt_dependencies "
+# These dependencies are taken from the Aseprite INSTALL.md file,
+# and may change with time. This will be a no-op on OSX.
+install_if_not_installed "
+  libfontconfig1-dev
+  libgl1-mesa-dev
   libx11-dev
   libxcursor-dev
-  libgl1-mesa-dev
-  libfontconfig1-dev
+  libxi-dev
 "
 
 # ---------------------------------------------------------------
