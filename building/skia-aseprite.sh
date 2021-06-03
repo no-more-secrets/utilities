@@ -112,7 +112,7 @@ cd skia
 # of the git repos.
 #
 #cp /tmp/git-sync-deps tools/git-sync-deps # UNCOMMENT
-python tools/git-sync-deps
+python3 tools/git-sync-deps
 
 # ---------------------------------------------------------------
 # Configure
