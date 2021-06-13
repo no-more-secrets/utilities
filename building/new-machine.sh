@@ -22,7 +22,7 @@ source util.sh
 
 bash lazygit.sh
 
-bash gcc.sh
+bash gcc.sh # must come before clang-rn-pgo.
 
 bash clang-rn-pgo.sh
 
