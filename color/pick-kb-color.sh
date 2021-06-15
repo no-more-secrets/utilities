@@ -12,7 +12,7 @@ echo 'enter to select and exit; escape for default.'
 prev_color=
 
 while true; do
-  color=$(~/dev/utilities/color/pick-color.sh)
+  color=$(~/dev/utilities/color/pick-color-from-screen.sh)
   color="${color//#/}"
   # We need a way for the user to break from this loop. This is
   # very important, since otherwise it is very difficult to es-
