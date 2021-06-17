@@ -306,6 +306,10 @@ if __name__ == '__main__':
                          dest='no_color',
                          action='store_true',
                          help='No colors in output' )
+    parser.add_argument( '--graphviz',
+                         dest='graphviz',
+                         action='store_true',
+                         help='Tell CMake to generate graphviz outtput showing target dependencies.' )
     parser.add_argument( '--prefix',
                          dest='prefix',
                          type=str,
@@ -606,6 +610,8 @@ if __name__ == '__main__':
     cmake_args.append( '-DCMAKE_CXX_COMPILER=%s' % cxx_compiler_path )
     if args.tidy:
       cmake_args.append( '-DUSE_CLANG_TIDY=%s' % cmake_bool( True ) )
+    if args.graphviz:
+      cmake_args.append( '--graphviz=graphviz/dependencies.dot' )
     if args.testing:
         cmake_args.append( '-DBUILD_TESTING=ON' )
     if gen_label == 'make':
