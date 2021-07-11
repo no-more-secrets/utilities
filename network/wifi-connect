@@ -1,150 +1,25 @@
 #!/bin/bash
-#
-#   NOTE: this script doesn't really work well when a desktop en-
-#   vironment is runnings. Actually, the script's approach may
-#   not right in general. It runs the wpa_supplicant daemon and
-#   doesn't have a good way to monitor it. Furthermore, that
-#   daemon is already running from the desktop environment.
-#
-#   Probably the right way to programmatically control wifi con-
-#   nections is to use the wpa_cli tool to interact with the
-#   already-running wpa_supplicant daemon.  See here:
-#
-#     https://shapeshed.com/linux-wifi/
-#
-# ---------------------------------------------------------------
-# Wifi Connection Tool
-# ---------------------------------------------------------------
-# On an Ubuntu/Debian based system this provides a commandline
-# interface to viewing a list of available wifi networks and se-
-# lecting one and connecting. This approach has been taken from
-# one of the answers here:
-#
-# https://askubuntu.com/questions/138472/
-#   how-do-i-connect-to-a-wpa-wifi-network-using-the-command-line
-#
-# ---------------------------------------------------------------
-set -eE
+# Show a list of wifi networks with dmenu and connect to the se-
+# lected one, or escape to cancel.
+set -e
 set -o pipefail
 
-# Must be done first.
-this=$(cd $(dirname $0) && pwd)
-cd $this
+dmenu=~/dev/suckless/dmenu/latest/dmenu
 
-# ---------------------------------------------------------------
-# Includes
-# ---------------------------------------------------------------
-source ../building/util.sh
+selection="$(nmcli dev wifi | $dmenu -l 30)"
 
-# ---------------------------------------------------------------
-# Get Wifi Interface
-# ---------------------------------------------------------------
-wifi_interface() {
-  iw dev | awk '/^\s+Interface/ { print $2 }'
-}
+[[ -z "$selection" ]] && exit 0
+# remove leading '*' which is found on the currently selected network.
+selection="${selection//\*}"
 
-(( $(wifi_interface | wc -l) != 1 )) && {
-  die "could not find precisely one wifi interface.\n" \
-      "Instead found:\n$(wifi_interface | nl)"
-}
+set -- $selection
 
-interface=$(wifi_interface)
-log "found wifi interface: $interface"
+[[ "$1" == IN-USE ]] && exit 0
 
-# ---------------------------------------------------------------
-# Select SSID
-# ---------------------------------------------------------------
-ssid_lines=$(nmcli --colors yes dev wifi)
-(( $(echo "$ssid_lines" | wc -l) <= 1 )) && \
-    die "no wifi networks found during scanning (try running \$ wifi off; wifi on)."
+bssid="$1"
 
-ssid_line=$(echo "$ssid_lines" | fzf)
-[[ "$ssid_line" =~ ^IN-USE ]] && \
-    die "header row selected; something went wrong."
+[[ "$bssid" =~ [0-9A-Z:]+ ]] || exit 1
 
-# SSID is in second column, but may contain spaces and non-ascii
-# characters, so we assume that the column following SSID will
-# contain the value "Infra" and use that to extract SSID.
-ssid=$(echo -n "$ssid_line" | sed -r 's/^[ *]+(.*[^ ]) +Infra .*/\1/g')
-log "selected SSID: \"${ssid}\""
+echo "connecting to: $bssid"
 
-ssid_md5=$(echo -n "$ssid" | md5sum | awk '{ print $1 }')
-log "SSID MD5: ${ssid_md5}"
-
-# ---------------------------------------------------------------
-# Save WPA(2) Config File
-# ---------------------------------------------------------------
-conf_dir="$HOME/.wpa-conf"
-mkdir -p "$conf_dir"
-
-ssid_file="$conf_dir/$ssid_md5"
-
-if [[ ! -e "$ssid_file" ]]; then
-  log "WPA config file does not exist, will create."
-  read -s -p "Enter network password: " pass
-  echo
-  wpa_passphrase "$ssid" "$pass" >"$ssid_file"
-  log "wrote config file: $ssid_file."
-else
-  log "config file $ssid_file already exists."
-fi
-
-# ---------------------------------------------------------------
-# Run WAP Supplicant
-# ---------------------------------------------------------------
-sudo_has_cached_credentials() {
-  sudo -S true < /dev/null 2> /dev/null
-}
-
-sudo_has_cached_credentials || {
-  echo "***NOTE: You will now be asked for your administrator password."
-}
-
-echo '*** PRESS ENTER WHEN wpa_supplicant IS READY ***'
-sleep 2
-
-# This will associate us with the network. This runs in the back-
-# ground.
-log "running: sudo wpa_supplicant -B -i\"$interface\" -c\"$ssid_file\""
-sudo wpa_supplicant -B -i"$interface" -c"$ssid_file"
-
-read _
-
-log "connection to network \"$ssid\" successful.  Obtaining IP..."
-
-# ---------------------------------------------------------------
-# Get IP Address
-# ---------------------------------------------------------------
-log "releasing current IP address..."
-sudo dhclient -r
-log "asking for IP address..."
-sudo dhclient "$interface"
-
-# ---------------------------------------------------------------
-# Validate IP Address
-# ---------------------------------------------------------------
-read_ip() {
-  local interface=$1
-  ifconfig $interface \
-      | tr '\t' ' '   \
-      | sed -nr 's/ *inet ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/p'
-}
-
-ipv4_address=$(read_ip $interface)
-
-[[ "$ipv4_address" =~ ^([0-9]+\.[0-9]+\.[0-9]+)\.[0-9]+$ ]] || {
-  echo 1>&2 "error: '$ipv4_address' is not a valid IP address."
-  exit 1
-}
-log "new ip address: $ipv4_address"
-
-# ---------------------------------------------------------------
-# Test Connection
-# ---------------------------------------------------------------
-log "testing connection by pinging Google."
-ping -c1 -q www.google.com
-
-# ---------------------------------------------------------------
-# Success
-# ---------------------------------------------------------------
-echo "------------------------- Success -------------------------"
+nmcli dev wifi connect $bssid
