@@ -12,8 +12,6 @@ if [[ -z "$id" ]]; then
   (( id > 0 )) || die "invalid id."
 fi
 
-echo "you entered id=$id"
-
 prop_name='libinput Accel Speed'
 
 { xinput list-props $id | grep "$prop_name"; } || \
@@ -35,5 +33,5 @@ value=$(echo " .9 (fastest)
 
 [[ ! -z "$value" ]]
 
-echo "setting mouse accerlation to $value."
+echo "setting mouse acceleration to $value."
 xinput --set-prop $id "$prop_name" $value
