@@ -20,4 +20,5 @@ layout_file="layouts/$name.lua"
 
 shell_code="$(cat "$layout_file" | lua lib/create-layout.lua)"
 
+cd ~
 echo "$shell_code" | sh
