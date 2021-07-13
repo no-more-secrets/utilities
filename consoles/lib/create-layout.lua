@@ -37,7 +37,7 @@ function gen_horizontal( t )
   for i = count, 1, -1 do
     dispatch( t[i] )
     if i == 1 then break end
-    print( 'tmux select-pane -L' )
+    print( 'tmux select-pane  -L' )
   end
 end
 
@@ -56,7 +56,7 @@ function gen_vertical( t )
   for i = count, 1, -1 do
     dispatch( t[i] )
     if i == 1 then break end
-    print( 'tmux select-pane -U' )
+    print( 'tmux select-pane  -U' )
   end
 end
 
