@@ -1,9 +1,9 @@
 #!/usr/bin/env lua
 
 -- This file will generate a shell script which, when run, will
--- create a tmux screen layout described by the (Lua) config file
--- passed in as an argument to this script.
-layout_util = require( 'layout-util' )
+-- create a tmux screen layout described by the (Lua) config that
+-- is piped into to stdin.
+layout_util = require( 'lib/layout-util' )
 
 -- Needed by the layout file.
 vertical = layout_util.vertical
@@ -11,9 +11,9 @@ horizontal = layout_util.horizontal
 command = layout_util.command
 
 -- Get layout.
-usage = 'usage: create-layout.lua <layout-file.lua>'
-layout_file = arg[1] or error( usage )
-layout = dofile( layout_file )
+input = ''
+for line in io.lines() do input = input .. line .. '\n' end
+layout = load( input )()
 
 -- Generate preamble with pretty-printed layout.
 print( '#!/bin/sh' )
