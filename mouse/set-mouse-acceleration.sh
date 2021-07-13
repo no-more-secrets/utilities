@@ -7,7 +7,9 @@ source ~/dev/utilities/bashlib/util.sh
 id="$1"
 
 if [[ -z "$id" ]]; then
-  echo -n "Run \`xinput list\` and input the id of the mouse (or rerun script with id as argument): "
+  xinput list
+  echo
+  echo -n "Input the id of the mouse (or rerun script with id as argument): "
   read id
   (( id > 0 )) || die "invalid id."
 fi
