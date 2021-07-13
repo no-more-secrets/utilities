@@ -38,6 +38,15 @@ build_threads() {
   return 0
 }
 
+# A script should pass the $0 argument to this function.
+cd_to_this() {
+  local dollar_0=$1
+  [[ -z "$dollar_0" ]] && \
+    die "argument to cd_to_this is empty."
+  this="$(dirname "$(readlink -f $dollar_0)")"
+  cd "$this"
+}
+
 # Given a stream of lines on stdin, this will chunk them (trans-
 # pose them) into n columns (n is first arg).
 #
