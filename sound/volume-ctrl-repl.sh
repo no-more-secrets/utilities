@@ -28,7 +28,7 @@ sink=$(pactl list sinks                \
   | sed -r 's/\s+[a-zA-Z]+: //g'       \
   | tr ' ' '_'                         \
   | xargs -n2 echo                     \
-  | column --table -N Name,Description \
+  | column -t                          \
   | fzf --select-1                     \
   | awk '{ print $1 }')
 
