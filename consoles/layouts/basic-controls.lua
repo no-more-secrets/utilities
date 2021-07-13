@@ -3,7 +3,7 @@ return vertical{
     [1]=command{ 'alsamixer' },
     [2]=vertical{
       [1]=command{ 'bluetoothctl' },
-      [2]=command{ 'fish' }
+      [2]=command{ '~/dev/utilities/sound/volume-ctrl-repl.sh' }
     }
   },
   [2]=horizontal{

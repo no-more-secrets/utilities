@@ -37,3 +37,41 @@ build_threads() {
   echo "$threads"
   return 0
 }
+
+# Given a stream of lines on stdin, this will chunk them (trans-
+# pose them) into n columns (n is first arg).
+#
+# Sample input:
+#
+#   <line 1>
+#   <line 2>
+#   <line 3>
+#   <line 4>
+#   <line 5>
+#   <line 6>
+#   <line 7>
+#
+# Output of `transpose 2`:
+#
+#   <line 1> <line 2>
+#   <line 3> <line 4>
+#   <line 5> <line 6>
+#   <line 7>
+#
+transpose() {
+  local n=$1
+  (( n == 0 )) && die "passed 0 to transpose."
+  local line
+  local i=0
+  while read -r line; do
+    echo -n "$line "
+    i=$(( i+1 ))
+    if (( i == n )); then
+      echo
+      i=0
+    fi
+  done
+  if (( i > 0 )); then
+    echo
+  fi
+}
