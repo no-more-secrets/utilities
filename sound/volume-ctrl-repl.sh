@@ -1,6 +1,7 @@
 #!/bin/bash
 # This is a repl that allows adjusting the volume of the active
-# pulseaudio sink.
+# pulseaudio sink. It is better to just use pulsemixer if it is
+# available. But if it isn't, this might do the trick.
 set -o pipefail
 
 # ---------------------------------------------------------------
