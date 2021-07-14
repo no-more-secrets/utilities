@@ -84,3 +84,13 @@ transpose() {
     echo
   fi
 }
+
+clear_current_line() {
+  echo -en "\033[2K"
+}
+
+clear_to_eol() { tput el; }
+
+move_up_one_line() {
+  echo -en "\033[A"
+}

@@ -23,14 +23,6 @@ bye() {
 }
 trap bye INT
 
-clear_current_line() {
-  echo -en "\033[2K\r"
-}
-
-move_up_one_line() {
-  echo -en "\033[A\r"
-}
-
 # ---------------------------------------------------------------
 # Get a pulseaudio sink.
 # ---------------------------------------------------------------
@@ -107,8 +99,7 @@ print_sink_volume() {
 # builtin speakers and then a bluetooth speaker is connected.
 while true; do
   if ! has_active_sinks; then
-    clear_current_line
-    echo -en '(no active pulseaudio sinks found; there is no audio playing)'
+    echo -en "\r(no audio playing)$(clear_to_eol)"
     # Use this as a sleep that the user can break via enter.
     read -t $refresh_time_secs
     continue
@@ -116,8 +107,7 @@ while true; do
   select_sink
   while true; do
     volume=$(print_sink_volume)
-    clear_current_line
-    echo -n "volume (L/R): $volume up/down [u/d]: "
+    echo -en "\rvolume (L/R): $volume up/down [u/d]: $(clear_to_eol)"
     read -t $refresh_time_secs -r c
     if [[ $? == 142 ]]; then
       break
