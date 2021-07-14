@@ -4,9 +4,16 @@
 set -o pipefail
 
 # ---------------------------------------------------------------
+# Parameters
+# ---------------------------------------------------------------
+refresh_time_secs=2
+
+# ---------------------------------------------------------------
 # Helper functions.
 # ---------------------------------------------------------------
 source ~/dev/utilities/bashlib/util.sh
+
+clear
 
 # Not really necessary, but nice.
 bye() {
@@ -15,6 +22,14 @@ bye() {
   exit 0
 }
 trap bye INT
+
+clear_current_line() {
+  echo -en "\033[2K\r"
+}
+
+move_up_one_line() {
+  echo -en "\033[A\r"
+}
 
 # ---------------------------------------------------------------
 # Get a pulseaudio sink.
@@ -32,14 +47,22 @@ sink_table() {
     | column -t
 }
 
+count_active_sinks() {
+  sink_table | grep RUNNING | wc -l
+}
+
 has_active_sinks() {
-  [[ "$(sink_table | grep RUNNING | wc -l)" > 0 ]] 
+  [[ "$(count_active_sinks)" > 0 ]]
 }
 
 # This is not supposed to be called unless there is at least one
 # active sink.
 select_sink() {
-  echo 'Select from available pulseaudio sinks:'
+  local num_active="$(count_active_sinks)"
+  (( num_active > 1 )) && {
+    clear
+    echo 'Select from available pulseaudio sinks:'
+  }
   # Here we are getting the name/description pairs, then trans-
   # posing them into a table so that the user can select.
   sink=$(sink_table       \
@@ -47,9 +70,9 @@ select_sink() {
     | fzf --select-1      \
     | awk '{ print $2 }')
 
-  echo "selected sink: $sink."
-  [[ ! -z "$sink" ]] && break
-  warn "sink name is empty."
+  (( num_active > 1 )) && clear
+  [[ -z "$sink" ]] && \
+    die "sink name is empty."
 }
 
 # ---------------------------------------------------------------
@@ -83,20 +106,19 @@ print_sink_volume() {
 # changed. An example of this is if the sound is coming out of
 # builtin speakers and then a bluetooth speaker is connected.
 while true; do
-  clear
   if ! has_active_sinks; then
-    echo '(no active pulseaudio sinks found; there is no audio playing)'
+    clear_current_line
+    echo -en '(no active pulseaudio sinks found; there is no audio playing)'
     # Use this as a sleep that the user can break via enter.
-    read -t 10
+    read -t $refresh_time_secs
     continue
   fi
   select_sink
   while true; do
-    clear
-    echo -n 'volume (L/R): '
-    print_sink_volume
-    echo -n ' up/down [u/d]: '
-    read -t 5 -r c
+    volume=$(print_sink_volume)
+    clear_current_line
+    echo -n "volume (L/R): $volume up/down [u/d]: "
+    read -t $refresh_time_secs -r c
     if [[ $? == 142 ]]; then
       break
     fi
@@ -105,5 +127,6 @@ while true; do
     elif [[ "$c" == "d" ]]; then
       set_sink_volume "-5%" || break
     fi
+    move_up_one_line
   done
 done
