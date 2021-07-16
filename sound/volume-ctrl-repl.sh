@@ -111,6 +111,7 @@ while true; do
     echo -en "\rvolume (L/R): $volume up/down [u/d]: $(clear_to_eol)"
     read -t $refresh_time_secs -r c
     if [[ $? == 142 ]]; then
+      # the read command hit the timeout.
       break
     fi
     if [[ "$c" == "u" ]]; then
