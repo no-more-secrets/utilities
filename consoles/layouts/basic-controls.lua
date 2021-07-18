@@ -11,6 +11,6 @@ return vertical{
   },
   [2]=horizontal{
     [1]=command{ 'htop' },
-    [2]=command{ 'bashtop' }
+    [2]=command{ 'fish' }
   },
 }
