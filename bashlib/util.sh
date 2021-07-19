@@ -67,28 +67,12 @@ cd_to_this() {
 #   <line 5> <line 6>
 #   <line 7>
 #
-# NOTE: we do not implement this using `xargs -n$1` because that
-# command (although it almost does what we want) it will break up
-# the words on a line in order that each resulting line has pre-
-# cisely n words on it. That is not what we want, because our
-# input lines may have spaces in them and we don't want them to
-# be broken up.
 transpose() {
   local n=$1
-  (( n == 0 )) && die "passed 0 to transpose."
-  local line
-  local i=0
-  while read -r line; do
-    echo -n "$line "
-    i=$(( i+1 ))
-    if (( i == n )); then
-      echo
-      i=0
-    fi
-  done
-  if (( i > 0 )); then
-    echo
-  fi
+  [[ -z "$n" ]] && die "missing argument to transpose."
+  (( n == 0 ))  && die "passed 0 to transpose."
+  # xargs default's to `echo` when no command is specified.
+  xargs -n$n -d'\n'
 }
 
 clear_current_line() {
