@@ -10,7 +10,7 @@ cmake-utils   := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 pre-build := $(if $(wildcard scripts/pre-build.sh),scripts/pre-build.sh,:)
 
-possible_targets := all run clean test rn
+cmake_targets := all clean test rn cmake-run
 
 ifeq ($(origin, NINJA_STATUS_PRINT_MODE),)
 	NINJA_STATUS_PRINT_MODE=scrolling
@@ -26,7 +26,7 @@ ifneq (,$(wildcard $(build-current)/Makefile))
     # propagating the jobserver.  For this same reason we
     # also do not just put the whole command into a variable
     # and just define the targets once.
-    $(possible_targets): $(build-current)
+    $(cmake_targets): $(build-current)
 	    @$(pre-build)
 	    @cd $(build-current) && $(MAKE) -s $@
 	    @touch $(stamp-file)
@@ -34,13 +34,17 @@ else
     # Use cmake to build here because it is the preferred
     # way to go when it works for us (which it does in this
     # case).
-    $(possible_targets): $(build-current)
+    $(cmake_targets): $(build-current)
 	    @$(pre-build)
 	    @cd $(build-current) && ninja $@
 	    @touch $(stamp-file)
 endif
 
 clean-target := $(if $(wildcard $(builds)),clean,)
+
+run:
+	@$(MAKE) -s all # somehow `exe` doesn't clear the screen.
+	@$(MAKE) -s cmake-run
 
 # Need to have `clean` as a dependency before removing the
 # .builds folder because some outputs of the build are in the
@@ -63,4 +67,4 @@ what:
 $(build-current):
 	@cmc
 
-.PHONY: $(possible_targets) update what
+.PHONY: $(cmake_targets) update what run
