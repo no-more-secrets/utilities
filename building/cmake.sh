@@ -72,7 +72,7 @@ if which cmake; then
     # SSL support and have CMake use that. This then appears to
     # avoid errors that would otherwise happen when CMake tries
     # to download using https links.
-    cmake .                                 \
+    cmake . -G 'Unix Makefiles'             \
         -DCMAKE_INSTALL_PREFIX=$prefix      \
         -DCMAKE_USE_SYSTEM_LIBRARY_CURL=YES
 else
