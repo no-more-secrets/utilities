@@ -57,7 +57,8 @@ cd $repo
 # ---------------------------------------------------------------
 mkdir build && cd build
 
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+cmake .. -G "Unix Makefiles" \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
          -DCMAKE_CXX_FLAGS=-std=c++11
 
 # ---------------------------------------------------------------
