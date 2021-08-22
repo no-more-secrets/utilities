@@ -17,4 +17,4 @@
   echo --------------------------------------------- -------------
 } | awk '{ count += $2; print } END { print "Total", count }' \
   | awk '{ print } END { print "--------------------------------------------- -------------" }' \
-  | column -t --output-separator='' | grep -v ' 0$'
+  | column -t -s=' ' | grep -v ' 0$'
