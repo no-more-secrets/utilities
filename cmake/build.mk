@@ -19,6 +19,11 @@ endif
 export DSICILIA_NINJA_STATUS_PRINT_MODE=$(NINJA_STATUS_PRINT_MODE)
 export DSICILIA_NINJA_REFORMAT_MODE=pretty
 
+ifneq ($(origin, KEEP_GOING),undefined)
+  NINJA_KEEP_GOING = -k0
+  MAKE_KEEP_GOING = -k
+endif
+
 build-config := $(notdir $(realpath $(build-current)))
 ifneq (,$(wildcard $(build-current)/Makefile))
     # Here we are invoking $(MAKE) directly instead of using
@@ -28,7 +33,7 @@ ifneq (,$(wildcard $(build-current)/Makefile))
     # and just define the targets once.
     $(cmake_targets): $(build-current)
 	    @$(pre-build)
-	    @cd $(build-current) && $(MAKE) -s $@
+	    @cd $(build-current) && $(MAKE) $(MAKE_KEEP_GOING) -s $@
 	    @touch $(stamp-file)
 else
     # Use cmake to build here because it is the preferred
@@ -36,7 +41,7 @@ else
     # case).
     $(cmake_targets): $(build-current)
 	    @$(pre-build)
-	    @cd $(build-current) && ninja $@
+	    @cd $(build-current) && ninja $(NINJA_KEEP_GOING) $@
 	    @touch $(stamp-file)
 endif
 
