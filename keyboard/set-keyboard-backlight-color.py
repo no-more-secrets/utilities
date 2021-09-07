@@ -2,8 +2,8 @@
 import os, sys, re
 
 bonobo = '/sys/devices/LNXSYSTM:00/LNXSYBUS:00/17761776:00/leds/system76_acpi::kbd_backlight/color'
-bonobo_color = 'FF1E00' # orange
-# bonobo_color = '400540' # dull purple
+# bonobo_color = 'FF1E00' # orange
+bonobo_color = '400540' # dull purple
 if os.path.exists( bonobo ):
   kbd_backlight = bonobo
   color         = bonobo_color
