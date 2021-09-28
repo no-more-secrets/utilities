@@ -6,7 +6,7 @@ set -o pipefail
 
 dmenu=~/dev/suckless/dmenu/latest/dmenu
 
-selection="$(nmcli dev wifi | $dmenu -l 30)"
+selection="$(nmcli dev wifi list --rescan yes | $dmenu -l 30)"
 
 [[ -z "$selection" ]] && exit 0
 # remove leading '*' which is found on the currently selected network.
@@ -21,5 +21,8 @@ bssid="$1"
 [[ "$bssid" =~ [0-9A-Z:]+ ]] || exit 1
 
 echo "connecting to: $bssid"
+
+# use this one to ask for password.
+# nmcli dev wifi connect $bssid --ask
 
 nmcli dev wifi connect $bssid
