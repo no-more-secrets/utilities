@@ -4,14 +4,22 @@ set -o pipefail
 
 source ~/dev/utilities/bashlib/util.sh
 
-id="$1"
+touchpad_id() {
+  xinput list | sed -rn 's/.*Touchpad.*id=([0-9]+).*/\1/p'
+}
 
-if [[ -z "$id" ]]; then
+id="$(touchpad_id)"
+num="$(echo "$id" | wc -l)"
+
+if (( num != 1 )); then
+  error "cannot locate touchpad id."
   xinput list
   echo
   echo -n "Input the id of the touchpad (or rerun script with id as argument): "
   read id
   (( id > 0 )) || die "invalid id."
+else
+  log "found touchpad id=$id"
 fi
 
 prop_name='libinput Natural Scrolling Enabled'
@@ -28,9 +36,9 @@ current=$(xinput list-props $id | sed -rn 's/\s+libinput Natural Scrolling Enabl
 current=$(( 1-current ))
 
 if (( current )); then
-  echo "enabling touchpad natural scrolling."
+  log "enabling touchpad natural scrolling."
 else
-  echo "disabling touchpad natural scrolling."
+  log "disabling touchpad natural scrolling."
 fi
 
 # Set to zero to disable.
