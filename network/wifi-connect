@@ -23,6 +23,6 @@ bssid="$1"
 echo "connecting to: $bssid"
 
 # use this one to ask for password.
-# nmcli dev wifi connect $bssid --ask
+nmcli dev wifi connect $bssid --ask
 
-nmcli dev wifi connect $bssid
+# nmcli dev wifi connect $bssid
