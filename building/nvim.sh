@@ -83,6 +83,20 @@ prefix="$tools/$project_key-$version"
 log "latest version: $version"
 
 # ---------------------------------------------------------------
+# Check apt Dependencies
+# ---------------------------------------------------------------
+# This will install apt packages that are required for the build.
+# These were determined empirically, and may change with time
+# and/or with Linux distribution. This will be a no-op on OSX.
+echo 'You may be asked for your password to install apt dependencies:'
+apt_deps="
+  gettext
+"
+echo -e "$apt_deps"
+
+install_if_not_installed "$apt_deps"
+
+# ---------------------------------------------------------------
 # Clone Repo
 # ---------------------------------------------------------------
 clone_latest_tag "$acct" "$repo"
