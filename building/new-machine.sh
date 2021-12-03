@@ -17,6 +17,8 @@ mkdir -p "$tools"
 # ---------------------------------------------------------------
 source util.sh
 
+bash nvim.sh
+
 [[ ! -d "$tools/ninja" ]] && \
   bash ninja.sh
 
