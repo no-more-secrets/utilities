@@ -10,9 +10,12 @@ vertical = layout_util.vertical
 horizontal = layout_util.horizontal
 command = layout_util.command
 
--- Get layout.
-input = ''
-for line in io.lines() do input = input .. line .. '\n' end
+-- Get layout. Read lines into a table and then join, as oppoed
+-- to concatenating each line onto an ever-growing string, since
+-- that would be an O(N^2) operation.
+input = {}
+for line in io.lines() do input[#input + 1] = line end
+input = table.concat( input, '\n' )
 layout = load( input )()
 
 -- Generate preamble with pretty-printed layout.
