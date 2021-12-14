@@ -137,6 +137,24 @@ tools_link $project_key
 bin_links $project_key
 
 # ---------------------------------------------------------------
+# Keyboard-specific Links
+# ---------------------------------------------------------------
+links='
+  g915
+'
+
+# Setup keyboard-specific symlinks.
+current_dir="$tools/$project_key-current"
+for name in $links; do
+  cd $target_dir/bin
+  rm -f "$name-led"
+  ln -s g810-led $name-led
+  cd ~/bin
+  rm -f "$name-led"
+  ln -s $current_dir/bin/$name-led $name-led
+done
+
+# ---------------------------------------------------------------
 # Finish
 # ---------------------------------------------------------------
 log "success."
