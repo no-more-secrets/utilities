@@ -21,7 +21,7 @@ while true; do
   [[ "$color" == "$prev_color" ]] && break
   prev_color="$color"
   echo -en "color: $color\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"
-  sudo ~/dev/utilities/color/set-keyboard-backlight-color.py $color
+  sudo ~/dev/utilities/keyboard/set-keyboard-backlight-color.py $color
 done
 
 clear
