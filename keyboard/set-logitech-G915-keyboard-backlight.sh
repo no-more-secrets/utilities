@@ -89,4 +89,5 @@ done
 #
 # To reset it to "board" mode change "software" to "board".
 #
+# FIXME: doesn't seem to work.
 g915_led --on-board-mode software
