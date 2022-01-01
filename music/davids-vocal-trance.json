@@ -27,10 +27,12 @@
   {
     "song_name": "Sin\u00e9ad - Alex M.O.R.P.H. Extended Vocal Mix",
     "album_artists": [
-      "Within Temptation"
+      "Within Temptation",
+      "Alex M.O.R.P.H."
     ],
     "contrib_artists": [
-      "Within Temptation"
+      "Within Temptation",
+      "Alex M.O.R.P.H."
     ],
     "album_name": "Sin\u00e9ad (Alex M.O.R.P.H. Remix)"
   },
@@ -234,7 +236,7 @@
   {
     "song_name": "Disarm Yourself - Club Mix",
     "album_artists": [
-      "Various Artists"
+      "Dash Berlin"
     ],
     "contrib_artists": [
       "Dash Berlin",
@@ -419,5 +421,106 @@
       "Jorn Van Deynhoven"
     ],
     "album_name": "Black Hole (The Remixes)"
+  },
+  {
+    "song_name": "Anything - Original Mix",
+    "album_artists": [
+      "Erick Strong",
+      "MalYar",
+      "Gemma Pavlovic"
+    ],
+    "contrib_artists": [
+      "Erick Strong",
+      "Gemma Pavlovic",
+      "MalYar"
+    ],
+    "album_name": "Anything"
+  },
+  {
+    "song_name": "Id\u00e9e fixe - Costa Remix",
+    "album_artists": [
+      "Various Artists"
+    ],
+    "contrib_artists": [
+      "Sleepthief",
+      "Roberta Harrison",
+      "Costa"
+    ],
+    "album_name": "Vocal Trance 2020"
+  },
+  {
+    "song_name": "The Sound Of Letting Go (Tribute To Yotam) [ASOT 989] - HamzeH Remix",
+    "album_artists": [
+      "Armin van Buuren ASOT Radio"
+    ],
+    "contrib_artists": [
+      "Graham Bell",
+      "SIVAN",
+      "HamzeH"
+    ],
+    "album_name": "ASOT 989 - A State Of Trance Episode 989 (Including A State Of Trance Showcase - Mix 015: Jorn van Deynhoven)"
+  },
+  {
+    "song_name": "Live Forever - Solid Stone Extended Remix",
+    "album_artists": [
+      "Ferry Corsten"
+    ],
+    "contrib_artists": [
+      "Ferry Corsten",
+      "Aruna",
+      "Solid Stone"
+    ],
+    "album_name": "Live Forever"
+  },
+  {
+    "song_name": "Saving Light",
+    "album_artists": [
+      "Gareth Emery",
+      "STANDERWICK",
+      "HALIENE"
+    ],
+    "contrib_artists": [
+      "Gareth Emery",
+      "STANDERWICK",
+      "HALIENE"
+    ],
+    "album_name": "Saving Light"
+  },
+  {
+    "song_name": "Nova II (The Second Journey) - Extended Mix",
+    "album_artists": [
+      "Daniel Kandi"
+    ],
+    "contrib_artists": [
+      "Daniel Kandi"
+    ],
+    "album_name": "Nova II (The Second Journey)"
+  },
+  {
+    "song_name": "Arctic Kiss - Andy Blueman Instrumental Remix",
+    "album_artists": [
+      "Various Artists"
+    ],
+    "contrib_artists": [
+      "Will Holland",
+      "Motionchild",
+      "Tiff Lacey"
+    ],
+    "album_name": "Ibiza Trance Collection 2010 - Volume One"
+  },
+  {
+    "song_name": "Can't Let Go - Colonial One & Mazza Remix",
+    "album_artists": [
+      "Fabio XB",
+      "Marell"
+    ],
+    "contrib_artists": [
+      "Fabio XB",
+      "Marell",
+      "Christina Novelli",
+      "Colonial One",
+      "Mazza"
+    ],
+    "album_name": "Can't Let Go"
   }
 ]
