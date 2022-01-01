@@ -12,6 +12,7 @@ sync() {
   local playlist_id="$1"
   local filename="$2"
   local playlist_url="https://open.spotify.com/playlist/$playlist_id"
+  echo "syncing $filename..."
   python3 export-spotify-playlist.py "$playlist_url" > $filename
 }
 
@@ -22,4 +23,5 @@ if git status --porcelain=v1 2>/dev/null | grep json; then
   lazygit
 fi
 
+echo "done."
 exit 0
