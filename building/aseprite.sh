@@ -154,6 +154,7 @@ cd /tmp/$work/$repo && mkdir -p build && cd build
 # aseprite to break if the skia-current symlink changes.
 $cmake .. -DSKIA_DIR=$skia_real_version                 \
           -DSKIA_LIBRARY_DIR=$skia_lib_dir              \
+          -DSKIA_LIBRARY=$skia_lib_dir/libskia.a        \
           -DCMAKE_INSTALL_PREFIX="$prefix"              \
           -DLAF_BACKEND=skia                            \
           -DCMAKE_BUILD_TYPE=RelWithDebInfo             \
