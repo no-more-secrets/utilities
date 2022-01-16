@@ -24,8 +24,6 @@ bash nvim.sh
 
 bash lazygit.sh
 
-bash skippy.sh
-
 bash gcc.sh # must come before clang-rn-pgo.
 
 bash clang-rn-pgo.sh

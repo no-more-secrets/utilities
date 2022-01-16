@@ -29,7 +29,7 @@ j = json.loads( sys.stdin.read() )
 print( j["parent"]["full_name"] )
 '
 
-forked_acct_repo="$(curl -s "https://api.github.com/repos/dpacbach/$repo" | python -c "$py_code")"
+forked_acct_repo="$(curl -s "https://api.github.com/repos/dpacbach/$repo" | python3 -c "$py_code")"
 
 parent_repo="https://dpacbach@github.com/$forked_acct_repo"
 
