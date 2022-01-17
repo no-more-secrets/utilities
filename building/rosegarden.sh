@@ -95,7 +95,7 @@ apt_deps="
 "
 echo -e "$apt_deps"
 
-install_apt_dependencies "$apt_deps"
+install_if_not_installed "$apt_deps"
 
 # ---------------------------------------------------------------
 # Checkout repo
