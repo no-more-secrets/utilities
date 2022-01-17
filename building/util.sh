@@ -27,24 +27,50 @@ real_path() {
   fi
 }
 
+# CMake seems to rely on the CMAKE_SYSTEM_PREFIX_PATH variable to
+# find packages on the system with find_package and the like.
+# Somehow it cannot deduce these directories on its own, at least
+# on some distros. Also, there doesn't seem to be an environment
+# variable that we can set to give it this info, so we have to
+# provide it on the command line. There is also
+# CMAKE_PREFIX_PATH, but that is supposed to be project-specific
+# and set within the project CMakeLists.txt files, so we will set
+# the system one instead which is used to build the final set of
+# prefix paths.
+make_cmake_system_prefix_path() {
+  local system_prefix_path='/'
+  local paths='
+    /usr/lib/x86_64-linux-gnu/cmake
+    /usr/lib/x86_64-linux-gnu
+  '
+  for path in $paths; do
+    system_prefix_path="$system_prefix_path;$path"
+  done
+  echo "$system_prefix_path"
+}
+
 # Will run cmake but will first emit the command to be run in a
 # text file in the current directory. This should be used in all
 # of the build scripts to run cmake instead of a bare cmake com-
 # mand.
 run_cmake() {
+  local CMAKE_SYSTEM_PREFIX_PATH=""
   local out="cmake-commmand.sh"
   echo '#!/bin/bash
-
 set -e
 
 this="$(dirname "$(readlink -f $0)")"
 cd "$this"
 
-cmake '"$@"'
-
-' > "$out"
+# NOTE: the CMAKE_SYSTEM_PREFIX_PATH has been appended by the
+#       run_cmake bash function that generated this script.
+cmake \' > "$out"
+  for param in "$@"; do
+    echo "  $param \\" >> "$out"
+  done
+  echo '  -DCMAKE_SYSTEM_PREFIX_PATH="'"$(make_cmake_system_prefix_path)"'"' >> "$out"
   chmod u+x "$out"
-  cmake "$@"
+  bash "$out"
 }
 
 # Creates a symlink in the ~/bin folder to the current version of
