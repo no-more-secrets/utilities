@@ -108,8 +108,8 @@ cd rosegarden-$version
 # ---------------------------------------------------------------
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-         -DCMAKE_INSTALL_PREFIX=$prefix
+run_cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+             -DCMAKE_INSTALL_PREFIX=$prefix
 
 # ---------------------------------------------------------------
 # Build/Test

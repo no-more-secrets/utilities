@@ -5,6 +5,11 @@
 set -e
 set -o pipefail
 
+# ---------------------------------------------------------------
+# Includes
+# ---------------------------------------------------------------
+source util.sh
+
 # At the time of writing, the catch2 testing framework has
 # issues with resolving linked folders, and on OSX it looks
 # like the /tmp folder is some kind of link to /private/tmp,
@@ -57,8 +62,8 @@ cd build
 
 prefix="$HOME/.local"
 
-cmake .. -DCMAKE_INSTALL_PREFIX="$prefix" \
-         -DCMAKE_INSTALL_LIBDIR="$prefix/lib"
+run_cmake .. -DCMAKE_INSTALL_PREFIX="$prefix" \
+             -DCMAKE_INSTALL_LIBDIR="$prefix/lib"
 
 if which nproc 2>/dev/null; then
     threads=$(nproc --all)

@@ -27,6 +27,26 @@ real_path() {
   fi
 }
 
+# Will run cmake but will first emit the command to be run in a
+# text file in the current directory. This should be used in all
+# of the build scripts to run cmake instead of a bare cmake com-
+# mand.
+run_cmake() {
+  local out="cmake-commmand.sh"
+  echo '#!/bin/bash
+
+set -e
+
+this="$(dirname "$(readlink -f $0)")"
+cd "$this"
+
+cmake '"$@"'
+
+' > "$out"
+  chmod u+x "$out"
+  cmake "$@"
+}
+
 # Creates a symlink in the ~/bin folder to the current version of
 # the tool.  Note: it assumes that the link name will be the same
 # as the binary name and that the binary is located in:

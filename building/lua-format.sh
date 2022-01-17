@@ -97,10 +97,10 @@ cd $repo
 # ---------------------------------------------------------------
 mkdir build
 cd build
-cmake ..                        \
-     -G Ninja                   \
-     -DCMAKE_BUILD_TYPE=Release \
-     -DCMAKE_INSTALL_PREFIX=$prefix
+run_cmake ..                        \
+         -G Ninja                   \
+         -DCMAKE_BUILD_TYPE=Release \
+         -DCMAKE_INSTALL_PREFIX=$prefix
 
 # ---------------------------------------------------------------
 # Build

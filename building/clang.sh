@@ -6,6 +6,11 @@ set -e
 set -o pipefail
 
 # ---------------------------------------------------------------
+# Includes
+# ---------------------------------------------------------------
+source util.sh
+
+# ---------------------------------------------------------------
 #                       Create Work Areas
 # ---------------------------------------------------------------
 cd /tmp
@@ -256,12 +261,12 @@ mkdir build
 cd build
 # Do the c/cxx flags here because their values may contain spaces
 # in them.
-cmake -G Ninja                       \
-      -Wno-dev                       \
-       $cmake_vars                   \
-      -DCMAKE_CXX_FLAGS="$cxx_flags" \
-      -DCMAKE_C_FLAGS="$c_flags"     \
-      ../llvm
+run_cmake -G Ninja                       \
+          -Wno-dev                       \
+           $cmake_vars                   \
+          -DCMAKE_CXX_FLAGS="$cxx_flags" \
+          -DCMAKE_C_FLAGS="$c_flags"     \
+          ../llvm
 
 # ---------------------------------------------------------------
 #                        Build/Test/Install

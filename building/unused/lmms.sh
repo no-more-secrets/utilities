@@ -137,10 +137,10 @@ cd $repo && mkdir build && cd build
 # ---------------------------------------------------------------
 # Run CMake
 # ---------------------------------------------------------------
-cmake .. -DCMAKE_INSTALL_PREFIX="$prefix"  \
-         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-         -DWANT_QT5=ON                     \
-         -G Ninja
+run_cmake .. -DCMAKE_INSTALL_PREFIX="$prefix"  \
+             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+             -DWANT_QT5=ON                     \
+             -G Ninja
 
 # ---------------------------------------------------------------
 # Build/Test

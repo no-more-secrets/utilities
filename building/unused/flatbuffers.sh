@@ -80,10 +80,10 @@ cd $repo
 # (case-insensitive file system).
 mkdir build1 && cd build1
 
-cmake ..                               \
-     -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-     -DCMAKE_INSTALL_PREFIX=$prefix    \
-     -G Ninja                          \
+run_cmake ..                               \
+         -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+         -DCMAKE_INSTALL_PREFIX=$prefix    \
+         -G Ninja                          \
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Build
