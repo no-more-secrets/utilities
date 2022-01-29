@@ -144,24 +144,21 @@ log "skia_lib_dir: $skia_lib_dir"
 export PATH="/usr/bin:$PATH"
 [[ "$(which ninja)" == "/usr/bin/ninja" ]] || \
   die "need to install ninja on the system."
-# But make sure that we don't use the cmake on the system b/c it
-# is sometimes too old.
-cmake=~/bin/cmake
 
 cd /tmp/$work/$repo && mkdir -p build && cd build
 # Use the deferenced path for the skia directory because we are
 # building against it and so we don't want a given version of
 # aseprite to break if the skia-current symlink changes.
-$cmake .. -DSKIA_DIR=$skia_real_version                 \
-          -DSKIA_LIBRARY_DIR=$skia_lib_dir              \
-          -DSKIA_LIBRARY=$skia_lib_dir/libskia.a        \
-          -DCMAKE_INSTALL_PREFIX="$prefix"              \
-          -DLAF_BACKEND=skia                            \
-          -DCMAKE_BUILD_TYPE=RelWithDebInfo             \
-          -DSKIA_OUT_DIR=$skia_real_version/out/Release \
-          -DLAF_WITH_EXAMPLES=OFF                       \
-          -DLAF_WITH_TESTS=OFF                          \
-          -G Ninja
+run_cmake .. -DSKIA_DIR=$skia_real_version                 \
+             -DSKIA_LIBRARY_DIR=$skia_lib_dir              \
+             -DSKIA_LIBRARY=$skia_lib_dir/libskia.a        \
+             -DCMAKE_INSTALL_PREFIX="$prefix"              \
+             -DLAF_BACKEND=skia                            \
+             -DCMAKE_BUILD_TYPE=RelWithDebInfo             \
+             -DSKIA_OUT_DIR=$skia_real_version/out/Release \
+             -DLAF_WITH_EXAMPLES=OFF                       \
+             -DLAF_WITH_TESTS=OFF                          \
+             -G Ninja
 
 # ---------------------------------------------------------------
 # Build/Test

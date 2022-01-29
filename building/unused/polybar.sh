@@ -126,9 +126,9 @@ cd $repo
 # ---------------------------------------------------------------
 mkdir -p build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-         -DCMAKE_INSTALL_PREFIX=$prefix    \
-         -G Ninja
+run_cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+             -DCMAKE_INSTALL_PREFIX=$prefix    \
+             -G Ninja
 
 # ---------------------------------------------------------------
 # Build

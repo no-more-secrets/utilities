@@ -18,6 +18,11 @@
 set -e
 set -o pipefail
 
+# ---------------------------------------------------------------
+# Includes
+# ---------------------------------------------------------------
+source util.sh
+
 cd /tmp
 
 work=iwyu-build
@@ -109,9 +114,9 @@ prefix="$tools/$our_tag"
 
 echo "Installing to: $prefix"
 
-cmake .. -DCMAKE_PREFIX_PATH="$HOME/dev/tools/llvm-current" \
-         -DCMAKE_INSTALL_PREFIX="$prefix"                   \
-          ..
+run_cmake .. -DCMAKE_PREFIX_PATH="$HOME/dev/tools/llvm-current" \
+             -DCMAKE_INSTALL_PREFIX="$prefix"                   \
+              ..
 
 if which nproc &>/dev/null; then
     threads=$(nproc --all)

@@ -95,7 +95,7 @@ apt_deps="
 "
 echo -e "$apt_deps"
 
-install_apt_dependencies "$apt_deps"
+install_if_not_installed "$apt_deps"
 
 # ---------------------------------------------------------------
 # Checkout repo
@@ -108,18 +108,18 @@ cd rosegarden-$version
 # ---------------------------------------------------------------
 mkdir build
 cd build
-cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
-         -DCMAKE_INSTALL_PREFIX=$prefix
+run_cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+             -DCMAKE_INSTALL_PREFIX=$prefix
 
 # ---------------------------------------------------------------
-# Build/Test
+# Build
 # ---------------------------------------------------------------
-make -j"$(build_threads)"
+ninja
 
 # ---------------------------------------------------------------
 # Install
 # ---------------------------------------------------------------
-make install
+ninja install
 
 # ---------------------------------------------------------------
 # Supplemental Installation Steps
