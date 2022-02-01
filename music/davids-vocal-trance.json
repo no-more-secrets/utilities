@@ -522,5 +522,30 @@
       "Mazza"
     ],
     "album_name": "Can't Let Go"
+  },
+  {
+    "song_name": "Concrete Angel - ReOrder Extended Remix",
+    "album_artists": [
+      "Gareth Emery"
+    ],
+    "contrib_artists": [
+      "Gareth Emery",
+      "Christina Novelli",
+      "ReOrder"
+    ],
+    "album_name": "Concrete Angel (Remixes)"
+  },
+  {
+    "song_name": "Won't Stop Searching",
+    "album_artists": [
+      "Misja Helsloot",
+      "Dirkie Coetzee"
+    ],
+    "contrib_artists": [
+      "Misja Helsloot",
+      "Dirkie Coetzee",
+      "Diana Leah"
+    ],
+    "album_name": "Won't Stop Searching"
   }
 ]
