@@ -40,7 +40,7 @@ cd $work
 # Dependencies
 # ---------------------------------------------------------------
 export GOPATH=/tmp/go-path-tmp
-[[ -e "$GOPATH" ]] && rm -rf "$GOPATH"
+# [[ -e "$GOPATH" ]] && rm -rf "$GOPATH"
 mkdir -p "$GOPATH"
 
 install_apt_dependencies '

@@ -5,31 +5,48 @@
 set -eE
 set -o pipefail
 
-# Must be done first.
-this=$(cd $(dirname $0) && pwd)
-cd $this
+# ---------------------------------------------------------------
+# Includes
+# ---------------------------------------------------------------
+source ~/dev/utilities/bashlib/util.sh
+source ~/dev/utilities/building/util.sh
+
+# ---------------------------------------------------------------
+# Setup
+# ---------------------------------------------------------------
+cd_to_this "$0"
 
 tools=~/dev/tools
 mkdir -p "$tools"
 
 # ---------------------------------------------------------------
-# Includes
+# Build
 # ---------------------------------------------------------------
-source util.sh
+log '=========================== ninja ==========================='
+bash ninja.sh
 
+log '============================ vim ============================'
+bash vim.sh
+
+log '=========================== nvim ============================'
 bash nvim.sh
 
-[[ ! -d "$tools/ninja" ]] && \
-  bash ninja.sh
-
+log '========================== lazygit =========================='
 bash lazygit.sh
 
-bash gcc.sh # must come before clang-rn-pgo.
-
-bash clang-rn-pgo.sh
-
+log '======================== lua-format ========================='
 bash lua-format.sh
 
+log '========================= aseprite =========================='
 bash aseprite.sh
 
+log '======================== rosegarden ========================='
 bash rosegarden.sh
+
+log '============================ gcc ============================'
+bash gcc.sh # must come before clang-rn-pgo.
+
+log '========================== clang ============================'
+bash clang-rn-pgo.sh
+
+log '========================= finished =========================='

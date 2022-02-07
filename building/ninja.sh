@@ -33,6 +33,16 @@ acct="dpacbach"
 repo="ninja"
 
 # ---------------------------------------------------------------
+# Version check
+# ---------------------------------------------------------------
+# Our custom ninja build has no version, so we just stop if it is
+# already present.
+if [[ -x $tools/$project_key/ninja ]]; then
+  log "$tools/$project_key/ninja already present, skipping build."
+  exit 0
+fi
+
+# ---------------------------------------------------------------
 # Create Work Area
 # ---------------------------------------------------------------
 cd /tmp

@@ -4,9 +4,14 @@
 c_norm="\033[00m"
 c_green="\033[32m"
 c_red="\033[31m"
+c_yellow="\033[93m"
 
 log() {
     echo -e "[$(date)] ${c_green}INFO${c_norm} $*"
+}
+
+log_no_newline() {
+    echo -en "[$(date)] ${c_green}INFO${c_norm} $*"
 }
 
 error() {
@@ -128,7 +133,7 @@ install_apt_dependencies() {
   # If we're not on linux then do nothing here.
   [[ "$(uname)" == Linux ]] || return 0
   local list="$1"
-  sudo apt install $list
+  sudo apt install $list --yes
 }
 
 install_if_not_installed() {
@@ -138,7 +143,7 @@ install_if_not_installed() {
   for package in $list; do
     log "checking for apt dependency $package..."
     if ! is_package_installed $package; then
-      sudo apt install $package
+      sudo apt install $package --yes
     fi
   done
   return 0
