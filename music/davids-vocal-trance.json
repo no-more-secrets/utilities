@@ -547,5 +547,39 @@
       "Diana Leah"
     ],
     "album_name": "Won't Stop Searching"
+  },
+  {
+    "song_name": "Reason To Believe - Original Mix",
+    "album_artists": [
+      "Adam Ellis",
+      "Neev Kennedy"
+    ],
+    "contrib_artists": [
+      "Adam Ellis",
+      "Neev Kennedy"
+    ],
+    "album_name": "Reason To Believe"
+  },
+  {
+    "song_name": "Dance With Me - Original Mix",
+    "album_artists": [
+      "Inci3ion"
+    ],
+    "contrib_artists": [
+      "Inci3ion",
+      "Liezl"
+    ],
+    "album_name": "Dance With Me"
+  },
+  {
+    "song_name": "Unforgivable - Extended Mix",
+    "album_artists": [
+      "Armin van Buuren"
+    ],
+    "contrib_artists": [
+      "Armin van Buuren",
+      "Jaren"
+    ],
+    "album_name": "Unforgivable"
   }
 ]
