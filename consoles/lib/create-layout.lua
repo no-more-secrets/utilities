@@ -74,20 +74,14 @@ function gen_command( t )
   print( res )
 end
 
+local dispatch_fn = {
+  horizontal = gen_horizontal,
+  vertical = gen_vertical,
+  command = gen_command,
+}
+
 function dispatch( t )
-  if t.type == 'horizontal' then
-    gen_horizontal( t )
-    return
-  end
-  if t.type == 'vertical' then
-    gen_vertical( t )
-    return
-  end
-  if t.type == 'command' then
-    gen_command( t )
-    return
-  end
-  error( 'invalid type: ' .. tostring( t.type ) )
+  dispatch_fn[t.type]( t )
 end
 
 dispatch( layout )
