@@ -39,7 +39,7 @@ cd $work
 # ---------------------------------------------------------------
 # Dependencies
 # ---------------------------------------------------------------
-check_apt_dependencies '
+install_if_not_installed '
   libsdl2-dev
   libsfml-dev
   libglew-dev
@@ -105,14 +105,15 @@ cd $repo
 # ---------------------------------------------------------------
 mkdir build && cd build
 
-run_cmake .. -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+run_cmake .. -G Ninja \
+             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
              -DCMAKE_INSTALL_PREFIX=$prefix
 
 # ---------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------
-make -j$(build_threads)
-make install
+ninja
+ninja install
 
 # ---------------------------------------------------------------
 # Make Links
