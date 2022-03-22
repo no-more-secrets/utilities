@@ -10,7 +10,7 @@ cmake-utils   := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
 
 pre-build := $(if $(wildcard scripts/pre-build.sh),scripts/pre-build.sh,:)
 
-cmake_targets := all clean test rn cmake-run game
+cmake_targets := all clean test rn cmake-run game gl_test
 
 ifeq ($(origin, NINJA_STATUS_PRINT_MODE),)
 	NINJA_STATUS_PRINT_MODE=scrolling
