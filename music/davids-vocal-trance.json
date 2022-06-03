@@ -526,7 +526,8 @@
   {
     "song_name": "Concrete Angel - ReOrder Extended Remix",
     "album_artists": [
-      "Gareth Emery"
+      "Gareth Emery",
+      "Christina Novelli"
     ],
     "contrib_artists": [
       "Gareth Emery",
@@ -581,5 +582,16 @@
       "Jaren"
     ],
     "album_name": "Unforgivable"
+  },
+  {
+    "song_name": "State of Emergency - Original Mix",
+    "album_artists": [
+      "Simmons & Blanc feat. Chloe Langley"
+    ],
+    "contrib_artists": [
+      "Chloe Langley",
+      "Simmons & Blanc"
+    ],
+    "album_name": "State of Emergency"
   }
 ]
