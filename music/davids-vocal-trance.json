@@ -593,5 +593,41 @@
       "Simmons & Blanc"
     ],
     "album_name": "State of Emergency"
+  },
+  {
+    "song_name": "In The Middle of a Dream - Radio Edit",
+    "album_artists": [
+      "4 Strings",
+      "Denise Rivera"
+    ],
+    "contrib_artists": [
+      "4 Strings",
+      "Denise Rivera"
+    ],
+    "album_name": "In The Middle of a Dream"
+  },
+  {
+    "song_name": "Anywhere With You - Solarstone Pure Mix",
+    "album_artists": [
+      "The Thrillseekers"
+    ],
+    "contrib_artists": [
+      "The Thrillseekers",
+      "Stine Grove",
+      "Solarstone"
+    ],
+    "album_name": "Anywhere With You"
+  },
+  {
+    "song_name": "Stranger To Your Love - Extended Mix",
+    "album_artists": [
+      "Ilan Bluestone",
+      "Ellen Smith"
+    ],
+    "contrib_artists": [
+      "Ilan Bluestone",
+      "Ellen Smith"
+    ],
+    "album_name": "Stranger To Your Love"
   }
 ]
