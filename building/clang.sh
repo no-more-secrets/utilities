@@ -218,7 +218,7 @@ libz=/usr/lib/x86_64-linux-gnu/libz.so
 
 (( clang_opts )) && {
   cxx_flags="$cxx_flags -fexperimental-new-pass-manager"
-  cmake_add LLVM_ENABLE_LTO "Thin"
+  #cmake_add LLVM_ENABLE_LTO "Thin"
 }
 
 # https://llvm.org/docs/HowToBuildWithPGO.html
