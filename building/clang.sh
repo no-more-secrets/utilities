@@ -218,6 +218,8 @@ libz=/usr/lib/x86_64-linux-gnu/libz.so
 
 (( clang_opts )) && {
   cxx_flags="$cxx_flags -fexperimental-new-pass-manager"
+  # LTO may provide a slight performance increase, but it just
+  # takes too long.
   #cmake_add LLVM_ENABLE_LTO "Thin"
 }
 
@@ -225,6 +227,11 @@ libz=/usr/lib/x86_64-linux-gnu/libz.so
 (( with_inst )) && {
   cmake_add LLVM_BUILD_INSTRUMENTED "IR"
   cmake_add LLVM_BUILD_RUNTIME      "YES"
+  # The default value currently appears to be 1.5. Not sure the
+  # meaning of that, but that causes various warnings to be
+  # emitted that suggest increasing that value. This changes the
+  # -vp-counters-per-site flag.
+  cmake_add LLVM_VP_COUNTERS_PER_SITE "2.0"
 }
 
 [[ ! -z "$with_pgo" ]] && {
