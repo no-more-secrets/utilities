@@ -82,7 +82,7 @@ if [[ ! -e "$profdata" && ! -e "$tools/llvm-pgo-current" ]]; then
   pushd /tmp/revolution-now-game
   # Note at this point llvm-current points to the instrumented
   # build.
-  cmc --clang --lld --libstdcxx --asan
+  cmc --clang --lld --libstdcxx --asan --release
   ccache --clear
   make all
   popd
