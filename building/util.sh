@@ -71,7 +71,7 @@ cd "$this"
 #       run_cmake bash function that generated this script.
 cmake \' > "$out"
   for param in "$@"; do
-    echo "  $param \\" >> "$out"
+    echo "  \"$param\" \\" >> "$out"
   done
   echo '  -DCMAKE_SYSTEM_PREFIX_PATH="'"$(make_cmake_system_prefix_path)"'"' >> "$out"
   chmod u+x "$out"
