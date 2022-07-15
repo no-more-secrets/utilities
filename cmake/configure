@@ -418,6 +418,12 @@ if __name__ == '__main__':
         compiler = 'clang'
         c_compiler_path = '%s/dev/tools/llvm-current/bin/clang' % os.environ['HOME']
         cxx_compiler_path = '%s/dev/tools/llvm-current/bin/clang++' % os.environ['HOME']
+        compiler_root = '%s/dev/tools/llvm-current' % os.environ['HOME']
+        if is_linux:
+            # Versions of clang starting from 15 appears to put
+            # some runtime libraries in a platform specific
+            # folder.
+            env_vars['LD_LIBRARY_PATH'] = '%s/lib/x86_64-unknown-linux-gnu' % compiler_root
     elif args.gcc is not None:
         compiler = 'gcc'
         assert args.gcc, 'gcc cannot be empty!'
