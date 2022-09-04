@@ -629,5 +629,28 @@
       "Ellen Smith"
     ],
     "album_name": "Stranger To Your Love"
+  },
+  {
+    "song_name": "Omen In The Rain - Myon Club Mix",
+    "album_artists": [
+      "Myon",
+      "Alissa Feudo"
+    ],
+    "contrib_artists": [
+      "Myon",
+      "Alissa Feudo"
+    ],
+    "album_name": "Omen In The Rain"
+  },
+  {
+    "song_name": "Cool In My Disaster",
+    "album_artists": [
+      "Arctic Moon"
+    ],
+    "contrib_artists": [
+      "Arctic Moon",
+      "Shuba"
+    ],
+    "album_name": "Cool In My Disaster"
   }
 ]
