@@ -48,8 +48,6 @@ echo "latest llvm tarball version:      $version"
 }
 
 echo
-echo -n "Press enter to continue..."
-read
 
 [[ ! -d "$release_name" ]]
 rm -f clang+llvm*.xz
