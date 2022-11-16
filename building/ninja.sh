@@ -67,14 +67,14 @@ cd $repo
 # ---------------------------------------------------------------
 mkdir build && cd build
 
-run_cmake .. -G "\"Unix Makefiles\"" \
+run_cmake .. -G Ninja \
              -DCMAKE_BUILD_TYPE=RelWithDebInfo \
              -DCMAKE_CXX_FLAGS=-std=c++11
 
 # ---------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------
-make -j$(build_threads)
+ninja
 
 [[ -x ninja ]]
 cp ninja $prefix/ninja
