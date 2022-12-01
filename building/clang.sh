@@ -177,7 +177,7 @@ cd $work
 # ---------------------------------------------------------------
 #                       Build CMake Command
 # ---------------------------------------------------------------
-subprojects='clang;clang-tools-extra;libcxx;libcxxabi;compiler-rt'
+subprojects='clang;clang-tools-extra'
 [[ "$(uname)" != Darwin ]] && subprojects="$subprojects;lld"
 
 cmake_add() {
@@ -195,6 +195,7 @@ cmake_add CMAKE_BUILD_TYPE          Release
 cmake_add COMPILER_RT_INCLUDE_TESTS OFF
 cmake_add LLVM_ENABLE_ASSERTIONS    OFF
 cmake_add LLVM_ENABLE_PROJECTS      $subprojects
+cmake_add LLVM_ENABLE_RUNTIMES      'libcxx;libcxxabi;compiler-rt'
 cmake_add CMAKE_INSTALL_PREFIX      $install
 
 # This is needed so that the profile output files can be written
