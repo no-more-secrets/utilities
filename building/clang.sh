@@ -218,7 +218,8 @@ libz=/usr/lib/x86_64-linux-gnu/libz.so
 }
 
 (( clang_opts )) && {
-  cxx_flags="$cxx_flags -fexperimental-new-pass-manager"
+  :
+  # cxx_flags="$cxx_flags -fexperimental-new-pass-manager"
   # LTO may provide a slight performance increase, but it just
   # takes too long.
   #cmake_add LLVM_ENABLE_LTO "Thin"
