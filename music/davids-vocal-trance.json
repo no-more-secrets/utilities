@@ -550,18 +550,6 @@
     "album_name": "Won't Stop Searching"
   },
   {
-    "song_name": "Reason To Believe - Original Mix",
-    "album_artists": [
-      "Adam Ellis",
-      "Neev Kennedy"
-    ],
-    "contrib_artists": [
-      "Adam Ellis",
-      "Neev Kennedy"
-    ],
-    "album_name": "Reason To Believe"
-  },
-  {
     "song_name": "Dance With Me - Original Mix",
     "album_artists": [
       "Inci3ion"
@@ -664,5 +652,31 @@
       "Clare Stagg"
     ],
     "album_name": "The Spell"
+  },
+  {
+    "song_name": "You Belong To Me - Original Vox",
+    "album_artists": [
+      "Bobina",
+      "Betsie Larkin"
+    ],
+    "contrib_artists": [
+      "Bobina",
+      "Betsie Larkin"
+    ],
+    "album_name": "You Belong To Me"
+  },
+  {
+    "song_name": "Step Into The Light - Touchstone Remix",
+    "album_artists": [
+      "Fabio XB",
+      "Liuck",
+      "Christina Novelli"
+    ],
+    "contrib_artists": [
+      "Fabio XB",
+      "Liuck",
+      "Christina Novelli"
+    ],
+    "album_name": "Step Into The Light Remixes"
   }
 ]
