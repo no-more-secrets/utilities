@@ -76,10 +76,10 @@ if [[ ! -e "$profdata" && ! -e "$tools/llvm-pgo-current" ]]; then
   export LLVM_PROFILE_FILE="$profiles/rn-%p-%m.profraw"
   # Clear existing profiling data.
   /bin/rm -f $profiles/*.profraw
-  rm -rf /tmp/revolution-now-game
-  git clone ssh://git@github.com/dpacbach/revolution-now-game \
-            /tmp/revolution-now-game --recursive
-  pushd /tmp/revolution-now-game
+  rm -rf /tmp/revolution-now
+  git clone ssh://git@github.com/revolution-now/revolution-now \
+            /tmp/revolution-now --recursive
+  pushd /tmp/revolution-now
   # Note at this point llvm-current points to the instrumented
   # build.
   cmc --clang --lld --libstdcxx --asan --release
