@@ -26,3 +26,5 @@ echo "connecting to: $bssid"
 # nmcli dev wifi connect $bssid --ask
 
 nmcli dev wifi connect $bssid
+
+echo 'Ground Central Connect: http://192.168.1.1'
