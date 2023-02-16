@@ -294,6 +294,7 @@ ninja_retry() {
 }
 
 ninja_retry
+
 (( ! skip_tests )) && {
   ninja_retry check-clang
   [[ "$(uname)" != Darwin ]] && ninja_retry check-lld
