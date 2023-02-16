@@ -15,4 +15,4 @@ set -x
 # version prevents it from doing that, leading to more random be-
 # havior but without ever randomly seeding it at the start of the
 # program.
-cp VICEFIX.EXE VICEROY.EXE
+cp data/MPS/COLONIZE/VICEFIX.EXE data/MPS/COLONIZE/VICEROY.EXE
