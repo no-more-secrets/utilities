@@ -5,8 +5,9 @@ source ~/dev/utilities/bashlib/util.sh
 
 add_option() { options="$options\n$1"; }
 
-options="Update & Build (current)"
-add_option "Update & Debug & Release (clang)"
+options="Update & Build (release)"
+add_option "Update & Build (current)"
+add_option "Update & Build Debug & Release (clang)"
 add_option "Update & Build All Platforms"
 add_option "Build All Platforms"
 add_option "Build Debug & Release (clang)"
@@ -51,12 +52,17 @@ update() {
 restore() { cmc --clang --lld --libstdcxx --release --cached; }
 
 case "$answer" in
+  "Update & Build (release)")
+    update
+    clear
+    cmc --clang --lld --libstdcxx --release; build_and_test
+    ;;
   "Update & Build (current)")
     update
     clear
     build_and_test
     ;;
-  "Update & Debug & Release (clang)")
+  "Update & Build Debug & Release (clang)")
     update
     clear
     cmc --clang --lld --libstdcxx --asan;    build_and_test
