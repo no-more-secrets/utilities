@@ -545,8 +545,9 @@ if __name__ == '__main__':
         log( 'Build directory %s already exists, activating it.' % build_dir )
         os.symlink( build_dir, 'current', target_is_directory=True )
         if args.cached:
-            print( '%sNOTE%s: Using cached `%s%s%s`.'
-                    % (bcolors.BLUE, bcolors.NORMAL, bcolors.GREEN, build_dir, bcolors.NORMAL) )
+            if args.verbose:
+                print( '%sNOTE%s: Using cached `%s%s%s`.'
+                        % (bcolors.BLUE, bcolors.NORMAL, bcolors.GREEN, build_dir, bcolors.NORMAL) )
             exit( 0 )
 
     builds_current = os.path.abspath( build_dir )
