@@ -6,6 +6,7 @@ source ~/dev/utilities/bashlib/util.sh
 add_option() { options="$options\n$1"; }
 
 options="Update (current)"
+add_option "Update & Debug & Release (clang)"
 add_option "All Platforms"
 add_option "Debug & Release (clang)"
 add_option "Debug & Release (gcc)"
@@ -41,15 +42,25 @@ build_and_test() {
   make test
 }
 
+update() {
+  git pull origin `git rev-parse --abbrev-ref HEAD` --quiet
+  git submodule sync --quiet
+  git submodule update --init
+}
+
 restore() { cmc --clang --lld --libstdcxx --release --cached; }
 
 case "$answer" in
   "Update (current)")
+    update
     clear
-    git pull origin `git rev-parse --abbrev-ref HEAD` --quiet
-    git submodule sync --quiet
-    git submodule update --init
     build_and_test
+    ;;
+  "Update & Debug & Release (clang)")
+    update
+    clear
+    cmc --clang --lld --libstdcxx --asan;    build_and_test
+    cmc --clang --lld --libstdcxx --release; build_and_test
     ;;
   "All Platforms")
     ~/dev/utilities/cmake/build-all-platforms.sh
