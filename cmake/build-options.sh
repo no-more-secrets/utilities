@@ -3,17 +3,32 @@ set -e
 
 source ~/dev/utilities/bashlib/util.sh
 
-add_option() { options="$options\n$1"; }
+add_line() { options="$options\n$1"; }
 
-options="Update & Build (release)"
-add_option "Update & Build (current)"
-add_option "Update & Build Debug & Release (clang)"
-add_option "Update & Build All Platforms"
-add_option "Build All Platforms"
-add_option "Build Debug & Release (clang)"
-add_option "Build Debug & Release (gcc)"
-add_option "Test & Game (current)"
-add_option "Build/Run Game (no tests)"
+options="Build Options Menu"
+add_line "----------------------------------------"
+add_line "Update & Build (release)"
+add_line "Update & Build (current)"
+add_line "Update & Build Debug & Release (clang)"
+add_line "Update & Build All Platforms"
+add_line "Build All Platforms"
+add_line "Build Debug & Release (clang)"
+add_line "Build Debug & Release (gcc)"
+add_line "Build/Run Tests & Game (current)"
+add_line "Build/Run Game (no tests)"
+add_line "Restore Default Configuration"
+
+fzf() {
+  command fzf            \
+    --header-lines=2     \
+    --header-first       \
+    --info=hidden        \
+    --height="~100"      \
+    --disabled           \
+    --bind='j:down'      \
+    --bind='k:up'        \
+    --border=rounded
+}
 
 select_answer() { echo -e "$options" | fzf; }
 
@@ -86,12 +101,14 @@ case "$answer" in
     cmc --gcc=current --libstdcxx --asan;    build_and_test
     cmc --gcc=current --libstdcxx --release; build_and_test
     ;;
-  "Test & Game (current)")
+  "Build/Run Tests & Game (current)")
     build_and_test
     make game
     ;;
   "Build/Run Game (no tests)")
     make game
+    ;;
+  "Restore Default Configuration")
     ;;
   *)
     die "unrecognized option: $answer"
