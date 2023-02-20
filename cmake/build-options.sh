@@ -5,14 +5,14 @@ source ~/dev/utilities/bashlib/util.sh
 
 add_option() { options="$options\n$1"; }
 
-options="Update (current)"
+options="Update & Build (current)"
 add_option "Update & Debug & Release (clang)"
-add_option "All Platforms"
-add_option "Debug & Release (clang)"
-add_option "Debug & Release (gcc)"
-add_option "Tests & Game (current)"
-add_option "Game (no tests)"
-add_option "Current"
+add_option "Update & Build All Platforms"
+add_option "Build All Platforms"
+add_option "Build Debug & Release (clang)"
+add_option "Build Debug & Release (gcc)"
+add_option "Test & Game (current)"
+add_option "Build/Run Game (no tests)"
 
 select_answer() { echo -e "$options" | fzf; }
 
@@ -51,7 +51,7 @@ update() {
 restore() { cmc --clang --lld --libstdcxx --release --cached; }
 
 case "$answer" in
-  "Update (current)")
+  "Update & Build (current)")
     update
     clear
     build_and_test
@@ -62,28 +62,29 @@ case "$answer" in
     cmc --clang --lld --libstdcxx --asan;    build_and_test
     cmc --clang --lld --libstdcxx --release; build_and_test
     ;;
-  "All Platforms")
+  "Update & Build All Platforms")
+    update
+    clear
     ~/dev/utilities/cmake/build-all-platforms.sh
     ;;
-  "Debug & Release (clang)")
+  "Build All Platforms")
+    ~/dev/utilities/cmake/build-all-platforms.sh
+    ;;
+  "Build Debug & Release (clang)")
     clear
     cmc --clang --lld --libstdcxx --asan;    build_and_test
     cmc --clang --lld --libstdcxx --release; build_and_test
     ;;
-  "Debug & Release (gcc)")
+  "Build Debug & Release (gcc)")
     clear
     cmc --gcc=current --libstdcxx --asan;    build_and_test
     cmc --gcc=current --libstdcxx --release; build_and_test
     ;;
-  "Current")
-    clear
-    cmc rc; build_and_test
-    ;;
-  "Tests & Game (current)")
-    cmc rc; build_and_test
+  "Test & Game (current)")
+    build_and_test
     make game
     ;;
-  "Game (no tests)")
+  "Build/Run Game (no tests)")
     make game
     ;;
   *)
