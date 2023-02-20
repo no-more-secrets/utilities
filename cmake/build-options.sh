@@ -5,10 +5,12 @@ source ~/dev/utilities/bashlib/util.sh
 
 add_option() { options="$options\n$1"; }
 
-options="Update"
+options="Update (current)"
 add_option "All Platforms"
-add_option "Debug & Release"
+add_option "Debug & Release (clang)"
 add_option "Debug & Release (gcc)"
+add_option "Tests & Game (current)"
+add_option "Game (no tests)"
 add_option "Current"
 
 select_answer() { echo -e "$options" | fzf; }
@@ -42,7 +44,7 @@ build_and_test() {
 restore() { cmc --clang --lld --libstdcxx --release --cached; }
 
 case "$answer" in
-  "Update")
+  "Update (current)")
     clear
     git pull origin `git rev-parse --abbrev-ref HEAD` --quiet
     git submodule sync --quiet
@@ -52,7 +54,7 @@ case "$answer" in
   "All Platforms")
     ~/dev/utilities/cmake/build-all-platforms.sh
     ;;
-  "Debug & Release")
+  "Debug & Release (clang)")
     clear
     cmc --clang --lld --libstdcxx --asan;    build_and_test
     cmc --clang --lld --libstdcxx --release; build_and_test
@@ -65,6 +67,13 @@ case "$answer" in
   "Current")
     clear
     cmc rc; build_and_test
+    ;;
+  "Tests & Game (current)")
+    cmc rc; build_and_test
+    make game
+    ;;
+  "Game (no tests)")
+    make game
     ;;
   *)
     die "unrecognized option: $answer"
