@@ -19,14 +19,15 @@ add_line "Build/Run Game (no tests)"
 add_line "Restore Default Configuration"
 
 fzf() {
-  command fzf            \
-    --header-lines=2     \
-    --header-first       \
-    --info=hidden        \
-    --height="~100"      \
-    --disabled           \
-    --bind='j:down'      \
-    --bind='k:up'        \
+  command fzf                 \
+    --header-lines=2          \
+    --header-first            \
+    --info=hidden             \
+    --height="~100"           \
+    --disabled                \
+    --bind='j:down'           \
+    --bind='k:up'             \
+    --bind change:clear-query \
     --border=rounded
 }
 
