@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 set -e
 set -x
 # This will enable the patched version that has the RNG generator
