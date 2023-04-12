@@ -6,6 +6,9 @@ which system76-power &>/dev/null || exit 0
 
 curr_mode=$(system76-power profile | sed -rn 's/Power Profile: (.*)/\1/p')
 curr_mode="${curr_mode,,}"
+if [[ "$curr_mode" == "?" ]]; then
+  curr_mode="power"
+fi
 
 usage_exit() {
   echo 1>&2 "usage: $(basename $(realpath $0)) [get|set <target>]"
