@@ -34,6 +34,9 @@ bash lazygit.sh
 log '======================== lua-format ========================='
 bash lua-format.sh
 
+log '==================== lua-language-server ===================='
+bash lua-language-server.sh
+
 log '========================= aseprite =========================='
 bash aseprite.sh
 
