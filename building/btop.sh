@@ -1,6 +1,6 @@
 #!/bin/bash
 # ---------------------------------------------------------------
-# lua-format
+# btop (C++ implementation of bashtop)
 # ---------------------------------------------------------------
 set -eE
 set -o pipefail
@@ -20,7 +20,7 @@ source util.sh
 # This must be a lowercase short word with no spaces describing
 # the software being built. Folders/links will be named with
 # this.
-project_key="lua-format"
+project_key="btop"
 
 tools="$HOME/dev/tools"
 mkdir -p "$tools"
@@ -66,8 +66,8 @@ clone_latest_tag() {
 # ---------------------------------------------------------------
 # Check version and if it already exists.
 # ---------------------------------------------------------------
-acct="Koihik"
-repo="LuaFormatter"
+acct="aristocratos"
+repo="btop"
 
 version=$(latest_github_repo_tag $acct $repo)
 
@@ -75,7 +75,6 @@ version=$(latest_github_repo_tag $acct $repo)
     log "$project_key-$version already exists, activating it."
     tools_link $project_key
     bin_links $project_key
-    #supplemental_install
     exit 0
 }
 
@@ -91,32 +90,23 @@ cd $repo
 # ---------------------------------------------------------------
 # Configure
 # ---------------------------------------------------------------
-mkdir build
-cd build
-run_cmake ..                        \
-         -G Ninja                   \
-         -DCMAKE_BUILD_TYPE=Release \
-         -DCMAKE_INSTALL_PREFIX=$prefix
+DESTDIR=$prefix
+PREFIX=
 
 # ---------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------
-ninja
-
-# ---------------------------------------------------------------
-# Test
-# ---------------------------------------------------------------
-ninja test
+make -j8 DESTDIR=$prefix PREFIX=
 
 # ---------------------------------------------------------------
 # Install
 # ---------------------------------------------------------------
-ninja install
+make install DESTDIR=$prefix PREFIX=
 
 # ---------------------------------------------------------------
 # Test Run
 # ---------------------------------------------------------------
-$prefix/bin/lua-format --help
+$prefix/bin/btop --help
 
 # ---------------------------------------------------------------
 # Make Links
