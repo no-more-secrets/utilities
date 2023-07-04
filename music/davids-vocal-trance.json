@@ -118,15 +118,16 @@
     "album_name": "Best of Vocal Trance"
   },
   {
-    "song_name": "Without It - Radio Edit",
+    "song_name": "Without It",
     "album_artists": [
-      "Various Artists"
+      "Allen & Envy",
+      "Jo Cartwright"
     ],
     "contrib_artists": [
       "Allen & Envy",
       "Jo Cartwright"
     ],
-    "album_name": "Vocal Trance Top 100"
+    "album_name": "Without It"
   },
   {
     "song_name": "Shape The Invisible - A Force Edit",
@@ -704,5 +705,29 @@
       "Skye"
     ],
     "album_name": "Drifting Away"
+  },
+  {
+    "song_name": "Temporary Highs",
+    "album_artists": [
+      "Markus Schulz",
+      "Lovlee"
+    ],
+    "contrib_artists": [
+      "Markus Schulz",
+      "Lovlee"
+    ],
+    "album_name": "Temporary Highs"
+  },
+  {
+    "song_name": "Anywhere - Extended Mix",
+    "album_artists": [
+      "Sean Tyas",
+      "Cari"
+    ],
+    "contrib_artists": [
+      "Sean Tyas",
+      "Cari"
+    ],
+    "album_name": "Anywhere"
   }
 ]
