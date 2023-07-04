@@ -336,6 +336,7 @@ build_gcc() {
                  --with-mpc=$install_prefix    \
                  --with-isl=$install_prefix    \
                  --prefix=$install_prefix      \
+                 --disable-bootstrap           \
                  --enable-languages=$languages \
                  --program-suffix=-$program_suffix
 
@@ -368,7 +369,7 @@ test_gcc() {
     echo "$code" >hello.cpp
     $gpp hello.cpp
     
-    ./a.out
+    LD_LIBRARY_PATH="$install_prefix/lib64" ./a.out
 }
 
 # ---------------------------------------------------------------
