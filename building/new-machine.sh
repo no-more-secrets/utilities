@@ -32,7 +32,7 @@ log '=========================== nvim ============================'
 bash nvim.sh
 
 log '========================== lazygit =========================='
-bash lazygit.sh
+bash download-lazygit.sh
 
 log '======================== lua-format ========================='
 bash lua-format.sh
