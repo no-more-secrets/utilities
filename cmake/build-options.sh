@@ -14,6 +14,7 @@ add_line "Update & Build All Platforms"
 add_line "Build All Platforms"
 add_line "Build Debug & Release (clang)"
 add_line "Build Debug & Release (gcc)"
+add_line "Build Debug & Release (gcc+clang)"
 add_line "Build/Run Tests & Game (current)"
 add_line "Build/Run Game (no tests)"
 add_line "Restore Default Configuration"
@@ -101,6 +102,13 @@ case "$answer" in
     clear
     cmc --gcc=current --libstdcxx --asan;    build_and_test
     cmc --gcc=current --libstdcxx --release; build_and_test
+    ;;
+  "Build Debug & Release (gcc+clang)")
+    clear
+    cmc --gcc=current --libstdcxx --asan;    build_and_test
+    cmc --gcc=current --libstdcxx --release; build_and_test
+    cmc --clang --lld --libstdcxx --asan;    build_and_test
+    cmc --clang --lld --libstdcxx --release; build_and_test
     ;;
   "Build/Run Tests & Game (current)")
     build_and_test
