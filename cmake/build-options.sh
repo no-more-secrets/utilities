@@ -66,7 +66,7 @@ update() {
   git submodule update --init
 }
 
-restore() { cmc --clang --lld --libstdcxx --release --cached; }
+restore() { cmc --clang --lld --libstdcxx --release --asan --cached; }
 
 case "$answer" in
   "Update & Build (release)")
