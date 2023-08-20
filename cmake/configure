@@ -213,6 +213,10 @@ if __name__ == '__main__':
                          dest='release',
                          action='store_true',
                          help='Do a release build' )
+    parser.add_argument( '--relwdeb',
+                         dest='relwdeb',
+                         action='store_true',
+                         help='Do a release build but include debug info.' )
     parser.add_argument( '-t', '--tidy',
                          dest='tidy',
                          action='store_true',
@@ -519,7 +523,21 @@ if __name__ == '__main__':
         # TODO: figure out which stdlib a compiler is using.
         stdlib = None
 
-    build_type = 'debug' if not args.release else 'release'
+    # The ASan output is not very useful without debug info, so
+    # make sure that we include it.
+    if args.asan and args.release:
+        args.release = False
+        args.relwdeb = True
+
+    if args.release and args.relwdeb:
+        raise Exception( 'cannot specify both --release and --relwdeb' )
+    if args.relwdeb:
+        build_type = 'relwdeb'
+    elif args.release:
+        build_type = 'release'
+    else:
+        build_type = 'debug'
+
 
     build_dir = platform_identifier( compiler=compiler,
                                      compiler_version=compiler_version,
@@ -559,7 +577,11 @@ if __name__ == '__main__':
         log( 'Removing CMakeCache.txt' )
         os.remove( 'CMakeCache.txt' )
 
-    cmake_build_type = { 'debug': 'Debug', 'release': 'Release' }[build_type]
+    cmake_build_type = dict(
+        debug   = 'Debug',
+        release = 'Release',
+        relwdeb = 'RelWithDebInfo'
+    )[build_type]
     log( 'Deduced CMake build type: ' + cmake_build_type )
 
     cmake_cxx_flags_init = []
