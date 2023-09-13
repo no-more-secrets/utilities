@@ -120,7 +120,7 @@ platforms=( )
 for cc in --gcc=current --clang; do
   # for lib in '' --libcxx --libstdcxx; do
   for lib in --libstdcxx --libcxx; do
-    for opt in '' --release; do
+    for opt in '' --relwdeb; do
       for asan in --asan ''; do
         [[ "$cc" =~ gcc && "$lib" =~ libcxx ]] && continue
         [[ "$cc" == ""  && "$lib" =~ libcxx ]] && continue
@@ -133,7 +133,7 @@ for cc in --gcc=current --clang; do
 done
 
 # Do --lto just once since it can take a really long time.
-# cc=--clang; lib=; opt=--release; asan=; lto=--lto;
+# cc=--clang; lib=; opt=--relwdeb; asan=; lto=--lto;
 # run_for_args
 
 pids=

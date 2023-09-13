@@ -66,13 +66,13 @@ update() {
   git submodule update --init
 }
 
-restore() { cmc --clang --lld --libstdcxx --release --asan --cached; }
+restore() { cmc --clang --lld --libstdcxx --relwdeb --asan --cached; }
 
 case "$answer" in
   "Update & Build (release)")
     update
     clear
-    cmc --clang --lld --libstdcxx --release; build_and_test
+    cmc --clang --lld --libstdcxx --relwdeb; build_and_test
     ;;
   "Update & Build (current)")
     update
@@ -83,7 +83,7 @@ case "$answer" in
     update
     clear
     cmc --clang --lld --libstdcxx --asan;    build_and_test
-    cmc --clang --lld --libstdcxx --release; build_and_test
+    cmc --clang --lld --libstdcxx --relwdeb; build_and_test
     ;;
   "Update & Build All Platforms")
     update
@@ -96,19 +96,19 @@ case "$answer" in
   "Build Debug & Release (clang)")
     clear
     cmc --clang --lld --libstdcxx --asan;    build_and_test
-    cmc --clang --lld --libstdcxx --release; build_and_test
+    cmc --clang --lld --libstdcxx --relwdeb; build_and_test
     ;;
   "Build Debug & Release (gcc)")
     clear
     cmc --gcc=current --libstdcxx --asan;    build_and_test
-    cmc --gcc=current --libstdcxx --release; build_and_test
+    cmc --gcc=current --libstdcxx --relwdeb; build_and_test
     ;;
   "Build Debug & Release (gcc+clang)")
     clear
     cmc --gcc=current --libstdcxx --asan;    build_and_test
-    cmc --gcc=current --libstdcxx --release; build_and_test
+    cmc --gcc=current --libstdcxx --relwdeb; build_and_test
     cmc --clang --lld --libstdcxx --asan;    build_and_test
-    cmc --clang --lld --libstdcxx --release; build_and_test
+    cmc --clang --lld --libstdcxx --relwdeb; build_and_test
     ;;
   "Build/Run Tests & Game (current)")
     build_and_test
