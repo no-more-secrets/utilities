@@ -15,6 +15,8 @@ add_line "Build All Platforms"
 add_line "Build Debug & Release (clang)"
 add_line "Build Debug & Release (gcc)"
 add_line "Build Debug & Release (gcc+clang)"
+add_line "Build Debug Cross Section (gcc,clang w/ 2 stdlibs)"
+add_line "Build Release Cross Section (gcc,clang w/ 2 stdlibs)"
 add_line "Build/Run Tests & Game (current)"
 add_line "Build/Run Game (no tests)"
 add_line "Restore Default Configuration"
@@ -108,6 +110,18 @@ case "$answer" in
     cmc --gcc=current --libstdcxx --asan;    build_and_test
     cmc --gcc=current --libstdcxx --relwdeb; build_and_test
     cmc --clang --lld --libstdcxx --asan;    build_and_test
+    cmc --clang --lld --libstdcxx --relwdeb; build_and_test
+    ;;
+  "Build Debug Cross Section (gcc,clang w/ 2 stdlibs)")
+    clear
+    cmc --gcc=current --libstdcxx --asan;    build_and_test
+    cmc --clang --lld --libcxx    --asan;    build_and_test
+    cmc --clang --lld --libstdcxx --asan;    build_and_test
+    ;;
+  "Build Release Cross Section (gcc,clang w/ 2 stdlibs)")
+    clear
+    cmc --gcc=current --libstdcxx --relwdeb; build_and_test
+    cmc --clang --lld --libcxx    --relwdeb; build_and_test
     cmc --clang --lld --libstdcxx --relwdeb; build_and_test
     ;;
   "Build/Run Tests & Game (current)")
