@@ -674,7 +674,7 @@ if __name__ == '__main__':
           ld_preload.append( libdlclose_noop )
 
     if args.libcxx:
-        cmake_args.append( '-DUSE_LIBCXX=ON' )
+        # cmake_args.append( '-DUSE_LIBCXX=ON' )
         # See: https://libcxx.llvm.org/docs/UsingLibcxx.html
         cmake_cxx_flags_init.extend( ['-stdlib=libc++', '-I%s/include/c++/v1' % llvm_current] )
         cmake_exe_linker_flags_init.extend( ['-stdlib=libc++', '-lc++abi', '-L%s/lib' % llvm_current, '-Wl,-rpath,%s/lib' % llvm_current] )
