@@ -525,19 +525,6 @@
     "album_name": "Can't Let Go"
   },
   {
-    "song_name": "Concrete Angel - ReOrder Extended Remix",
-    "album_artists": [
-      "Gareth Emery",
-      "Christina Novelli"
-    ],
-    "contrib_artists": [
-      "Gareth Emery",
-      "Christina Novelli",
-      "ReOrder"
-    ],
-    "album_name": "Concrete Angel (Remixes)"
-  },
-  {
     "song_name": "Won't Stop Searching",
     "album_artists": [
       "Misja Helsloot",
@@ -729,5 +716,29 @@
       "Cari"
     ],
     "album_name": "Anywhere"
+  },
+  {
+    "song_name": "See The Sun - Dan Stone Extended Rework",
+    "album_artists": [
+      "Various Artists"
+    ],
+    "contrib_artists": [
+      "Matt Darey",
+      "Kate Louise Smith",
+      "Urban Astronauts",
+      "Dan Stone"
+    ],
+    "album_name": "See The Sun (Dan Stone Rework)"
+  },
+  {
+    "song_name": "Tombs We Build - Original Mix",
+    "album_artists": [
+      "Driftmoon"
+    ],
+    "contrib_artists": [
+      "Driftmoon",
+      "Kim Kiona"
+    ],
+    "album_name": "Tombs We Build"
   }
 ]
