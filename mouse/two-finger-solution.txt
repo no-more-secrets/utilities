@@ -1,0 +1,17 @@
+From one of the answers here:
+
+  https://askubuntu.com/questions/1387034/touchpad-starts-requiring-2-fingers-way-to-fix
+
+  "I ran into this problem today. I was able to work around it by
+  switching to one of the virtual terminals and then back to the
+  desktop.
+
+  In my case this was CTRL+ALT+F3, then you can use
+  ALT+LEFT_ARROW until you get your desktop back."
+
+For the Darter you can do:
+
+  * CTRL+ALT+F3  ==>  switch to terminal
+  * CTRL+ALT+F2  ==>  switch back to desktop
+
+and the problem should have gone away.
