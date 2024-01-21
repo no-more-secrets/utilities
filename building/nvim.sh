@@ -105,6 +105,14 @@ cd $repo
 # ---------------------------------------------------------------
 # Build
 # ---------------------------------------------------------------
+unset LUA_PATH
+unset LUA_CPATH
+unset LUA_INIT
+
+old_lua_version="$(luarocks config lua_version)"
+log "setting lua version from $old_lua_version to 5.1 temporarily..."
+luarocks config lua_version 5.1
+
 # NeoVim has a CMake-based build, but the directions say to use
 # the Makefile, which also appears to do other things like down-
 # load third-party dependencies.
@@ -126,6 +134,12 @@ python3 -m pip install --user --upgrade pynvim
 # ---------------------------------------------------------------
 tools_link $project_key
 bin_links $project_key
+
+# ---------------------------------------------------------------
+# Restore Lua Version.
+# ---------------------------------------------------------------
+log "setting lua version back to $old_lua_version."
+luarocks config lua_version "$old_lua_version"
 
 # ---------------------------------------------------------------
 # Finish
