@@ -7,6 +7,7 @@ add_line() { options="$options\n$1"; }
 
 options="Build Options Menu"
 add_line "----------------------------------------"
+add_line "Restore Default Configuration"
 add_line "Update & Build (release)"
 add_line "Update & Build (current)"
 add_line "Update & Build Debug & Release (clang)"
@@ -19,7 +20,6 @@ add_line "Build Debug Cross Section (gcc,clang w/ 2 stdlibs)"
 add_line "Build Release Cross Section (gcc,clang w/ 2 stdlibs)"
 add_line "Build/Run Tests & Game (current)"
 add_line "Build/Run Game (no tests)"
-add_line "Restore Default Configuration"
 
 fzf() {
   command fzf                 \
