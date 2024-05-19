@@ -25,6 +25,9 @@ mkdir -p "$tools"
 log '=========================== ninja ==========================='
 bash ninja.sh
 
+log '========================= youtube-dl ========================'
+bash download-youtube-dl.sh
+
 log '========================= alacritty ========================='
 bash alacritty.sh
 
