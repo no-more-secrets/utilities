@@ -769,5 +769,41 @@
       "Clara Yates"
     ],
     "album_name": "Too Far Tonight"
+  },
+  {
+    "song_name": "I Won't Let You Fall - Uplifting Extended Mix",
+    "album_artists": [
+      "Aly & Fila",
+      "JES"
+    ],
+    "contrib_artists": [
+      "Aly & Fila",
+      "JES"
+    ],
+    "album_name": "I Won't Let You Fall"
+  },
+  {
+    "song_name": "Hide U - Tinlicker Remix",
+    "album_artists": [
+      "Sian Evans",
+      "Tinlicker"
+    ],
+    "contrib_artists": [
+      "Sian Evans",
+      "Tinlicker"
+    ],
+    "album_name": "Hide U (Tinlicker Remix)"
+  },
+  {
+    "song_name": "Hide U - Tinlicker Extended Remix",
+    "album_artists": [
+      "Sian Evans",
+      "Tinlicker"
+    ],
+    "contrib_artists": [
+      "Sian Evans",
+      "Tinlicker"
+    ],
+    "album_name": "Hide U (Tinlicker Remix)"
   }
 ]
