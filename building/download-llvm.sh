@@ -19,9 +19,19 @@ cd "$tools"
   exit 1
 }
 
+TARGET_LTS_UBUNTU_VERSION=22.04
+
+echo "Target Ubuntu LTS version of binary to download: $TARGET_LTS_UBUNTU_VERSION"
+echo
+echo "Make sure the above is correct, otherwise the compiler can segfault."
+echo
+echo "Press enter to continue..."
+read
+
 latest_llvm_tarball_stem() {
   curl -s https://api.github.com/repos/llvm/llvm-project/releases \
     | grep -E 'clang\+llvm-.*-x86_64-linux-gnu-ubuntu-.*tar.xz",' \
+    | grep -E "$TARGET_LTS_UBUNTU_VERSION"                        \
     | head -n1                                                    \
     | sed -r 's/\s*"name": "(.*)\.tar\.xz",/\1/g'
 }
