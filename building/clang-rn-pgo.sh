@@ -24,6 +24,21 @@ fi
 popd
 
 # ---------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------
+make_retry() {
+  local target="$1"
+  local cmd
+  [[ ! -z "$target" ]] && cmd="make $target KEEP_GOING=" \
+                       || cmd="make KEEP_GOING="
+  while true; do
+    $cmd && break
+    echo 'FAILED... RETRYING...'
+    sleep 60
+  done
+}
+
+# ---------------------------------------------------------------
 #                            Stage 1
 # ---------------------------------------------------------------
 # Stage 1, download if necessary (only for new machines).
@@ -84,7 +99,7 @@ if [[ ! -e "$profdata" && ! -e "$tools/llvm-pgo-current" ]]; then
   # build.
   cmc --clang --lld --libstdcxx --asan --release
   ccache --clear
-  make all
+  make_retry all
   popd
   echo "Merging profraw files..."
   $tools/llvm-current-bak/bin/llvm-profdata merge -output=$profdata $profiles/*.profraw
