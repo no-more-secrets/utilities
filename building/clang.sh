@@ -281,7 +281,8 @@ run_cmake -G Ninja                       \
 #                        Build/Test/Install
 # ---------------------------------------------------------------
 # On some machines the build fails with internal compiler errors
-# (such as segfaults) that seem to go away on retries (??).
+# (such as segfaults) that seem to go away on retries. This is
+# probably due to overloading of the CPU.
 ninja_retry() {
   local target="$1"
   local cmd
@@ -298,8 +299,8 @@ ninja_retry
 (( ! skip_tests )) && {
   ninja_retry check-clang
   [[ "$(uname)" != Darwin ]] && ninja_retry check-lld
-  #ninja_retry check-libcxx # FIXME enable these?
-  #ninja_retry check-libcxxabi # FIXME enable these?
+  ninja_retry check-cxxabi
+  # ninja_retry check-cxx  # Not worth it.
 }
 
 # No retry here.
