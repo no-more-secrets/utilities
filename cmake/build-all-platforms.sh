@@ -6,6 +6,7 @@
 c_norm="\033[00m"
 c_green="\033[32m"
 c_red="\033[31m"
+c_blue="\033[34m"
 
 log() {
     echo -e "[$(date)] ${c_green}INFO${c_norm} $*"
@@ -89,11 +90,23 @@ logfile="/tmp/build-all.log"
 rm -f $logfile
 echo -n >$logfile
 
+now_secs() {
+  date +%s
+}
+
 # This function expects a bunch of variables to be set.
 run_for_args() {
   flags="$@"
+  local start_time="$(now_secs)"
   build_and_test "$flags"
   code=$?
+  local end_time="$(now_secs)"
+  local delta_time="$(( end_time-start_time ))s"
+  # This is to right justify the time.
+  # delta_time="       $delta_time"
+  # [[ "$delta_time" =~ .*(....)$ ]]
+  # delta_time="${BASH_REMATCH[1]}"
+  delta_time="${c_blue}$delta_time${c_norm}"
   if (( code == 0 )); then
     # Success.
     status="${c_green}SUCCESS${c_norm}"
@@ -111,7 +124,7 @@ run_for_args() {
     platform="$(echo "$flags" \
       | sed -r 's/,+/,/g; s/(.*),$/\1/; s/--//g')"
   fi
-  echo -e "$platform $status" >> $logfile
+  echo -e "$platform $status $delta_time" >> $logfile
 }
 
 platforms=( )
@@ -181,7 +194,7 @@ native_gcc_patch_version="$(native_gcc_version | awk '{ print $3 }')"
 
 print_table() {
   {
-    echo "Configuration Result"
+    echo "Configuration Result Time"
     cat $logfile
   } | column -t
 }
