@@ -4,6 +4,7 @@
 c_norm="\033[00m"
 c_green="\033[32m"
 c_red="\033[31m"
+c_blue="\033[34m"
 c_yellow="\033[93m"
 s_bold="\033[1m"
 s_under="\033[4m"
