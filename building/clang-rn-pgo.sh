@@ -13,7 +13,7 @@ set -o pipefail
 # ---------------------------------------------------------------
 # Imports
 # ---------------------------------------------------------------
-source ~/dev/utilities/bash/util.sh
+source ~/dev/utilities/bashlib/util.sh
 
 cd_to_this "$0"
 
