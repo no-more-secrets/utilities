@@ -143,7 +143,13 @@ requires_not_arg with_inst with_pgo
 # ---------------------------------------------------------------
 #                       Version Checking
 # ---------------------------------------------------------------
-suffix=$(date +"%Y-%m-%d-%M.%H.%S")
+if [[ -z "$use_commit" ]]; then
+  suffix=$(date +"%Y-%m-%d-%M.%H.%S")
+else
+  suffix="$use_commit"
+  # E.g. llvmorg-19.1.0 ==> 19.1.0
+  [[ "$suffix" =~ ^llvmorg-(.*) ]] && suffix="${BASH_REMATCH[1]}"
+fi
 (( with_inst )) && suffix="instrumented-$suffix"
 [[ ! -z "$with_pgo" ]] && suffix="pgo-$suffix"
 [[ -z "$suffix"  ]] && die "suffix variable not populated."
@@ -250,6 +256,7 @@ repo='llvm-project'
 if [[ ! -z "$use_commit" ]]; then
   git clone $llvm_github/$repo.git
   cd $repo
+  echo "checking out commit $use_commit ..."
   git checkout "$use_commit"
   cd -
 else
@@ -313,7 +320,7 @@ ninja install
 cd $(dirname $install) # folder containing all the llvm-*
 link='llvm-current'
 rm -f "$link"
-ln -s llvm-$suffix $link
+ln -s llvm-$version $link
 
 cd ~/bin
 rm -f clang-format

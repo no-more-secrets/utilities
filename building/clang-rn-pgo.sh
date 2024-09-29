@@ -10,11 +10,35 @@
 set -e
 set -o pipefail
 
-cd "$(dirname "$(readlink -f "$0")")"
+# ---------------------------------------------------------------
+# Imports
+# ---------------------------------------------------------------
+source ~/dev/utilities/bash/util.sh
 
+cd_to_this "$0"
+
+# ---------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------
 tools=$HOME/dev/tools
 profdata=/tmp/rn-profdata.prof
 
+# ---------------------------------------------------------------
+# CLI arguments
+# ---------------------------------------------------------------
+usage() {
+  error "usage: $0 <tag>"
+  error ""
+  error "  tag: e.g. llvmorg-19.1.0"
+  exit 1
+}
+
+tag="$1"
+[[ -z "$tag" ]] && usage
+
+# ---------------------------------------------------------------
+# Recovery
+# ---------------------------------------------------------------
 # If we got interrupted, restore llvm-current to the stage 1.
 pushd "$tools"
 if [[ -e llvm-current-bak ]]; then
@@ -63,6 +87,7 @@ if [[ ! -e "$tools/llvm-inst-current" ]]; then
   ./clang.sh --use-clang=$HOME/dev/tools/llvm-current \
              --skip-confirmation                      \
              --skip-tests                             \
+             --use-commit="$tag"                      \
              --clang-opts                             \
              --with-inst
   pushd $HOME/dev/tools
@@ -123,6 +148,7 @@ if [[ ! -e "$tools/llvm-pgo-current" ]]; then
   ./clang.sh --use-clang=$HOME/dev/tools/llvm-current \
              --skip-confirmation                      \
              --clang-opts                             \
+             --use-commit="$tag"                      \
              --with-pgo=$profdata
   pushd $HOME/dev/tools
   new_llvm="$(basename $(readlink -f llvm-current))"
