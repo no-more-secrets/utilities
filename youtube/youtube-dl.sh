@@ -24,4 +24,4 @@ youtube_dl=~/dev/tools/youtube-dl-current/bin/youtube-dl
 # This uses youtube-dl's template feature to allow us to specify
 # the output file name without having to know the extension/file-
 # type that youtube-dl will choose.
-$youtube_dl "$url" -o "$stem.%(ext)s"
+$youtube_dl -f best "$url" -o "$stem.%(ext)s"
