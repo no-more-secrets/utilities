@@ -122,14 +122,6 @@ make CMAKE_BUILD_TYPE=RelWithDebInfo \
      install
 
 # ---------------------------------------------------------------
-# First-time vim-transition
-# ---------------------------------------------------------------
-# This is required to allow for python extentions.
-python3 -m pip install --user --upgrade wheel
-python3 -m pip install --user --upgrade setuptools
-python3 -m pip install --user --upgrade pynvim
-
-# ---------------------------------------------------------------
 # Make Links
 # ---------------------------------------------------------------
 tools_link $project_key
