@@ -11,6 +11,7 @@ add_line "Restore Default Configuration"
 add_line "Update & Build (release)"
 add_line "Update & Build (current)"
 add_line "Update & Build Debug & Release (clang)"
+add_line "Update & Build Debug & Release (gcc+clang)"
 add_line "Update & Build All Platforms"
 add_line "Build All Platforms"
 add_line "Build Debug & Release (clang)"
@@ -87,6 +88,14 @@ case "$answer" in
     cmc --clang --lld --libstdcxx --relwdeb; build_and_test
     cmc --clang --lld --libstdcxx --asan;    build_and_test
     ;;
+  "Update & Build Debug & Release (gcc+clang)")
+    update
+    clear
+    cmc --clang --lld --libstdcxx --relwdeb; build_and_test
+    cmc --gcc=current --libstdcxx --relwdeb; build_and_test
+    cmc --clang --lld --libstdcxx --asan;    build_and_test
+    cmc --gcc=current --libstdcxx --asan;    build_and_test
+    ;;
   "Update & Build All Platforms")
     update
     clear
@@ -107,10 +116,10 @@ case "$answer" in
     ;;
   "Build Debug & Release (gcc+clang)")
     clear
-    cmc --gcc=current --libstdcxx --relwdeb; build_and_test
-    cmc --gcc=current --libstdcxx --asan;    build_and_test
     cmc --clang --lld --libstdcxx --relwdeb; build_and_test
     cmc --clang --lld --libstdcxx --asan;    build_and_test
+    cmc --gcc=current --libstdcxx --relwdeb; build_and_test
+    cmc --gcc=current --libstdcxx --asan;    build_and_test
     ;;
   "Build Debug Cross Section (gcc,clang w/ 2 stdlibs)")
     clear
