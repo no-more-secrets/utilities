@@ -98,6 +98,9 @@ def platform_identifier( *args, **params ):
     if params['lld']:
         chain.append( 'lld' )
 
+    if params['mold']:
+        chain.append( 'mold' )
+
     if params['lto']:
         chain.append( 'lto' )
 
@@ -278,6 +281,10 @@ if __name__ == '__main__':
                          dest='lld',
                          action='store_true',
                          help='Use lld linker (must be using clang)' )
+    parser.add_argument( '--mold',
+                         dest='mold',
+                         action='store_true',
+                         help='Use mold linker' )
     parser.add_argument( '--lto',
                          dest='lto',
                          action='store_true',
@@ -375,6 +382,9 @@ if __name__ == '__main__':
     if args.lld:
         assert args.clang, 'Must use --clang if using --lld'
 
+    if args.mold:
+        assert not args.lld, 'cannot use both mold and lld'
+
     if args.libcxx:
         assert args.clang, 'Must use --clang if using --libcxx'
 
@@ -383,6 +393,9 @@ if __name__ == '__main__':
 
     if args.clang and not args.lld:
       warning( 'using clang but not lld.' )
+
+    if not args.clang and not args.mold:
+      warning( 'using gcc but not mold.' )
 
     log( 'args.gcc: %s' % args.gcc )
 
@@ -542,6 +555,7 @@ if __name__ == '__main__':
     build_dir = platform_identifier( compiler=compiler,
                                      compiler_version=compiler_version,
                                      lld=args.lld,
+                                     mold=args.mold,
                                      lto=args.lto,
                                      stdlib=stdlib,
                                      build_type=build_type,
@@ -680,6 +694,8 @@ if __name__ == '__main__':
         cmake_exe_linker_flags_init.extend( ['-stdlib=libc++', '-lc++abi', '-L%s/lib' % llvm_current, '-Wl,-rpath,%s/lib' % llvm_current] )
     if args.lld:
       cmake_exe_linker_flags_init.append( '-fuse-ld=lld' )
+    if args.mold:
+      cmake_exe_linker_flags_init.append( '-fuse-ld=mold' )
     if args.lto:
       cmake_cxx_flags_init.append( '-flto' )
       cmake_exe_linker_flags_init.append( '-flto' )

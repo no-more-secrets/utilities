@@ -2,6 +2,7 @@
 [[ "$(uname)" == Darwin ]] && osx=1 || osx=0
 
 (( osx )) && lld_default= || lld_default='--lld'
+(( osx )) && mold_default= || mold_default='--mold'
 
 c_norm="\033[00m"
 c_green="\033[32m"
@@ -139,6 +140,7 @@ for cc in --gcc=current --clang; do
         [[ "$cc" == ""  && "$lib" =~ libcxx ]] && continue
         flags="$cc $lib $opt $asan"
         [[ "$cc" =~ --clang ]] && flags="$flags $lld_default"
+        [[ "$cc" =~ gcc ]]     && flags="$flags $mold_default"
         platforms=( "${platforms[@]}" "$flags" )
       done
     done
