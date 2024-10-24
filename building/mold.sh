@@ -76,6 +76,7 @@ version=$(latest_github_repo_tag $acct $repo)
     log "$project_key-$version already exists, activating it."
     tools_link $project_key
     bin_links $project_key $bin_name
+    bin_links $project_key ld.mold
     #supplemental_install
     exit 0
 }
@@ -139,6 +140,7 @@ $prefix/bin/mold --version
 # ---------------------------------------------------------------
 tools_link $project_key
 bin_links $project_key $bin_name
+bin_links $project_key ld.mold
 
 # ---------------------------------------------------------------
 # Finish
