@@ -805,5 +805,29 @@
       "Tinlicker"
     ],
     "album_name": "Hide U (Tinlicker Remix)"
+  },
+  {
+    "song_name": "So Caught Up - DNS Project Remix",
+    "album_artists": [
+      "Max Graham"
+    ],
+    "contrib_artists": [
+      "Max Graham",
+      "Neev Kennedy",
+      "DNS Project"
+    ],
+    "album_name": "So Caught Up"
+  },
+  {
+    "song_name": "A New Dream [Bonus Track]",
+    "album_artists": [
+      "Tenishia",
+      "Jonathan Mendelsohn"
+    ],
+    "contrib_artists": [
+      "Tenishia",
+      "Jonathan Mendelsohn"
+    ],
+    "album_name": "A New Dream"
   }
 ]
