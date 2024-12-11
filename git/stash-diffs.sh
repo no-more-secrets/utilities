@@ -1,7 +1,7 @@
 #!/bin/bash
 # This script will stash the current changes to the stash without
 # touching their timestamps.
-set -eo pipefail
+set -e
 
 # We use the "git stash create" + "git stash store" method in-
 # stead of "git stash push" + "git stash apply" because the
