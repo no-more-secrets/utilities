@@ -115,9 +115,7 @@ ninja
 # ---------------------------------------------------------------
 # Test
 # ---------------------------------------------------------------
-ninja build_tests # won't get built otherwise, even by ninja test.
-# NOTE: ^^^ this may have to be changed to `test_runner` in
-#           a future version.
+ninja test_runner # won't get built otherwise, even by ninja test.
 ninja test
 
 # ---------------------------------------------------------------
