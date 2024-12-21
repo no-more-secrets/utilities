@@ -28,9 +28,6 @@ bash ninja.sh
 log '========================= youtube-dl ========================'
 bash download-youtube-dl.sh
 
-log '========================= alacritty ========================='
-bash alacritty.sh
-
 log '=========================== nvim ============================'
 bash nvim.sh
 
