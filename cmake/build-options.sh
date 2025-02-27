@@ -69,7 +69,9 @@ update() {
   git submodule update --init
 }
 
-restore() { cmc --clang --lld --libstdcxx --relwdeb --cached; }
+restore() {
+  ~/dev/revolution-now/tools/set-default-configuration.sh
+}
 
 case "$answer" in
   "Update & Build (release)")

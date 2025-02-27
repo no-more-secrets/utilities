@@ -191,8 +191,7 @@ native_gcc_minor_version="$(native_gcc_version | awk '{ print $2 }')"
 native_gcc_patch_version="$(native_gcc_version | awk '{ print $3 }')"
 
 # Restore to default devel flags.
-(( native_gcc_major_version >= 14 )) && cmc --cached --clang --lld --asan \
-                                     || cmc --cached --clang --lld --asan --libstdcxx
+~/dev/revolution-now/tools/set-default-configuration.sh
 
 print_table() {
   {
