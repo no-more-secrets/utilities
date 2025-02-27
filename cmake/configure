@@ -121,6 +121,9 @@ def platform_identifier( *args, **params ):
     if params['profile_compilation']:
         chain.append( 'timetrace' )
 
+    if params['coverage']:
+        chain.append( 'coverage' )
+
     if params['generator'] and params['generator'] != 'make':
         chain.append( params['generator'] )
 
@@ -321,6 +324,10 @@ if __name__ == '__main__':
                          dest='graphviz',
                          action='store_true',
                          help='Tell CMake to generate graphviz outtput showing target dependencies.' )
+    parser.add_argument( '--coverage',
+                         dest='coverage',
+                         action='store_true',
+                         help='Compile with code coverage enabled.' )
     parser.add_argument( '--prefix',
                          dest='prefix',
                          type=str,
@@ -398,6 +405,9 @@ if __name__ == '__main__':
       warning( 'using gcc but not mold.' )
 
     log( 'args.gcc: %s' % args.gcc )
+
+    if args.coverage:
+        assert args.clang, 'The --coverage option currently only supports clang.'
 
     if args.sdl_local:
         # If we have local SDL2 builds in the usual location then
@@ -563,7 +573,8 @@ if __name__ == '__main__':
                                      asan=args.asan,
                                      tracelog=args.tracelog,
                                      generator=gen_label,
-                                     profile_compilation=args.profile_compilation)
+                                     profile_compilation=args.profile_compilation,
+                                     coverage=args.coverage)
 
     if os.path.exists( 'current' ):
         if not args.no_symlink:
@@ -631,6 +642,9 @@ if __name__ == '__main__':
         if compiler == 'clang' and is_osx:
             cmake_cxx_flags_init.append( '-stdlib=libstdc++' )
         cmake_exe_linker_flags_init.extend( ['-Wl,-rpath,%s' % gcc_lib_home, '-L%s' % gcc_lib_home] )
+
+    if args.coverage:
+        cmake_cxx_flags_init.extend( ['-fprofile-instr-generate', '-fcoverage-mapping'] )
 
     llvm_current = '%s/dev/tools/llvm-current' % os.environ['HOME']
 
