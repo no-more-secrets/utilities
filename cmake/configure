@@ -706,6 +706,10 @@ if __name__ == '__main__':
         # See: https://libcxx.llvm.org/docs/UsingLibcxx.html
         cmake_cxx_flags_init.extend( ['-stdlib=libc++', '-I%s/include/c++/v1' % llvm_current] )
         cmake_exe_linker_flags_init.extend( ['-stdlib=libc++', '-lc++abi', '-L%s/lib' % llvm_current, '-Wl,-rpath,%s/lib' % llvm_current] )
+    if not args.libcxx:
+        # At the time of writing libc++ has not yet implemented
+        # <stacktrace>.
+        cmake_args.append( '-DENABLE_CPP23_STACKTRACE=YES' )
     if args.lld:
       cmake_exe_linker_flags_init.append( '-fuse-ld=lld' )
     if args.mold:
