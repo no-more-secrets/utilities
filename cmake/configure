@@ -728,17 +728,6 @@ if __name__ == '__main__':
     if args.tracelog:
       cmake_args.append( '-DDEBUG_TRACE=ON' )
 
-    if generator == 'ninja':
-      # The Ninja generator seems to write source file paths as
-      # relative paths and those are what end up in the debug
-      # info. In those cases it is generally not possible for a
-      # runtime mechansim to locate source files unless run from
-      # the correct folder. One such library is the backward-cpp
-      # (C++ backtrace) library which, in those cases, needs this
-      # variable to prefix source file paths so that it can print
-      # source file snippets at each frame in the stack trace.
-      env_vars['BACKWARD_CXX_SOURCE_PREFIXES'] = builds_current
-
     # This should be last
     if cmake_cxx_flags_init:
       cmake_args.append( '-DCMAKE_CXX_FLAGS_INIT=%s' % ' '.join( cmake_cxx_flags_init ) )
