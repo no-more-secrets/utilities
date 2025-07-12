@@ -10,9 +10,10 @@ s_bold="\033[1m"
 s_under="\033[4m"
 
 log_stamp() { echo -e "[$(date)] ${c_green}info${c_norm} $*"; }
-log()       { echo -e "${c_green}info${c_norm} $*"; }
 
-warn() { echo -e "${c_yellow}warn${c_norm} $*"; }
+log()       { echo -e "${c_green}info${c_norm} $*"; }
+debug()     { echo -e "${c_blue}debug${c_norm} $*"; }
+warn()      { echo -e "${c_yellow}warn${c_norm} $*"; }
 
 error_stamp() { echo -e "[$(date)] ${c_red}error${c_norm}: $*" >&2; }
 error()       { echo -e "${c_red}error${c_norm}: $*" >&2; }

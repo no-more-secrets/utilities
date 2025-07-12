@@ -2,23 +2,41 @@
 set -e
 set -o pipefail
 
+# ---------------------------------------------------------------
+# Imports.
+# ---------------------------------------------------------------
+source ~/dev/utilities/bashlib/util.sh
+
+# ---------------------------------------------------------------
+# Constants.
+# ---------------------------------------------------------------
+ENABLE_DEBUG_LOGGING=0
+
+# ---------------------------------------------------------------
+# Program Arguments.
+# ---------------------------------------------------------------
+usage() { die "usage: $0 [--json|--table]"; }
+
+mode="${1:---table}"
+
+case "$mode" in
+  --json)
+    mode=json
+    ;;
+  --table)
+    mode=table
+    ;;
+  *)
+    usage
+    ;;
+esac
+
+# ---------------------------------------------------------------
+# Helpers.
+# ---------------------------------------------------------------
 wifi_interface() {
   iw dev | awk '/^[ \t]+Interface/ { print $2 }'
 }
-
-(( $(wifi_interface | wc -l) == 0 )) && {
-  echo 1>&2 "error: could not find any WiFi interfaces."
-  exit 1
-}
-
-if (( $(wifi_interface | wc -l) > 1 )); then
-  echo -ne "select wifi interface:"
-  interface=$(wifi_interface | fzf)
-else
-  interface=$(wifi_interface)
-fi
-
-echo "using wifi interface: $interface"
 
 get_ip() {
   local interface=$1
@@ -27,53 +45,86 @@ get_ip() {
       | sed -nr 's/ *inet ([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/p'
 }
 
-ipv4_address=$(get_ip $interface)
+setup() {
+  (( $(wifi_interface | wc -l) == 0 )) &&
+    die "could not find any WiFi interfaces."
 
-[[ "$ipv4_address" =~ ^([0-9]+\.[0-9]+\.[0-9]+)\.[0-9]+$ ]] || {
-  echo 1>&2 "error: '$ipv4_address' is not a valid IP address."
-  exit 1
+  if (( $(wifi_interface | wc -l) > 1 )); then
+    echo -ne "select wifi interface:"
+    interface=$(wifi_interface | fzf)
+  else
+    interface=$(wifi_interface)
+  fi
+  (( ENABLE_DEBUG_LOGGING )) &&
+    debug "using wifi interface: $interface" 1>&2
+
+  ipv4_address=$(get_ip $interface)
+
+  [[ "$ipv4_address" =~ ^([0-9]+\.[0-9]+\.[0-9]+)\.[0-9]+$ ]] ||
+    die "'$ipv4_address' is not a valid IP address."
+
+  (( ENABLE_DEBUG_LOGGING )) &&
+    debug "found ip address: $ipv4_address" 1>&2
+
+  first_three_components=${BASH_REMATCH[1]}
+  [[ "$first_three_components" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] ||
+    die "'$first_three_components' are not valid initial components of IP address."
 }
-echo "found ip address: $ipv4_address"
 
-first_three_components=${BASH_REMATCH[1]}
-[[ "$first_three_components" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || {
-  echo 1>&2 "error: '$first_three_components' are not valid initial components of IP address."
-  exit 1
-}
+table() {
+  awk_pgrm='
+    {
+      $1=""
+      $4=""
+      print
+    }
+  '
 
-awk_pgrm='
+  echo "scanning $first_three_components.*:"
+  echo "-------------------------------------------------------------------"
+
   {
-    $1=""
-    $4=""
-    print
-  }
-'
+    echo "host ip name - status"
+    echo "------- ---------------- ----------------------------- - ------"
+    nmap -oG - -sP "$first_three_components.0/24" | grep -v '^#'
+  } | awk "$awk_pgrm"     \
+    | sed 's/()/[blank]/' \
+    | tr -d '()'          \
+    | column -t -s' '     \
+    | sed 's/^/ /'
 
-echo "scanning $first_three_components.*:"
-echo "-------------------------------------------------------------------"
+  echo "-------------------------------------------------------------------"
+}
 
-{
-  echo "host ip name - status"
-  echo "------- ---------------- ----------------------------- - ------"
-  nmap -oG - -sP "$first_three_components.0/24" | grep -v '^#'
-} | awk "$awk_pgrm"     \
-  | sed 's/()/[blank]/' \
-  | tr -d '()'          \
-  | column -t -s' '     \
-  | sed 's/^/ /'
-
-echo "-------------------------------------------------------------------"
-
-exit $?
-
-# The below alternative will tell nmap to output in XML, then
-# will use the xmltodict module to parse the XML and convert it
-# to a python dictionary, then will pretty-print the result. If
-# you want to run this, apt install python-xmltodict.
-xmltodict='
+json() {
+  # The below alternative will tell nmap to output in XML, then
+  # will use the xmltodict module to parse the XML and convert it
+  # to a python dictionary, then will pretty-print the result. If
+  # you want to run this, apt install python-xmltodict.
+  xmltodict='
 import xmltodict, pprint, json, sys
 pp = pprint.PrettyPrinter(indent=4)
-print json.dumps( xmltodict.parse( sys.stdin.read() ), indent=4 )
-'
+print( json.dumps( xmltodict.parse( sys.stdin.read() ), indent=4 ) )
+  '
 
-nmap -oX - -sP "$first_three_components.0/24" | python -c "$xmltodict"
+  nmap -oX - -sP "$first_three_components.0/24" \
+    | python -c "$xmltodict"                    \
+    | jq
+}
+
+# ---------------------------------------------------------------
+# Main.
+# ---------------------------------------------------------------
+main() {
+  setup
+  case "$mode" in
+    json)
+      json
+      ;;
+    table)
+      table
+      ;;
+  esac
+}
+
+main
