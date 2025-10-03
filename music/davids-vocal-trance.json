@@ -82,7 +82,7 @@
       "Yuri Kane",
       "Melissa Loretta"
     ],
-    "album_name": "Ferry Corsten - Once Upon A Night (The Lost Tapes)"
+    "album_name": "Ferry Corsten - Once Upon a Night (The Lost Tapes)"
   },
   {
     "song_name": "For The First Time - Original Mix",
@@ -671,8 +671,7 @@
     "song_name": "Arctic Kiss - Andy Blueman Remix",
     "album_artists": [
       "Motionchild",
-      "Will Holland",
-      "Tiff Lacey"
+      "Will Holland"
     ],
     "contrib_artists": [
       "Motionchild",
@@ -720,7 +719,10 @@
   {
     "song_name": "See The Sun - Dan Stone Extended Rework",
     "album_artists": [
-      "Various Artists"
+      "Matt Darey",
+      "Kate Louise Smith",
+      "Urban Astronauts",
+      "Dan Stone"
     ],
     "contrib_artists": [
       "Matt Darey",
@@ -843,5 +845,17 @@
       "F.G. Noise"
     ],
     "album_name": "Starlight (F.G. Noise Remix)"
+  },
+  {
+    "song_name": "Parachute - Extended Mix",
+    "album_artists": [
+      "Heavens Cry",
+      "Julie Thompson"
+    ],
+    "contrib_artists": [
+      "Heavens Cry",
+      "Julie Thompson"
+    ],
+    "album_name": "Parachute"
   }
 ]
