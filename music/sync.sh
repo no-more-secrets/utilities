@@ -17,7 +17,7 @@ sync() {
 }
 
 sync "3YE33l8eAP3zNrtAVDPvsx" davids-vocal-trance.json
-sync "0jHjEJUeGqKisKEagkh46N" colonization-game-soundtrack-originals.json
+# sync "0jHjEJUeGqKisKEagkh46N" colonization-game-soundtrack-originals.json
 
 if git status --porcelain=v1 2>/dev/null | grep json; then
   lazygit
