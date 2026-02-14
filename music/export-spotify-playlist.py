@@ -4,8 +4,8 @@ playlist_url = sys.argv[1]
 assert playlist_url
 
 client       = None
-clientId     = '4fe3fecfe5334023a1472516cc99d805' # from spotdl
-clientSecret = '0f02b7c483c04257984695007a4a8d5c' # from spotdl
+clientId     = "fdf2063fa3454cc6a614cca3f6777720" # from my spotify account
+clientSecret = "92b032e66cd7467391490867cb12a91e" # from my spotify account
 
 cred_mgr     = spotipy.oauth2.SpotifyClientCredentials( client_id=clientId, client_secret=clientSecret )
 client       = spotipy.Spotify( client_credentials_manager=cred_mgr )
