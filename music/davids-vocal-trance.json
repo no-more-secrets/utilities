@@ -787,11 +787,11 @@
   {
     "song_name": "Hide U - Tinlicker Remix",
     "album_artists": [
-      "Sian Evans",
+      "Kosheen",
       "Tinlicker"
     ],
     "contrib_artists": [
-      "Sian Evans",
+      "Kosheen",
       "Tinlicker"
     ],
     "album_name": "Hide U (Tinlicker Remix)"
@@ -799,11 +799,11 @@
   {
     "song_name": "Hide U - Tinlicker Extended Remix",
     "album_artists": [
-      "Sian Evans",
+      "Kosheen",
       "Tinlicker"
     ],
     "contrib_artists": [
-      "Sian Evans",
+      "Kosheen",
       "Tinlicker"
     ],
     "album_name": "Hide U (Tinlicker Remix)"
@@ -857,5 +857,44 @@
       "Julie Thompson"
     ],
     "album_name": "Parachute"
+  },
+  {
+    "song_name": "Amnesia - Extended Mix",
+    "album_artists": [
+      "Synergy"
+    ],
+    "contrib_artists": [
+      "Synergy",
+      "Suzy Hopwood"
+    ],
+    "album_name": "Amnesia"
+  },
+  {
+    "song_name": "Freefalling - FUTURECODE Extended Remix",
+    "album_artists": [
+      "Claudia Cazacu",
+      "Audrey Gallagher",
+      "FUTURECODE"
+    ],
+    "contrib_artists": [
+      "Claudia Cazacu",
+      "Audrey Gallagher",
+      "FUTURECODE"
+    ],
+    "album_name": "Freefalling (FUTURECODE Remix)"
+  },
+  {
+    "song_name": "One Day - Extended Mix",
+    "album_artists": [
+      "Levekar",
+      "Farid",
+      "Cassandra Grey"
+    ],
+    "contrib_artists": [
+      "Levekar",
+      "Farid",
+      "Cassandra Grey"
+    ],
+    "album_name": "One Day"
   }
 ]
