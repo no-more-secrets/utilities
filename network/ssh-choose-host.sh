@@ -7,4 +7,4 @@ ip="$(./choose-host.sh)"
 
 [[ -n "$ip" ]]
 
-ssh "$ip"
+ssh -XY "$ip"
