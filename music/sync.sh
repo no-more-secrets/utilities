@@ -13,7 +13,16 @@ sync() {
   local filename="$2"
   local playlist_url="https://open.spotify.com/playlist/$playlist_id"
   echo "syncing $filename..."
-  python3 export-spotify-playlist.py "$playlist_url" > $filename
+  rm -f "$filename.tmp"
+  trap "rm -f \"\$filename.tmp\"" EXIT INT
+  # -B means don't compile files to avoid creating pyc files.
+  python3 -B export-spotify-playlist.py "$playlist_url" > "$filename.tmp"
+  mv "$filename.tmp" "$filename"
+}
+
+# First decrypt the keys file if it hasn't already been done.
+[[ ! -f keys.py ]] && {
+  gpg --output keys.py --decrypt keys.py.asc
 }
 
 sync "3YE33l8eAP3zNrtAVDPvsx" davids-vocal-trance.json
