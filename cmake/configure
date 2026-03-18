@@ -638,7 +638,7 @@ if __name__ == '__main__':
             # (in some specific cases, for reason unknown) that
             # the "-nostdinc++" parameter added next is unused.
             cmake_cxx_flags_init.append( '-Wno-unused-command-line-argument' )
-        cmake_cxx_flags_init.extend( ['-nostdinc++', '-I%s' % gcc_inc_home, '-I%s' % gcc_inc_platform] )
+        cmake_cxx_flags_init.extend( ['-nostdinc++', '-isystem %s' % gcc_inc_home, '-isystem %s' % gcc_inc_platform] )
         if compiler == 'clang' and is_osx:
             cmake_cxx_flags_init.append( '-stdlib=libstdc++' )
         cmake_exe_linker_flags_init.extend( ['-Wl,-rpath,%s' % gcc_lib_home, '-L%s' % gcc_lib_home] )
