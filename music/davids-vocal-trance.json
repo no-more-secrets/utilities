@@ -896,5 +896,16 @@
       "Cassandra Grey"
     ],
     "album_name": "One Day"
+  },
+  {
+    "song_name": "Stay - Extended Mix",
+    "album_artists": [
+      "Craig Connelly"
+    ],
+    "contrib_artists": [
+      "Craig Connelly",
+      "Jessica Lawrence"
+    ],
+    "album_name": "Stay"
   }
 ]
