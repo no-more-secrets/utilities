@@ -17,7 +17,8 @@ sync() {
   trap "rm -f \"\$filename.tmp\"" EXIT INT TERM
   # -B means don't compile files to avoid creating pyc files.
   python3 -B export-spotify-playlist.py "$playlist_url" > "$filename.tmp"
-  mv "$filename.tmp" "$filename"
+  cat "$filename.tmp" | jq >"$filename"
+  rm "$filename.tmp"
 }
 
 # First decrypt the keys file if it hasn't already been done.
